@@ -6,12 +6,12 @@ import { router } from "./router";
 import { Toaster } from "sonner";
 
 export function App() {
-  return(
+  return (
     <>
-    <Toaster richColors />
-    <QueryClientProvider client={queryClient}>
+      <Toaster richColors />
+      <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-    </QueryClientProvider>
+      </QueryClientProvider>
     </>
   )
 }

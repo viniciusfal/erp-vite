@@ -4,10 +4,10 @@ import { Label } from '@radix-ui/react-label'
 import { ChartNoAxesCombined } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { signIn } from '@/api/sign-in-api'
-import {toast} from 'sonner'
+import { toast } from 'sonner'
 
 const signInForm = z.object({
   email: z.string().email(),
@@ -16,10 +16,10 @@ const signInForm = z.object({
 
 type SignInForm = z.infer<typeof signInForm>
 
-export  function SignIn() {
-  const {register, handleSubmit} = useForm<SignInForm>()
+export function SignIn() {
+  const { register, handleSubmit } = useForm<SignInForm>()
   const navigate = useNavigate()
-  
+
 
   const { mutateAsync: session } = useMutation({
     mutationFn: signIn
@@ -27,16 +27,16 @@ export  function SignIn() {
 
   async function handleSignIn(data: SignInForm) {
     try {
-      await session({ email: data.email, password: data.password})
-  
+      await session({ email: data.email, password: data.password })
+
       toast.success("Seja bem vindo!")
-  
+
       navigate('/dashboard')
     } catch (err) {
       toast.error("Credenciais incorretas", {
         description: 'Tente novamente ou clique em esqueci minha senha.'
       })
-   }
+    }
   }
 
   return (
@@ -56,18 +56,18 @@ export  function SignIn() {
         <form className='w-[450px] space-y-3 mt-2.5' onSubmit={handleSubmit(handleSignIn)}>
           <div>
             <Label className='text-sm text-muted-foreground'>Email</Label>
-            <Input 
-            type="text" 
-            className="p-2" 
-            {...register('email')}/>
+            <Input
+              type="text"
+              className="p-2"
+              {...register('email')} />
           </div>
 
           <div>
             <Label className='text-sm text-muted-foreground'>Senha</Label>
-            <Input  
-            type="password" 
-            className="p-2" 
-            {...register('password')} />
+            <Input
+              type="password"
+              className="p-2"
+              {...register('password')} />
           </div>
 
           <div className='flex flex-col gap-2'>
