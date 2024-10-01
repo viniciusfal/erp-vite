@@ -7,8 +7,7 @@ import { z } from 'zod'
 import {useNavigate} from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { signIn } from '@/api/sign-in-api'
-import {  ToastAction } from '@/components/ui/toast'
-import { useToast } from '@/hooks/use-toast'
+import {toast} from 'sonner'
 
 const signInForm = z.object({
   email: z.string().email(),
@@ -20,7 +19,7 @@ type SignInForm = z.infer<typeof signInForm>
 export  function SignIn() {
   const {register, handleSubmit} = useForm<SignInForm>()
   const navigate = useNavigate()
-  const {toast} = useToast()
+  
 
   const { mutateAsync: session } = useMutation({
     mutationFn: signIn
@@ -30,26 +29,19 @@ export  function SignIn() {
     try {
       await session({ email: data.email, password: data.password})
   
-      toast({
-        variant: "default",
-        title: "Seja bem Vindo!",
-        description: "Login realizado com sucesso"
-      })
+      toast.success("Seja bem vindo!")
   
       navigate('/dashboard')
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Credenciais não validas",
-        description: "Erro ao tentar realizar o login",
-        action: <ToastAction altText="Tentar novamente">Tente novamente</ToastAction>,
+      toast.error("Credenciais incorretas", {
+        description: 'Tente novamente ou clique em esqueci minha senha.'
       })
    }
   }
 
   return (
-    <div className="flex h-screen">
-      <section className='w-1/2 flex items-center flex-col justify-center'>
+    <div className="flex h-screen ">
+      <section className='w-1/2 flex items-center flex-col justify-center max-md:w-full max-md:flex-none'>
         <div className='flex flex-col gap-4 items-center'>
           <div className='bg-gradient-to-tr to-slate-950  from-slate-800  rounded-2xl w-[80px] h-[80px] pl-2 pt-2'>
             <ChartNoAxesCombined className='h-[60px] w-[60px] text-secondary' />
@@ -79,13 +71,13 @@ export  function SignIn() {
           </div>
 
           <div className='flex flex-col gap-2'>
-            <Button type='submit' className='bg-gradient-to-tr to-slate-950  from-slate-800 '>Entrar</Button>
+            <Button type='submit' className='bg-gradient-to-tr to-slate-950  from-slate-800'>Entrar</Button>
             <a href="#" className='text-sm underline text-muted-foreground text-end'>Esqueci minha senha</a>
           </div>
         </form>
       </section>
 
-      <section className="bg-gradient-to-tr to-slate-950  from-slate-800 0 w-1/2 rounded-2xl my-4 mr-4 font-semibold italic">
+      <section className="bg-gradient-to-tr to-slate-950  from-slate-800 0 w-1/2 rounded-2xl my-4 mr-4 font-semibold italic max-md:bg-none ">
 
       </section>
     </div>
