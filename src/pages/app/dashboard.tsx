@@ -1,6 +1,6 @@
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
-import { Bolt, Download, Ghost } from "lucide-react";
+import { Bolt, Download } from "lucide-react";
 
 export function Dashboard() {
   return (
