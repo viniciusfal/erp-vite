@@ -1,11 +1,14 @@
 
-import { SignIn } from "./pages/auth/sign-in";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider } from "react-router-dom";
+import { queryClient } from "./lib/query-client";
+import { router } from "./router";
 
 export function App() {
   return(
-    <div>
-      <SignIn />
-    </div>
+    <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+    </QueryClientProvider>
   )
 }
 
