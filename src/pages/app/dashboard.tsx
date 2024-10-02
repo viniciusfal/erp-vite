@@ -1,31 +1,144 @@
-import { Header } from "@/components/header";
-import { Button } from "@/components/ui/button";
-import { Bolt, Download } from "lucide-react";
+import { CalendarDateRangePicker } from '@/components/date-ranger-picker'
+import { Header } from '@/components/header'
+import { Overview } from '@/components/overview'
+import { RecentSales } from '@/components/recent-sales'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Bolt, CircleMinus, CirclePlus, Download } from 'lucide-react'
 
 export function Dashboard() {
   return (
-    <div className="bg-primary-foreground h-screen px-8">
+    <div className="h-screen bg-primary-foreground px-8">
       <Header />
 
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-2">
           <h2 className="text-4xl text-slate-900">Dashboard</h2>
-          <span className="text-sm text-muted-foreground">Veja as estaticas do financeiro</span>
+          <span className="mb-4 text-sm text-muted-foreground">
+            Veja as estaticas do financeiro
+          </span>
         </div>
 
         <div>
           <div className="flex items-center gap-2">
-            <Button variant={"outline"} className="flex items-center gap-2 text-muted-foreground rounded-full">
+            <Button
+              variant={'outline'}
+              className="flex items-center gap-2 rounded-full text-muted-foreground"
+            >
               <Download className="size-5" />
               Exportar Dados
             </Button>
 
-            <Button variant={"outline"} className="rounded-full">
-              <Bolt className="size-5 text-muted-foreground " />
+            <Button variant={'outline'} className="rounded-full">
+              <Bolt className="size-5 text-muted-foreground" />
             </Button>
           </div>
         </div>
       </div>
+
+      <Tabs defaultValue="overview" className="space-y-4">
+        <div className="flex justify-between">
+          <TabsList>
+            <TabsTrigger
+              value="overview"
+              className="rounded-full bg-gradient-to-r from-slate-800 to-slate-950 text-muted"
+            >
+              Visão Geral
+            </TabsTrigger>
+            <TabsTrigger value="analytics" disabled>
+              Analises
+            </TabsTrigger>
+            <TabsTrigger value="reports" disabled>
+              Relatorios
+            </TabsTrigger>
+            <TabsTrigger value="notifications" disabled>
+              Agendamentos
+            </TabsTrigger>
+          </TabsList>
+          <CalendarDateRangePicker />
+        </div>
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="bg-gradient-to-tr from-sky-800 to-sky-500 text-white">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Faturamento Total
+                </CardTitle>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  className="h-4 w-4 text-muted"
+                >
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">R$45,231.89</div>
+                <p className="text-xs text-muted">
+                  +20.1% do que o mês passado
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Entradas</CardTitle>
+                <CirclePlus className="size-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">R$ 10,000.25</div>
+                <p className="text-xs text-muted-foreground">
+                  +180.1% que no mês passado
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Saídas</CardTitle>
+                <CircleMinus className="size-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">R$ 2,000.14</div>
+                <p className="text-xs text-muted-foreground">
+                  +19% from last month
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-4">
+              <CardHeader>
+                <CardTitle>Visão Geral</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-2">
+                <Overview />
+              </CardContent>
+            </Card>
+            <Card className="col-span-3">
+              <CardHeader>
+                <CardTitle>Registros recentes</CardTitle>
+                <CardDescription>
+                  Você fez 265 registros nesse mês.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RecentSales />
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
