@@ -1,11 +1,18 @@
 import { BellDot, ChartNoAxesCombined, ExternalLink } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { useState } from "react"; // Importar useState
+import { useState } from "react";
 import { Input } from "./ui/input";
+import { Link, useLocation } from "react-router-dom"; // Importar Link e useLocation
 
 export function Header() {
-  const [activeButton, setActiveButton] = useState("dashboard"); // Estado para o botão ativo
+  const location = useLocation(); // Usar useLocation para pegar a rota atual
+  const [activeButton, setActiveButton] = useState(location.pathname); // Inicializar o estado com a rota atual
+
+  // Função para lidar com a mudança de rota
+  const handleButtonClick = (path: string) => {
+    setActiveButton(path);
+  };
 
   return (
     <header className="flex justify-between py-6 px-8 items-center">
@@ -17,38 +24,42 @@ export function Header() {
       </div>
 
       <nav className="flex gap-5 items-center justify-center">
+        <Link to="/dashboard">
+          <Button
+            className={`rounded-full h-12 w-32 text-sm ${activeButton === '/dashboard' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
+            variant={"outline"}
+            onClick={() => handleButtonClick('/dashboard')}
+          >
+            Dashboard
+          </Button>
+        </Link>
+        <Link to="/finances">
+          <Button
+            className={`rounded-full h-12 w-32 text-sm ${activeButton === '/finances' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
+            variant={"outline"}
+            onClick={() => handleButtonClick('/finances')}
+          >
+            Financeiro
+          </Button>
+        </Link>
         <Button
-          className={`rounded-full h-12 w-32 text-sm ${activeButton === 'dashboard' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}  `}
+          className={`rounded-full h-12 w-32 text-sm ${activeButton === '/drh' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
           variant={"outline"}
-          onClick={() => setActiveButton('dashboard')}
-        >
-          Dashboard
-        </Button>
-        <Button
-          className={`rounded-full h-12 w-32 text-sm ${activeButton === 'financeiro' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
-          variant={"outline"}
-          onClick={() => setActiveButton('financeiro')}
-        >
-          Financeiro
-        </Button>
-        <Button
-          className={`rounded-full h-12 w-32 text-sm ${activeButton === 'drh' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
-          variant={"outline"}
-          onClick={() => setActiveButton('drh')}
+          onClick={() => handleButtonClick('/drh')}
         >
           DRH
         </Button>
         <Button
-          className={`rounded-full h-12 w-32 text-sm ${activeButton === 'trafego' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
+          className={`rounded-full h-12 w-32 text-sm ${activeButton === '/trafego' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
           variant={"outline"}
-          onClick={() => setActiveButton('trafego')}
+          onClick={() => handleButtonClick('/trafego')}
         >
           Tráfego
         </Button>
 
-        <a href="https://glpiamazoniainter.com/glpi" target="_blank" >
+        <a href="https://glpiamazoniainter.com/glpi" target="_blank">
           <Button
-            className={`h-12 w-32 text-sm flex items-center  gap-1 hover:text-gradient-to-r hover:from-slate-950 hover:to-slate-800 `}
+            className={`h-12 w-32 text-sm flex items-center gap-1 hover:text-gradient-to-r hover:from-slate-950 hover:to-slate-800`}
             variant={"link"}
           >
             Suporte
@@ -58,7 +69,7 @@ export function Header() {
       </nav>
 
       <div className="flex gap-3 items-center">
-        <div className="">
+        <div>
           <Input type="search" placeholder="Pesquisar..." />
         </div>
 
