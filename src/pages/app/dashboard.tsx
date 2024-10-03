@@ -18,7 +18,7 @@ export function Dashboard() {
     <div className="bg-primary-foreground">
       <Header />
 
-      <div className='px-8'>
+      <div className="px-8">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
             <h2 className="text-4xl text-slate-900">Dashboard</h2>
@@ -94,7 +94,9 @@ export function Dashboard() {
               </Card>
               <Card className="">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Entradas</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Entradas
+                  </CardTitle>
                   <CirclePlus className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -141,7 +143,6 @@ export function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
-
     </div>
   )
 }

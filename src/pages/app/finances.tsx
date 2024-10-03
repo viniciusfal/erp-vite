@@ -1,14 +1,13 @@
-import { CalendarDateRangePicker } from "@/components/date-ranger-picker";
-import { TableTransaction } from "@/components/table-transaction";
-import { Button } from "@/components/ui/button";
-import { Bolt } from "lucide-react";
-import { Helmet } from "react-helmet-async";
+import { CalendarDateRangePicker } from '@/components/date-ranger-picker'
+import { TableTransaction } from '@/components/table-transaction'
+import { Button } from '@/components/ui/button'
+import { Bolt } from 'lucide-react'
+import { Helmet } from 'react-helmet-async'
 
 export function Finances() {
   return (
-    <div className="h-screen">
-
-      <div className="flex justify-between items-center">
+    <div className="">
+      <div className="flex items-center justify-between">
         <Helmet titleTemplate="Financeiro" />
 
         <div className="flex items-center justify-between">
@@ -26,12 +25,9 @@ export function Finances() {
             <Bolt className="size-5 text-muted-foreground" />
           </Button>
         </div>
-
       </div>
 
       <TableTransaction />
     </div>
-
-
   )
 }
