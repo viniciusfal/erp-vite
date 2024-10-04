@@ -25,7 +25,9 @@ import { File, Plus, Wrench, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
 
-export function TableTransaction() {
+export function TableTransaction({ setVisible }) {
+
+
   return (
     <div className="flex w-2/3 flex-col justify-between rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
       <div className="flex justify-between">
@@ -47,6 +49,7 @@ export function TableTransaction() {
           <Button
             className="rounded-full hover:bg-primary hover:text-white"
             variant="outline"
+            onClick={() => setVisible(true)}
           >
             <Plus className="size-4" />
           </Button>

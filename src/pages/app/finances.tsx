@@ -1,3 +1,4 @@
+import { CardTransaction } from '@/components/card-transaction'
 import { CalendarDateRangePicker } from '@/components/date-ranger-picker'
 import { TableTransaction } from '@/components/table-transaction'
 import { TopIncome } from '@/components/top-income'
@@ -18,9 +19,12 @@ import {
   SelectGroup,
 } from '@/components/ui/select'
 import { Bolt, MoveUpRight } from 'lucide-react'
+import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 
 export function Finances() {
+  const [visible, setVisible] = useState<boolean>(false)
+
   return (
     <div className="">
       <div className="flex items-center justify-between">
@@ -44,7 +48,7 @@ export function Finances() {
       </div>
 
       <div className="flex gap-2">
-        <TableTransaction />
+        <TableTransaction setVisible={setVisible} />
 
         <div className="flex w-1/3 flex-col gap-2">
           <div className="flex h-1/2 w-full flex-col justify-between rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
@@ -72,7 +76,7 @@ export function Finances() {
 
             <TopIncome />
 
-            <div className="flex justify-around">
+            <div className="flex justify-around mb-4">
               <div className="flex items-center gap-1">
                 <div className="size-2 rounded-full bg-sky-500"></div>
                 <span className="text-xs text-muted-foreground">
@@ -128,6 +132,14 @@ export function Finances() {
           </div>
         </div>
       </div>
+
+      {visible === true ? (
+        <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
+          <CardTransaction setVisible={setVisible} />
+        </div>
+      ) : (<div></div>)}
     </div>
+
+
   )
 }

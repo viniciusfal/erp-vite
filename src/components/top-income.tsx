@@ -47,11 +47,9 @@ export function TopIncome() {
           content={<ChartTooltipContent hideLabel />}
         />
 
-        {/* Renderiza uma barra para cada entrada no chartData */}
-
         <Bar
           dataKey="desktop"
-          fill={incomes[0]} // Aplica a cor específica para cada barra
+          fill={incomes[1]} // Aplica a cor específica para cada barra
           radius={8}
         />
       </BarChart>
