@@ -25,7 +25,7 @@ import { File, Plus, Wrench, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
 
-export function TableTransaction({ setVisible }) {
+export function TableTransaction({ setVisible }: any) {
 
 
   return (

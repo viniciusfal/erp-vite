@@ -20,9 +20,7 @@ import {
 import { Switch } from "./ui/switch"
 import { Separator } from "./ui/separator"
 
-export function CardTransaction({ setVisible }) {
-
-
+export function CardTransaction({ setVisible }: any) {
   return (
     <Card className="w-1/3">
       <CardHeader>

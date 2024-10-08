@@ -1,5 +1,6 @@
 import { CardTransaction } from '@/components/card-transaction'
 import { CalendarDateRangePicker } from '@/components/date-ranger-picker'
+import { Payments } from '@/components/payments'
 import { TableTransaction } from '@/components/table-transaction'
 import { TopIncome } from '@/components/top-income'
 import { Button } from '@/components/ui/button'
@@ -18,12 +19,23 @@ import {
   SelectContent,
   SelectGroup,
 } from '@/components/ui/select'
-import { Bolt, MoveUpRight } from 'lucide-react'
+
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+
+import { Bolt, File, MoveUpRight, Wrench, X } from 'lucide-react'
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
+import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
+import { TooltipTrigger } from '@radix-ui/react-tooltip'
+import { Link } from 'react-router-dom'
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
+  const [visiblePayment, setVisiblePayment] = useState<boolean>(false)
 
   return (
     <div className="">
@@ -106,25 +118,82 @@ export function Finances() {
               <Button
                 variant="outline"
                 className="rounded-full p-3 text-muted-foreground hover:bg-primary hover:text-white"
+                onClick={() => setVisiblePayment(true)}
               >
                 <MoveUpRight className="size-3" />
               </Button>
             </div>
 
             {Array.from({ length: 2 }).map((_, index) => (
-              <Card className="mt-2 bg-muted" key={index}>
-                <CardHeader>
-                  <CardTitle className="font-medium">
-                    Boleto Transdata
-                  </CardTitle>
+              <Card className="mt-2 bg-muted" key={index} >
+                <CardHeader >
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="font-medium">
+                      Boleto Transdata
+                    </CardTitle>
+                    <div className="flex gap-1 items-center">
+                      <div>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Link to="#">
+                                <Button variant="outline" className="rounded-full">
+                                  <File className="size-3 text-muted-foreground" />
+                                </Button>
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Ver Anexo</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                      </div>
+
+                      <div>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Button variant="outline" className="rounded-full">
+                                <Wrench className="size-3 text-muted-foreground" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Editar</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+
+                      <div>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger className="">
+                              <Button
+                                className="rounded-full  hover:bg-red-300 hover:text-white bg-red-400 text-white"
+                                variant="outline"
+                              >
+                                <X className="size-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Deletar</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </div>
+                  </div>
                   <CardDescription>R$ 980,65</CardDescription>
                 </CardHeader>
-                <CardContent className="-mt-4 flex items-center justify-between">
+                <CardContent className="-mt-4 flex items-end justify-between">
                   <span className="text-sm text-muted-foreground">
                     Vencimento: 04/10/2024
                   </span>
-                  <Button className="bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90">
-                    Detalhes
+
+
+                  < Button className="bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90">
+                    Marcar como Pago
                   </Button>
                 </CardContent>
               </Card>
@@ -133,12 +202,22 @@ export function Finances() {
         </div>
       </div>
 
-      {visible === true ? (
-        <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
-          <CardTransaction setVisible={setVisible} />
-        </div>
-      ) : (<div></div>)}
-    </div>
+      {
+        visible === true ? (
+          <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
+            <CardTransaction setVisible={setVisible} />
+          </div>
+        ) : (<div></div>)
+      }
+
+      {
+        visiblePayment === true ? (
+          <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
+            <Payments setVisiblePayment={setVisiblePayment} />
+          </div>
+        ) : (<div></div>)
+      }
+    </div >
 
 
   )
