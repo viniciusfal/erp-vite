@@ -12,7 +12,6 @@ import { useState } from "react";
 export function Payments({ setVisiblePayment }: any) {
   const [paidState, setPaidState] = useState<boolean[]>([])
 
-
   function handleMarkAsPaid(index: number) {
     const updatedPaid = [...paidState]
     updatedPaid[index] = true

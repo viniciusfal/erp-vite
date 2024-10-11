@@ -14,6 +14,19 @@ import {
 } from '@/components/ui/pagination'
 
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -24,10 +37,75 @@ import { SelectGroup } from '@radix-ui/react-select'
 import { File, Plus, Wrench, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { getTransactions } from '@/api/get-transactions'
+import { useState } from 'react'
+import { removeTransaction } from '@/api/remove-transaction'
+import { z } from 'zod'
+import { toast } from 'sonner'
+import { queryClient } from '@/lib/query-client'
+
+
+interface Transactions {
+  transaction_id: string
+  title: string
+  value: number
+  type: string
+  category: string
+  scheduling: boolean
+  annex: string | null
+  payment_date: Date | null
+  created_at: Date
+  updated_at: Date
+}
+const TransactionID = z.object({
+  id: z.string().uuid()
+})
+
+type transactionID = z.infer<typeof TransactionID>
+
+const ITEMS_PER_PAGE = 10
 
 export function TableTransaction({ setVisible }: any) {
+  const { data: transactions } = useQuery<Transactions[]>({
+    queryKey: ['transactions'],
+    queryFn: getTransactions
+  })
+
+  const { mutateAsync: transaction } = useMutation({
+    mutationFn: removeTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+        exact: false, // Se quiser invalidar todas as consultas que começam com 'transactions'
+      });
+      toast.warning('Transação Deletada com sucesso.');
+    },
+    onError: () => {
+      toast.error('Falha ao excluir transação.');
+    }
+  });
 
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const totalPages = transactions ? Math.ceil(transactions.length / ITEMS_PER_PAGE) : 1
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const endIndex = startIndex + ITEMS_PER_PAGE
+  const currentTransactions = transactions?.slice(startIndex, endIndex)
+
+
+
+  async function handleConfirmRemove(data: transactionID) {
+    try {
+      await transaction({
+        id: data.id,
+      });
+      // Aqui você pode adicionar a lógica de sucesso, se necessário.
+    } catch (error) {
+      console.error('Erro ao excluir transação:', error);
+    }
+  }
   return (
     <div className="flex w-2/3 flex-col justify-between rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
       <div className="flex justify-between">
@@ -64,7 +142,7 @@ export function TableTransaction({ setVisible }: any) {
             <TableHead className="w-[250px]">Categoria</TableHead>
 
             <TableHead className="w-[50px] font-medium">
-              Pagamento Agendado
+              Agendado?
             </TableHead>
             <TableHead className="w-[180px] font-medium">
               Pagamento / Agendamento
@@ -76,21 +154,21 @@ export function TableTransaction({ setVisible }: any) {
           </TableRow>
         </TableHeader>
         <TableBody className="text-sm">
-          {Array.from({ length: 10 }).map((_, index) => (
+          {currentTransactions?.map((t, index) => (
             <TableRow key={index} className="border-muted">
-              <TableCell>{index + 1}. Arrecadação </TableCell>
-              <TableCell>5.000,00</TableCell>
-              <TableCell>Receita Administrativa</TableCell>
-              <TableCell>Não</TableCell>
-              <TableCell>02/10/2024</TableCell>
+              <TableCell>{index + 1}{t.title}</TableCell>
+              <TableCell>{t.value}</TableCell>
+              <TableCell>{t.category}</TableCell>
+              <TableCell>{t.scheduling ? 'Sim' : 'Não'}</TableCell>
+              <TableCell>{t.payment_date ? new Date(t.payment_date).toLocaleDateString() : new Date(t.created_at).toLocaleDateString()}</TableCell>
               <TableCell>
-                <Link to="#">
+                <Link to={t.annex ? t.annex : '#'}>
                   <File className="size-4 text-muted-foreground" />
                 </Link>
               </TableCell>
               <TableCell>
                 <Button className="rounded-full bg-green-100 p-3 text-xs text-green-400 hover:cursor-default hover:bg-green-100">
-                  Entrada
+                  {t.type}
                 </Button>
               </TableCell>
               <TableCell>
@@ -99,16 +177,30 @@ export function TableTransaction({ setVisible }: any) {
                 </Button>
               </TableCell>
               <TableCell>
-                <Button
-                  className="rounded-full text-red-300 hover:bg-red-300 hover:text-white"
-                  variant="ghost"
-                >
-                  <X className="size-4" />
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger>
+                    <Button variant='ghost' className='hover:bg-red-400  text-red-400 hover:text-white
+                    '>
+                      <X className='size-4' />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Tem certeza que deseja excluir essa transação?</AlertDialogTitle>
+                      <AlertDialogDescription>Ao exlcuir você não tera mais acesso a essa transação.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleConfirmRemove({ id: t.transaction_id })}>Excluir</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
+
+
       </Table>
 
       <div className="flex justify-between">
@@ -118,41 +210,26 @@ export function TableTransaction({ setVisible }: any) {
           <Pagination className="">
             <PaginationContent className="space-x-1">
               <PaginationItem>
-                <PaginationLink
-                  href="#"
-                  className="rounded-full bg-gradient-to-tr from-slate-800 to-slate-950 text-white hover:text-white"
-                >
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  href="#"
-                  className="rounded-full border bg-muted"
-                >
-                  2
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  href="#"
-                  className="rounded-full border bg-muted"
-                >
-                  3
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  href="#"
-                  className="rounded-full border bg-muted"
-                >
-                  4
-                </PaginationLink>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <PaginationLink
+                    key={index}
+                    href="#"
+                    className={`rounded-full ${currentPage === index + 1 ? 'bg-gradient-to-tr from-slate-800 to-slate-950 text-white' : 'border bg-muted'}`}
+                    onClick={
+                      (e) => {
+                        e.preventDefault()
+                        setCurrentPage(index + 1)
+                      }
+                    }
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                ))}
               </PaginationItem>
             </PaginationContent>
           </Pagination>
         </div>
       </div>
-    </div>
+    </div >
   )
 }

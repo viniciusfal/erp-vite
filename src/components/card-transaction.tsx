@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,94 +6,157 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
-import { Switch } from "./ui/switch"
-import { Separator } from "./ui/separator"
+import { Switch } from "./ui/switch";
+import { Separator } from "./ui/separator";
+import { z } from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { registerTransaction } from "@/api/register-transaction";
+import { toast } from "sonner";
+
+const inCredits = z.object({
+  title: z.string(),
+  value: z.number(),
+  type: z.string(),
+  category: z.string(),
+  scheduling: z.boolean(),
+  annex: z.string().nullable(),
+  payment_date: z.date().nullable(),
+});
+
+type Incredits = z.infer<typeof inCredits>;
 
 export function CardTransaction({ setVisible }: any) {
+  const { control, handleSubmit, register } = useForm<Incredits>();
+
+  const { mutateAsync: transaction } = useMutation({
+    mutationFn: registerTransaction,
+  });
+
+  async function handleTransaction(data: Incredits) {
+    try {
+      await transaction({
+        title: data.title,
+        type: data.type,
+        category: data.category,
+        value: parseFloat(data.value.toString()),
+        payment_date: data.payment_date ? new Date(data.payment_date) : null,
+        annex: null, // Assumindo que você não está usando anexos
+        scheduling: data.scheduling,
+      });
+
+      toast.success("Transação cadastrada com sucesso.");
+      console.log(data);
+    } catch (err) {
+      toast.error("Erro no preenchimento das informações");
+      console.log(err);
+    }
+  }
+
   return (
-    <Card className="w-1/3">
+    <Card className="w-1/3 max-lg:w-1/2 max-sm:w-full">
       <CardHeader>
         <CardTitle>Registrar Transação</CardTitle>
         <CardDescription className="text-xs">Insira as informações abaixo:</CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form onSubmit={handleSubmit(handleTransaction)}>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Titulo</Label>
-              <Input id="title" placeholder="Dê um titulo a sua transação" />
+              <Label>Titulo</Label>
+              <Input id="title" placeholder="Dê um titulo a sua transação" {...register("title")} />
             </div>
 
             <div>
-              <Label htmlFor="value">Valor</Label>
-              <Input id="value" type="number" placeholder="0" />
+              <Label>Valor</Label>
+              <Input id="value" type="number" placeholder="0" {...register("value")} />
             </div>
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="type">Tipo</Label>
-              <Select>
-                <SelectTrigger id="type" >
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="income" >Entrada</SelectItem>
-                  <SelectItem value="outcome">Saida</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>Tipo</Label>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select {...field} onValueChange={field.onChange}>
+                    <SelectTrigger id="type">
+                      <SelectValue placeholder="Selecione..." />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      <SelectItem value="income">Entrada</SelectItem>
+                      <SelectItem value="outcome">Saida</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="category">Categoria</Label>
-              <Select>
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="despesasAdm">Despesas Administrativas</SelectItem>
-                  <SelectItem value="folha">Folha de pagamento</SelectItem>
-                  <SelectItem value="labore">Pro Labore</SelectItem>
-                  <SelectItem value="etc1">Despesas tal</SelectItem>
-                  <SelectItem value="etc2">Despesas tal</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>Categoria</Label>
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <Select {...field} onValueChange={field.onChange}>
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Selecione..." />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      <SelectItem value="despesasAdm">Despesas Administrativas</SelectItem>
+                      <SelectItem value="folha">Folha de pagamento</SelectItem>
+                      <SelectItem value="labore">Pro Labore</SelectItem>
+                      <SelectItem value="etc1">Despesas tal</SelectItem>
+                      <SelectItem value="etc2">Despesas tal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
             <Separator className="my-2" />
 
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground ">
-              <Switch />
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <Controller
+                name="scheduling"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
               <span>Quero agendar esse pagamento</span>
             </div>
 
             <div className="flex justify-between items-center">
               <div>
-                <Label htmlFor="paymentDate" className="text-sm">Data de Pagamento / Agendamento</Label>
-                <Input type="date" />
+                <Label className="text-sm">Data de Pagamento / Agendamento</Label>
+                <Input type="date" {...register("payment_date")} />
               </div>
 
-
               <div>
-                <Label htmlFor="anex">Anexar</Label>
-                <Input type="file" />
+                <Label>Anexar</Label>
+                <Input type="file" {...register("annex")} />
               </div>
             </div>
           </div>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" onClick={() => setVisible(false)}>Cancel</Button>
+            <Button type="submit">Salvar</Button>
+          </CardFooter>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={() => setVisible(false)}>Cancel</Button>
-        <Button>Salvar</Button>
-      </CardFooter>
     </Card>
-  )
+  );
 }

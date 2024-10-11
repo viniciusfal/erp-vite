@@ -1,28 +1,26 @@
-import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, XAxis, Cell } from 'recharts';
 
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from '@/components/ui/chart'
+} from '@/components/ui/chart';
 
-export const description = 'A bar chart'
+export const description = 'A bar chart';
 
 const chartData = [
-  { position: '305', desktop: 305, color: '#0ea5e9' },
-  { position: '237', desktop: 237, color: '#7dd3fc' },
-  { position: '186', desktop: 186, color: '#e0f2fe' },
-]
-
-const incomes = chartData.map((c) => c.color)
+  { position: '305', desktop: 305 },
+  { position: '237', desktop: 237 },
+  { position: '186', desktop: 186 },
+];
 
 const chartConfig = {
   desktop: {
     label: 'Entradas',
     color: 'hsl(var(--chart-1))',
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function TopIncome() {
   return (
@@ -31,8 +29,23 @@ export function TopIncome() {
         accessibilityLayer
         data={chartData}
         barGap={1}
-        barCategoryGap="1%"
+        barCategoryGap="0%"
       >
+        <defs>
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#003f5c', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: '#0ea5e9', stopOpacity: 1 }} />
+          </linearGradient>
+          <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#005f99', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: '#7dd3fc', stopOpacity: 1 }} />
+          </linearGradient>
+          <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#007bbd', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: '#e0f2fe', stopOpacity: 1 }} />
+          </linearGradient>
+        </defs>
+
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="position"
@@ -43,16 +56,16 @@ export function TopIncome() {
         />
 
         <ChartTooltip
-          cursor={false}
+          cursor={true}
           content={<ChartTooltipContent hideLabel />}
         />
 
-        <Bar
-          dataKey="desktop"
-          fill={incomes[1]} // Aplica a cor específica para cada barra
-          radius={8}
-        />
+        <Bar dataKey="desktop" radius={8}>
+          {chartData.map((_, index) => (
+            <Cell key={index} fill={`url(#grad${index + 1})`} />
+          ))}
+        </Bar>
       </BarChart>
     </ChartContainer>
-  )
+  );
 }

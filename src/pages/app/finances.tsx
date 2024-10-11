@@ -20,12 +20,6 @@ import {
   SelectGroup,
 } from '@/components/ui/select'
 
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
-
 import { Bolt, File, MoveUpRight, Wrench, X } from 'lucide-react'
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
