@@ -37,40 +37,33 @@ import { SelectGroup } from '@radix-ui/react-select'
 import { File, Plus, Wrench, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { getTransactions } from '@/api/get-transactions'
-import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+
 import { removeTransaction } from '@/api/remove-transaction'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { queryClient } from '@/lib/query-client'
+import type { Dispatch, SetStateAction } from 'react'
+import type { Transactions } from '@/services/listing-transacrions'
 
-
-interface Transactions {
-  transaction_id: string
-  title: string
-  value: number
-  type: string
-  category: string
-  scheduling: boolean
-  annex: string | null
-  payment_date: Date | null
-  created_at: Date
-  updated_at: Date
+interface TableProps {
+  setVisible: Dispatch<SetStateAction<boolean>>;
+  currentTransactions: Transactions[] | undefined;
+  totalPages: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  setInputType: Dispatch<SetStateAction<string>>;
+  inputType: string;
+  currentPage: number
 }
+
+
 const TransactionID = z.object({
   id: z.string().uuid()
 })
 
 type transactionID = z.infer<typeof TransactionID>
 
-const ITEMS_PER_PAGE = 10
-
-export function TableTransaction({ setVisible }: any) {
-  const { data: transactions } = useQuery<Transactions[]>({
-    queryKey: ['transactions'],
-    queryFn: getTransactions
-  })
+export function TableTransaction({ setVisible, setInputType, setCurrentPage, currentTransactions, inputType, totalPages, currentPage }: TableProps) {
 
   const { mutateAsync: transaction } = useMutation({
     mutationFn: removeTransaction,
@@ -87,39 +80,30 @@ export function TableTransaction({ setVisible }: any) {
   });
 
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const totalPages = transactions ? Math.ceil(transactions.length / ITEMS_PER_PAGE) : 1
-
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-  const endIndex = startIndex + ITEMS_PER_PAGE
-  const currentTransactions = transactions?.slice(startIndex, endIndex)
-
-
-
   async function handleConfirmRemove(data: transactionID) {
     try {
+      console.log('Tentando remover a transação com ID:', data.id); // Para depuração
       await transaction({
-        id: data.id,
+        id: data.id
       });
-      // Aqui você pode adicionar a lógica de sucesso, se necessário.
     } catch (error) {
       console.error('Erro ao excluir transação:', error);
     }
   }
   return (
-    <div className="flex w-2/3 flex-col justify-between rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
+    <div className="flex w-2/3 flex-col  rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
       <div className="flex justify-between">
         <strong className="text-2xl font-medium">Lista de transações</strong>
         <div className="flex gap-2">
-          <Select>
-            <SelectTrigger className="w-[180px]">
+          <Select onValueChange={setInputType}>
+            <SelectTrigger className="w-[180px]" value={inputType}>
               <SelectValue placeholder="Filtrar por" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="full">Todas</SelectItem>
-                <SelectItem value="income">Entradas</SelectItem>
-                <SelectItem value="outcome">Saídas</SelectItem>
+                <SelectItem value="entrada">Entrada</SelectItem>
+                <SelectItem value="saida">Saídas</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -155,8 +139,8 @@ export function TableTransaction({ setVisible }: any) {
         </TableHeader>
         <TableBody className="text-sm">
           {currentTransactions?.map((t, index) => (
-            <TableRow key={index} className="border-muted">
-              <TableCell>{index + 1}{t.title}</TableCell>
+            <TableRow key={t.transaction_id} className="border-muted">
+              <TableCell>{index + 1}{". " + t.title}</TableCell>
               <TableCell>{t.value}</TableCell>
               <TableCell>{t.category}</TableCell>
               <TableCell>{t.scheduling ? 'Sim' : 'Não'}</TableCell>
@@ -167,7 +151,10 @@ export function TableTransaction({ setVisible }: any) {
                 </Link>
               </TableCell>
               <TableCell>
-                <Button className="rounded-full bg-green-100 p-3 text-xs text-green-400 hover:cursor-default hover:bg-green-100">
+                <Button
+                  className={t.type === 'entrada' ? 'rounded-full bg-green-100 p-3 text-xs text-green-400 hover:cursor-default hover:bg-green-100' :
+                    'rounded-full bg-red-400 p-3 text-xs text-red-50 hover:cursor-default hover:bg-red-400'}
+                >
                   {t.type}
                 </Button>
               </TableCell>

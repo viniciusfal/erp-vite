@@ -26,10 +26,18 @@ import { Helmet } from 'react-helmet-async'
 import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
 import { TooltipTrigger } from '@radix-ui/react-tooltip'
 import { Link } from 'react-router-dom'
+import { listingtransaction } from '@/services/listing-transacrions'
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
   const [visiblePayment, setVisiblePayment] = useState<boolean>(false)
+  const [inputType, setInputType] = useState('full')
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const handleListingTransactios = listingtransaction(currentPage, inputType)
+
+  const currentTransactions = handleListingTransactios.currentTransactions
+  const totalPages = handleListingTransactios.totalPages
 
   return (
     <div className="">
@@ -54,7 +62,8 @@ export function Finances() {
       </div>
 
       <div className="flex gap-2">
-        <TableTransaction setVisible={setVisible} />
+        <TableTransaction currentPage={currentPage} setVisible={setVisible} currentTransactions={currentTransactions} totalPages={totalPages} setCurrentPage={setCurrentPage} setInputType={setInputType} inputType={inputType}
+        />
 
         <div className="flex w-1/3 flex-col gap-2">
           <div className="flex h-1/2 w-full flex-col justify-between rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
@@ -80,30 +89,9 @@ export function Finances() {
               </Select>
             </div>
 
-            <TopIncome />
+            <TopIncome currentTransactions={currentTransactions} />
 
-            <div className="flex justify-around mb-4">
-              <div className="flex items-center gap-1">
-                <div className="size-2 rounded-full bg-sky-500"></div>
-                <span className="text-xs text-muted-foreground">
-                  Arrecadação
-                </span>
-              </div>
 
-              <div className="flex items-center gap-1">
-                <div className="size-2 rounded-full bg-sky-300"></div>
-                <span className="text-xs text-muted-foreground">
-                  Arrecadação
-                </span>
-              </div>
-
-              <div className="flex items-center gap-1">
-                <div className="size-2 rounded-full bg-sky-100"></div>
-                <span className="text-xs text-muted-foreground">
-                  Arrecadação
-                </span>
-              </div>
-            </div>
           </div>
 
           <div className="flex h-1/2 w-full flex-col rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">

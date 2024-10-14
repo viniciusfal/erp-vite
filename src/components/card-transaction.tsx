@@ -24,6 +24,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { registerTransaction } from "@/api/register-transaction";
 import { toast } from "sonner";
+import { queryClient } from "@/lib/query-client";
 
 const inCredits = z.object({
   title: z.string(),
@@ -42,9 +43,20 @@ export function CardTransaction({ setVisible }: any) {
 
   const { mutateAsync: transaction } = useMutation({
     mutationFn: registerTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['transactions']
+      })
+      toast.success("Transação cadastrada com sucesso.");
+    },
+    onError: () => {
+      toast.error("Erro no preenchimento das informações");
+
+    }
   });
 
-  async function handleTransaction(data: Incredits) {
+
+  const handleTransaction = async (data: Incredits) => {
     try {
       await transaction({
         title: data.title,
@@ -56,10 +68,9 @@ export function CardTransaction({ setVisible }: any) {
         scheduling: data.scheduling,
       });
 
-      toast.success("Transação cadastrada com sucesso.");
+      setVisible(false)
       console.log(data);
     } catch (err) {
-      toast.error("Erro no preenchimento das informações");
       console.log(err);
     }
   }
@@ -93,8 +104,8 @@ export function CardTransaction({ setVisible }: any) {
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      <SelectItem value="income">Entrada</SelectItem>
-                      <SelectItem value="outcome">Saida</SelectItem>
+                      <SelectItem value="entrada">Entrada</SelectItem>
+                      <SelectItem value="saida">Saida</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -112,9 +123,9 @@ export function CardTransaction({ setVisible }: any) {
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      <SelectItem value="despesasAdm">Despesas Administrativas</SelectItem>
-                      <SelectItem value="folha">Folha de pagamento</SelectItem>
-                      <SelectItem value="labore">Pro Labore</SelectItem>
+                      <SelectItem value="despesas adm">Despesas Administrativas</SelectItem>
+                      <SelectItem value="folha de pagamento">Folha de pagamento</SelectItem>
+                      <SelectItem value="pro-labore">Pro Labore</SelectItem>
                       <SelectItem value="etc1">Despesas tal</SelectItem>
                       <SelectItem value="etc2">Despesas tal</SelectItem>
                     </SelectContent>
@@ -151,12 +162,12 @@ export function CardTransaction({ setVisible }: any) {
               </div>
             </div>
           </div>
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex justify-between pt-5">
             <Button variant="outline" onClick={() => setVisible(false)}>Cancel</Button>
             <Button type="submit">Salvar</Button>
           </CardFooter>
         </form>
       </CardContent>
-    </Card>
+    </Card >
   );
 }
