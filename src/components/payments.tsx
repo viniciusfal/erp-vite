@@ -9,27 +9,45 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink } from ".
 import { useState, Dispatch } from "react";
 
 import { listingPayments } from "@/services/listing-payments";
+import { useMutation } from "@tanstack/react-query";
+import { markPayment } from "@/api/mark-payment";
+import { queryClient } from "@/lib/query-client";
+import { toast } from "sonner";
 
 interface PaymentProps {
   setVisiblePayment: Dispatch<React.SetStateAction<boolean>>
 }
 
 export function Payments({ setVisiblePayment }: PaymentProps) {
-  const [paidState, setPaidState] = useState<boolean[]>([])
+  const [valuePaymentFilter, setValuePaymentFilter] = useState('unpaid')
   const [currentPage, setCurrentPage] = useState(1)
 
+  const { mutateAsync: transaction } = useMutation({
+    mutationFn: markPayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['transactions']
+      })
+    },
+    onError: () => {
+      toast.error("Erro ao tentar marcar como pago")
+    }
 
-  function handleMarkAsPaid(index: number) {
-    const updatedPaid = [...paidState]
-    updatedPaid[index] = true
+  })
 
-    setPaidState(updatedPaid)
+  async function handleMarkAsPaid(id: string) {
+    try {
+      await transaction({ id })
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const allPayments = listingPayments(currentPage)
   const currentPayments = allPayments.paymentTransactions
   const totalPages = allPayments.totalPages
 
+  const filteredPaids = currentPayments?.filter((payments) => valuePaymentFilter === 'paid' ? payments.pay === true : payments.pay === false)
 
   return (
     <div className="">
@@ -39,8 +57,8 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
             <CardTitle>Historico de Agendamentos</CardTitle>
             <div className="flex gap-2">
               <CalendarDateRangePicker />
-              <Select>
-                <SelectTrigger className="w-[180px]">
+              <Select onValueChange={setValuePaymentFilter}>
+                <SelectTrigger className="w-[180px]" value={valuePaymentFilter}>
                   <SelectValue placeholder="Escolha..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -52,8 +70,8 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
           </div>
         </CardHeader>
         <CardContent>
-          {currentPayments?.map((t, index) => (
-            <Card className="mt-2 bg-muted" key={index} style={paidState[index] ? { borderColor: '#4ade80' } : { borderColor: '#f87171' }}>
+          {filteredPaids?.map((t) => (
+            <Card className="mt-2 bg-muted" key={t.transaction_id} style={t.pay ? { borderColor: '#4ade80' } : { borderColor: '#f87171' }}>
               <CardHeader >
                 <div className="flex justify-between items-center">
                   <CardTitle className="font-medium">
@@ -112,19 +130,19 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
                     </div>
                   </div>
                 </div>
-                <CardDescription>R$ {t.value}</CardDescription>
+                <CardDescription className="text-base">R$ {t.value}</CardDescription>
               </CardHeader>
               <CardContent className="-mt-4 flex items-end justify-between">
                 <span className="text-sm text-muted-foreground">
                   Vencimento: {t.payment_date && new Date(t.payment_date).toLocaleDateString()}
                 </span>
 
-                {paidState[index] === true ? (
+                {t.pay === true && (
                   <span className="text-sm text-muted-foreground">
                     Pago dia: {new Date().toLocaleDateString()}
                   </span>
-                ) : <span></span>}
-                <Button className="bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90" onClick={() => handleMarkAsPaid(index)}>
+                )}
+                <Button disabled={t.pay} variant="outline" className={!t.pay ? "bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90" : "hidden"} onClick={() => handleMarkAsPaid(t.transaction_id)}>
                   Marcar como Pago
                 </Button>
               </CardContent>

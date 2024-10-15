@@ -12,6 +12,7 @@ export interface Transactions {
   payment_date: Date | null
   created_at: Date
   updated_at: Date
+  pay: boolean
 }
 
 const ITEMS_PER_PAGE = 4
