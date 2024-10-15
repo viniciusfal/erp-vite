@@ -8,8 +8,9 @@ export interface TransactionBody {
   scheduling: boolean
   annex: string | null
   payment_date: Date | null
+  pay: boolean
 }
 
-export async function registerTransaction({ title, value, type, category, scheduling, annex, payment_date }: TransactionBody) {
-  await api.post('/transaction/', { title, value, type, category, scheduling, annex, payment_date })
+export async function registerTransaction({ title, value, type, category, scheduling, annex, payment_date, pay }: TransactionBody) {
+  await api.post('/transaction/', { title, value, type, category, scheduling, annex, payment_date, pay })
 }

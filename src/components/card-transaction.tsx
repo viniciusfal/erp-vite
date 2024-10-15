@@ -34,12 +34,15 @@ const inCredits = z.object({
   scheduling: z.boolean(),
   annex: z.string().nullable(),
   payment_date: z.date().nullable(),
+  pay: z.boolean()
 });
 
 type Incredits = z.infer<typeof inCredits>;
 
 export function CardTransaction({ setVisible }: any) {
-  const { control, handleSubmit, register } = useForm<Incredits>();
+  const { control, handleSubmit, register, watch } = useForm<Incredits>();
+  const type = watch('type')
+
 
   const { mutateAsync: transaction } = useMutation({
     mutationFn: registerTransaction,
@@ -66,6 +69,7 @@ export function CardTransaction({ setVisible }: any) {
         payment_date: data.payment_date ? new Date(data.payment_date) : null,
         annex: null, // Assumindo que você não está usando anexos
         scheduling: data.scheduling,
+        pay: data.pay
       });
 
       setVisible(false)
@@ -118,7 +122,7 @@ export function CardTransaction({ setVisible }: any) {
                 name="category"
                 control={control}
                 render={({ field }) => (
-                  <Select {...field} onValueChange={field.onChange}>
+                  <Select {...field} onValueChange={field.onChange} >
                     <SelectTrigger id="category">
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
@@ -136,7 +140,7 @@ export function CardTransaction({ setVisible }: any) {
 
             <Separator className="my-2" />
 
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <div className={type === 'saida' ? "flex items-center space-x-2 text-sm text-muted-foreground" : "invisible"}>
               <Controller
                 name="scheduling"
                 control={control}
@@ -144,6 +148,8 @@ export function CardTransaction({ setVisible }: any) {
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={type === 'entrada'}
+
                   />
                 )}
               />

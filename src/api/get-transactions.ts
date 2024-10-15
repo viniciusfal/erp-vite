@@ -11,6 +11,7 @@ export interface GetTransactionsResponse {
   payment_date: Date | null
   created_at: Date
   updated_at: Date
+  pay: boolean
 }
 
 export async function getTransactions() {
