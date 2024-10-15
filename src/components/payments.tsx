@@ -6,17 +6,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "./ui/pagination";
-import { useState } from "react";
+import { useState, Dispatch } from "react";
 
+import { listingPayments } from "@/services/listing-payments";
 
-export function Payments({ setVisiblePayment }: any) {
+interface PaymentProps {
+  setVisiblePayment: Dispatch<React.SetStateAction<boolean>>
+}
+
+export function Payments({ setVisiblePayment }: PaymentProps) {
   const [paidState, setPaidState] = useState<boolean[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+
 
   function handleMarkAsPaid(index: number) {
     const updatedPaid = [...paidState]
     updatedPaid[index] = true
+
     setPaidState(updatedPaid)
   }
+
+  const allPayments = listingPayments(currentPage)
+  const currentPayments = allPayments.paymentTransactions
+  const totalPages = allPayments.totalPages
+
 
   return (
     <div className="">
@@ -39,12 +52,12 @@ export function Payments({ setVisiblePayment }: any) {
           </div>
         </CardHeader>
         <CardContent>
-          {Array.from({ length: 3 }).map((_, index) => (
+          {currentPayments?.map((t, index) => (
             <Card className="mt-2 bg-muted" key={index} style={paidState[index] ? { borderColor: '#4ade80' } : { borderColor: '#f87171' }}>
               <CardHeader >
                 <div className="flex justify-between items-center">
                   <CardTitle className="font-medium">
-                    Boleto Transdata
+                    {t.title}
                   </CardTitle>
                   <div className="flex gap-1 items-center">
                     <div>
@@ -99,11 +112,11 @@ export function Payments({ setVisiblePayment }: any) {
                     </div>
                   </div>
                 </div>
-                <CardDescription>R$ 980,65</CardDescription>
+                <CardDescription>R$ {t.value}</CardDescription>
               </CardHeader>
               <CardContent className="-mt-4 flex items-end justify-between">
                 <span className="text-sm text-muted-foreground">
-                  Vencimento: 04/10/2024
+                  Vencimento: {t.payment_date && new Date(t.payment_date).toLocaleDateString()}
                 </span>
 
                 {paidState[index] === true ? (
@@ -118,46 +131,27 @@ export function Payments({ setVisiblePayment }: any) {
             </Card>
           ))}
         </CardContent>
-
-
         <CardFooter className="absolute bottom-0 mx-auto right-0 space-x-4">
           <Pagination className="">
             <PaginationContent className="space-x-1">
               <PaginationItem>
-                <PaginationLink
-                  href="#"
-                  className="rounded-full bg-gradient-to-tr from-slate-800 to-slate-950 text-white hover:text-white"
-                >
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  href="#"
-                  className="rounded-full border bg-muted"
-                >
-                  2
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  href="#"
-                  className="rounded-full border bg-muted"
-                >
-                  3
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink
-                  href="#"
-                  className="rounded-full border bg-muted"
-                >
-                  4
-                </PaginationLink>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <PaginationLink
+                    key={index}
+                    href="#"
+                    className={`rounded-full ${currentPage === index + 1 ? 'bg-gradient-to-tr from-slate-800 to-slate-950 text-white' : 'border bg-muted'}`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setCurrentPage(index + 1)
+                    }}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                ))}
               </PaginationItem>
             </PaginationContent>
           </Pagination>
-          <Button className="w-[100px]" onClick={() => setVisiblePayment(false)}>Sair</Button>
+          <Button className="w-[100px] " onClick={() => setVisiblePayment(false)}>Sair</Button>
         </CardFooter>
       </Card >
     </div >

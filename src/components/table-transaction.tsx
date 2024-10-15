@@ -186,8 +186,6 @@ export function TableTransaction({ setVisible, setInputType, setCurrentPage, cur
             </TableRow>
           ))}
         </TableBody>
-
-
       </Table>
 
       <div className="flex justify-between">
