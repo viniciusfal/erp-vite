@@ -27,6 +27,7 @@ import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/toolti
 import { TooltipTrigger } from '@radix-ui/react-tooltip'
 import { Link } from 'react-router-dom'
 import { listingtransaction } from '@/services/listing-transacrions'
+import { listingPayments } from '@/services/listing-payments'
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
@@ -35,9 +36,26 @@ export function Finances() {
   const [currentPage, setCurrentPage] = useState(1)
 
   const handleListingTransactios = listingtransaction(currentPage, inputType)
-
   const currentTransactions = handleListingTransactios.currentTransactions
   const totalPages = handleListingTransactios.totalPages
+
+  const allPayments = listingPayments(1)
+  const currentPayments = allPayments.paymentTransactions
+
+
+  const today = new Date();
+
+  const filteredPayments = currentPayments
+    ?.filter((p) => !p.pay && p.payment_date) // Filtra pagamentos não pagos e com data válida
+    .filter((p) => p.payment_date && new Date(p.payment_date) >= today) // Adiciona filtro para pagamentos a vencer
+    .sort((a, b) => {
+      const dateA = a.payment_date ? new Date(a.payment_date) : new Date(0); // Usa uma data padrão se null
+      const dateB = b.payment_date ? new Date(b.payment_date) : new Date(0); // Usa uma data padrão se null
+      return dateA.getTime() - dateB.getTime(); // Ordena por data crescente
+    })
+    .slice(0, 2)
+
+
 
   return (
     <div className="">
@@ -106,12 +124,12 @@ export function Finances() {
               </Button>
             </div>
 
-            {Array.from({ length: 2 }).map((_, index) => (
-              <Card className="mt-2 bg-muted" key={index} >
+            {filteredPayments?.map((payment) => (
+              <Card className="mt-2 bg-muted" key={payment.transaction_id} >
                 <CardHeader >
                   <div className="flex justify-between items-center">
                     <CardTitle className="font-medium">
-                      Boleto Transdata
+                      {payment.title}
                     </CardTitle>
                     <div className="flex gap-1 items-center">
                       <div>
@@ -166,11 +184,11 @@ export function Finances() {
                       </div>
                     </div>
                   </div>
-                  <CardDescription>R$ 980,65</CardDescription>
+                  <CardDescription>{payment.value}</CardDescription>
                 </CardHeader>
                 <CardContent className="-mt-4 flex items-end justify-between">
                   <span className="text-sm text-muted-foreground">
-                    Vencimento: 04/10/2024
+                    Vencimento:{payment.payment_date && new Date(payment.payment_date).toLocaleDateString()}
                   </span>
 
 
@@ -185,19 +203,19 @@ export function Finances() {
       </div>
 
       {
-        visible === true ? (
+        visible && (
           <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
             <CardTransaction setVisible={setVisible} />
           </div>
-        ) : (<div></div>)
+        )
       }
 
       {
-        visiblePayment === true ? (
+        visiblePayment && (
           <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
             <Payments setVisiblePayment={setVisiblePayment} />
           </div>
-        ) : (<div></div>)
+        )
       }
     </div >
 
