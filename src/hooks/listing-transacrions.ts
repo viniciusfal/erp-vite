@@ -1,5 +1,5 @@
-import { getTransactions } from "@/api/get-transactions";
-import { useQuery } from "@tanstack/react-query";
+import { getTransactions } from '@/api/get-transactions'
+import { useQuery } from '@tanstack/react-query'
 
 export interface Transactions {
   transaction_id: string
@@ -16,22 +16,25 @@ export interface Transactions {
 
 const ITEMS_PER_PAGE = 10
 
-export function listingtransaction(currentPage: number, inputType: string) {
+export function useListingtransaction(currentPage: number, inputType: string) {
   const { data: transactions } = useQuery<Transactions[]>({
     queryKey: ['transactions'],
-    queryFn: getTransactions
+    queryFn: getTransactions,
   })
 
-  const totalPages = transactions ? Math.ceil(transactions.length / ITEMS_PER_PAGE) : 1
+  const totalPages = transactions
+    ? Math.ceil(transactions.length / ITEMS_PER_PAGE)
+    : 1
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
 
-  const filteredForType = inputType === 'full' ? transactions
-    : transactions?.filter(t => t.type === inputType)
+  const filteredForType =
+    inputType === 'full'
+      ? transactions
+      : transactions?.filter((t) => t.type === inputType)
 
   const currentTransactions = filteredForType?.slice(startIndex, endIndex)
-
 
   return { currentTransactions, totalPages }
 }

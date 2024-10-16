@@ -1,33 +1,35 @@
-import { BellDot, ChartNoAxesCombined, ExternalLink } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
-import { useState } from "react";
-import { Input } from "./ui/input";
-import { Link, useLocation } from "react-router-dom"; // Importar Link e useLocation
+import { BellDot, ChartNoAxesCombined, ExternalLink } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { Button } from './ui/button'
+import { useState } from 'react'
+import { Input } from './ui/input'
+import { Link, useLocation } from 'react-router-dom' // Importar Link e useLocation
 
 export function Header() {
-  const location = useLocation(); // Usar useLocation para pegar a rota atual
-  const [activeButton, setActiveButton] = useState(location.pathname); // Inicializar o estado com a rota atual
+  const location = useLocation() // Usar useLocation para pegar a rota atual
+  const [activeButton, setActiveButton] = useState(location.pathname) // Inicializar o estado com a rota atual
 
   // Função para lidar com a mudança de rota
   const handleButtonClick = (path: string) => {
-    setActiveButton(path);
-  };
+    setActiveButton(path)
+  }
 
   return (
-    <header className="flex justify-between py-6 px-8 items-center">
+    <header className="flex items-center justify-between px-8 py-6">
       <div className="flex items-end gap-1">
-        <div className='bg-gradient-to-tr to-slate-950 from-slate-800 rounded-2xl px-2 py-2'>
-          <ChartNoAxesCombined className='size-5 text-secondary' />
+        <div className="rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-950 px-2 py-2">
+          <ChartNoAxesCombined className="size-5 text-secondary" />
         </div>
-        <strong className="text-lg text-muted-foreground font-[SUSE]">ERP NET</strong>
+        <strong className="font-[SUSE] text-lg text-muted-foreground">
+          ERP NET
+        </strong>
       </div>
 
-      <nav className="flex gap-5 items-center justify-center">
+      <nav className="flex items-center justify-center gap-5">
         <Link to="/dashboard">
           <Button
-            className={`rounded-full h-12 w-32 text-sm ${activeButton === '/dashboard' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
-            variant={"outline"}
+            className={`h-12 w-32 rounded-full text-sm ${activeButton === '/dashboard' ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-muted' : 'bg-transparent'}`}
+            variant={'outline'}
             onClick={() => handleButtonClick('/dashboard')}
           >
             Dashboard
@@ -35,45 +37,49 @@ export function Header() {
         </Link>
         <Link to="/finances">
           <Button
-            className={`rounded-full h-12 w-32 text-sm ${activeButton === '/finances' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
-            variant={"outline"}
+            className={`h-12 w-32 rounded-full text-sm ${activeButton === '/finances' ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-muted' : 'bg-transparent'}`}
+            variant={'outline'}
             onClick={() => handleButtonClick('/finances')}
           >
             Financeiro
           </Button>
         </Link>
         <Button
-          className={`rounded-full h-12 w-32 text-sm ${activeButton === '/drh' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
-          variant={"outline"}
+          className={`h-12 w-32 rounded-full text-sm ${activeButton === '/drh' ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-muted' : 'bg-transparent'}`}
+          variant={'outline'}
           onClick={() => handleButtonClick('/drh')}
         >
           DRH
         </Button>
         <Button
-          className={`rounded-full h-12 w-32 text-sm ${activeButton === '/trafego' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
-          variant={"outline"}
+          className={`h-12 w-32 rounded-full text-sm ${activeButton === '/trafego' ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-muted' : 'bg-transparent'}`}
+          variant={'outline'}
           onClick={() => handleButtonClick('/trafego')}
         >
           Tráfego
         </Button>
 
-        <a href="https://glpiamazoniainter.com/glpi" target="_blank">
+        <a
+          href="https://glpiamazoniainter.com/glpi"
+          target="_blank"
+          rel="noreferrer"
+        >
           <Button
-            className={`h-12 w-32 text-sm flex items-center gap-1 hover:text-gradient-to-r hover:from-slate-950 hover:to-slate-800`}
-            variant={"link"}
+            className={`hover:text-gradient-to-r flex h-12 w-32 items-center gap-1 text-sm hover:from-slate-950 hover:to-slate-800`}
+            variant={'link'}
           >
             Suporte
-            <ExternalLink className="size-2.5 mb-2" />
+            <ExternalLink className="mb-2 size-2.5" />
           </Button>
         </a>
       </nav>
 
-      <div className="flex gap-3 items-center">
+      <div className="flex items-center gap-3">
         <div>
           <Input type="search" placeholder="Pesquisar..." />
         </div>
 
-        <div className="bg-white rounded-full p-3.5">
+        <div className="rounded-full bg-white p-3.5">
           <BellDot className="size-5 text-muted-foreground" />
         </div>
 
@@ -83,5 +89,5 @@ export function Header() {
         </Avatar>
       </div>
     </header>
-  );
+  )
 }

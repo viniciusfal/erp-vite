@@ -1,15 +1,13 @@
-import { createBrowserRouter } from "react-router-dom";
-import { SignIn } from "./pages/auth/sign-in";
-import { Dashboard } from "./pages/app/dashboard";
-import { AppLayout } from "./pages/layouts/app";
-import { Finances } from "./pages/app/finances";
-
-
+import { createBrowserRouter } from 'react-router-dom'
+import { SignIn } from './pages/auth/sign-in'
+import { Dashboard } from './pages/app/dashboard'
+import { AppLayout } from './pages/layouts/app'
+import { Finances } from './pages/app/finances'
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <SignIn />
+    element: <SignIn />,
   },
   {
     path: '/',
@@ -17,13 +15,12 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/finances',
-        element: <Finances />
-      }
-    ]
+        element: <Finances />,
+      },
+    ],
   },
   {
     path: '/dashboard',
-    element: <Dashboard />
-  }
-
+    element: <Dashboard />,
+  },
 ])

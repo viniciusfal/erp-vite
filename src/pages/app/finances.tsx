@@ -23,10 +23,14 @@ import {
 import { Bolt, File, MoveUpRight, Wrench, X } from 'lucide-react'
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
-import { TooltipTrigger } from '@radix-ui/react-tooltip'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { Link } from 'react-router-dom'
-import { listingtransaction } from '@/services/listing-transacrions'
+import { useListingtransaction } from '@/hooks/listing-transacrions'
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
@@ -34,7 +38,7 @@ export function Finances() {
   const [inputType, setInputType] = useState('full')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const handleListingTransactios = listingtransaction(currentPage, inputType)
+  const handleListingTransactios = useListingtransaction(currentPage, inputType)
 
   const currentTransactions = handleListingTransactios.currentTransactions
   const totalPages = handleListingTransactios.totalPages
@@ -62,7 +66,14 @@ export function Finances() {
       </div>
 
       <div className="flex gap-2">
-        <TableTransaction currentPage={currentPage} setVisible={setVisible} currentTransactions={currentTransactions} totalPages={totalPages} setCurrentPage={setCurrentPage} setInputType={setInputType} inputType={inputType}
+        <TableTransaction
+          currentPage={currentPage}
+          setVisible={setVisible}
+          currentTransactions={currentTransactions}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+          setInputType={setInputType}
+          inputType={inputType}
         />
 
         <div className="flex w-1/3 flex-col gap-2">
@@ -90,8 +101,6 @@ export function Finances() {
             </div>
 
             <TopIncome currentTransactions={currentTransactions} />
-
-
           </div>
 
           <div className="flex h-1/2 w-full flex-col rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
@@ -107,19 +116,22 @@ export function Finances() {
             </div>
 
             {Array.from({ length: 2 }).map((_, index) => (
-              <Card className="mt-2 bg-muted" key={index} >
-                <CardHeader >
-                  <div className="flex justify-between items-center">
+              <Card className="mt-2 bg-muted" key={index}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
                     <CardTitle className="font-medium">
                       Boleto Transdata
                     </CardTitle>
-                    <div className="flex gap-1 items-center">
+                    <div className="flex items-center gap-1">
                       <div>
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger>
                               <Link to="#">
-                                <Button variant="outline" className="rounded-full">
+                                <Button
+                                  variant="outline"
+                                  className="rounded-full"
+                                >
                                   <File className="size-3 text-muted-foreground" />
                                 </Button>
                               </Link>
@@ -129,14 +141,16 @@ export function Finances() {
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
-
                       </div>
 
                       <div>
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger>
-                              <Button variant="outline" className="rounded-full">
+                              <Button
+                                variant="outline"
+                                className="rounded-full"
+                              >
                                 <Wrench className="size-3 text-muted-foreground" />
                               </Button>
                             </TooltipTrigger>
@@ -152,7 +166,7 @@ export function Finances() {
                           <Tooltip>
                             <TooltipTrigger className="">
                               <Button
-                                className="rounded-full  hover:bg-red-300 hover:text-white bg-red-400 text-white"
+                                className="rounded-full bg-red-400 text-white hover:bg-red-300 hover:text-white"
                                 variant="outline"
                               >
                                 <X className="size-3" />
@@ -173,8 +187,7 @@ export function Finances() {
                     Vencimento: 04/10/2024
                   </span>
 
-
-                  < Button className="bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90">
+                  <Button className="bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90">
                     Marcar como Pago
                   </Button>
                 </CardContent>
@@ -184,23 +197,21 @@ export function Finances() {
         </div>
       </div>
 
-      {
-        visible === true ? (
-          <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
-            <CardTransaction setVisible={setVisible} />
-          </div>
-        ) : (<div></div>)
-      }
+      {visible === true ? (
+        <div className="z-1 fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-60">
+          <CardTransaction setVisible={setVisible} />
+        </div>
+      ) : (
+        <div></div>
+      )}
 
-      {
-        visiblePayment === true ? (
-          <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
-            <Payments setVisiblePayment={setVisiblePayment} />
-          </div>
-        ) : (<div></div>)
-      }
-    </div >
-
-
+      {visiblePayment === true ? (
+        <div className="z-1 fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-60">
+          <Payments setVisiblePayment={setVisiblePayment} />
+        </div>
+      ) : (
+        <div></div>
+      )}
+    </div>
   )
 }
