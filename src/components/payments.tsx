@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "./ui/pagination";
 import { useState, Dispatch } from "react";
 
-import { listingPayments } from "@/services/listing-payments";
+import { useListingPayments } from "@/hooks/listing-payments";
 import { useMutation } from "@tanstack/react-query";
 import { markPayment } from "@/api/mark-payment";
 import { queryClient } from "@/lib/query-client";
@@ -21,6 +21,7 @@ interface PaymentProps {
 export function Payments({ setVisiblePayment }: PaymentProps) {
   const [valuePaymentFilter, setValuePaymentFilter] = useState('unpaid')
   const [currentPage, setCurrentPage] = useState(1)
+
 
   const { mutateAsync: transaction } = useMutation({
     mutationFn: markPayment,
@@ -43,7 +44,7 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
     }
   }
 
-  const allPayments = listingPayments(currentPage)
+  const allPayments = useListingPayments(currentPage, valuePaymentFilter)
   const currentPayments = allPayments.paymentTransactions
   const totalPages = allPayments.totalPages
 
@@ -51,7 +52,7 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
 
   return (
     <div className="">
-      <Card className="w-[800px] h-[850px] relative" >
+      <Card className="w-[50vw] h-[95vh] relative max-lg:w-[80vw]" >
         <CardHeader className="">
           <div className="flex justify-between items-center">
             <CardTitle>Historico de Agendamentos</CardTitle>

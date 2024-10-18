@@ -6,7 +6,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { type Transactions } from '@/services/listing-transacrions';
+import { useListingtransaction } from '@/hooks/listing-transactions';
 
 export const description = 'A bar chart';
 
@@ -17,11 +17,10 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-interface CurrentT {
-  currentTransactions: Transactions[] | undefined
-}
 
-export function TopIncome({ currentTransactions }: CurrentT) {
+export function TopIncome() {
+  const { currentTransactions } = useListingtransaction(1, 'entrada')
+
   // Agrupar e somar as entradas por categoria
   const totals = (currentTransactions || [])
     .filter(transaction => transaction.type === 'entrada')

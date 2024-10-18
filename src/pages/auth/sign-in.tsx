@@ -84,7 +84,9 @@ export function SignIn() {
         </form>
       </section>
 
-      <section className="0 my-4 mr-4 w-1/2 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-950 font-semibold italic max-md:bg-none"></section>
+      <section className="0 my-4 mr-4 w-1/2 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-950 font-semibold italic max-md:bg-none">
+
+      </section>
     </div>
   )
 }

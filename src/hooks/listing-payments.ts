@@ -17,7 +17,7 @@ export interface Transactions {
 
 const ITEMS_PER_PAGE = 4
 
-export function listingPayments(currentPage: number) {
+export function useListingPayments(currentPage: number, valuePaymentFilter: string) {
   const { data: transactions, isLoading } = useQuery<Transactions[]>({
     queryKey: ['transactions'],
     queryFn: getTransactions
@@ -27,14 +27,20 @@ export function listingPayments(currentPage: number) {
     return { paymentTransactions: [], totalPages: 0 }; // ou retornar algum estado de carregamento
   }
 
+
+
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
 
   const filteredPayments = transactions?.filter((t) => t.scheduling === true && t.type === 'saida')
 
+  const finalFilteredPayments = filteredPayments?.filter((payment) => {
+    return valuePaymentFilter === 'paid' ? payment.pay === true : payment.pay === false
+  })
+
   const totalPages = filteredPayments ? Math.ceil(filteredPayments.length / ITEMS_PER_PAGE) : 1
 
-  const paymentTransactions = filteredPayments?.slice(startIndex, endIndex)
+  const paymentTransactions = finalFilteredPayments?.slice(startIndex, endIndex)
 
   return { paymentTransactions, totalPages }
 }

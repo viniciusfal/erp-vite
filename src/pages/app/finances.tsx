@@ -26,8 +26,8 @@ import { Helmet } from 'react-helmet-async'
 import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
 import { TooltipTrigger } from '@radix-ui/react-tooltip'
 import { Link } from 'react-router-dom'
-import { listingtransaction } from '@/services/listing-transacrions'
-import { listingPayments } from '@/services/listing-payments'
+import { useListingtransaction } from '@/hooks/listing-transactions'
+import { useListingPayments } from '@/hooks/listing-payments'
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
@@ -35,11 +35,11 @@ export function Finances() {
   const [inputType, setInputType] = useState('full')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const handleListingTransactios = listingtransaction(currentPage, inputType)
+  const handleListingTransactios = useListingtransaction(currentPage, inputType)
   const currentTransactions = handleListingTransactios.currentTransactions
   const totalPages = handleListingTransactios.totalPages
 
-  const allPayments = listingPayments(1)
+  const allPayments = useListingPayments(1, 'unpaid')
   const currentPayments = allPayments.paymentTransactions
 
 
@@ -55,10 +55,8 @@ export function Finances() {
     })
     .slice(0, 2)
 
-
-
   return (
-    <div className="">
+    <div className="min-h-screen">
       <div className="flex items-center justify-between">
         <Helmet titleTemplate="Financeiro" />
 
@@ -107,7 +105,7 @@ export function Finances() {
               </Select>
             </div>
 
-            <TopIncome currentTransactions={currentTransactions} />
+            <TopIncome />
 
 
           </div>

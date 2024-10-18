@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+
 import { SelectGroup } from '@radix-ui/react-select'
 import { File, Plus, Wrench, X } from 'lucide-react'
 import { Button } from './ui/button'
@@ -43,8 +44,10 @@ import { removeTransaction } from '@/api/remove-transaction'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { queryClient } from '@/lib/query-client'
-import type { Dispatch, SetStateAction } from 'react'
-import type { Transactions } from '@/services/listing-transacrions'
+import { useState, type Dispatch, type SetStateAction } from 'react'
+import type { Transactions } from '@/hooks/listing-transactions'
+import { setTransaction } from '@/api/set-transactions'
+import { Input } from './ui/input'
 
 interface TableProps {
   setVisible: Dispatch<SetStateAction<boolean>>;
@@ -56,7 +59,6 @@ interface TableProps {
   currentPage: number
 }
 
-
 const TransactionID = z.object({
   id: z.string().uuid()
 })
@@ -64,6 +66,78 @@ const TransactionID = z.object({
 type transactionID = z.infer<typeof TransactionID>
 
 export function TableTransaction({ setVisible, setInputType, setCurrentPage, currentTransactions, inputType, totalPages, currentPage }: TableProps) {
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editedData, setEditedData] = useState<Partial<Transactions>>({})
+
+  const { mutateAsync: updateTransaction } = useMutation({
+    mutationFn: setTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      toast.success('transação atualizada com sucesso')
+      setEditingId(null) // para sair do modo de edição
+    },
+
+    onError: () => {
+      toast.error('Falha ao atualizar transação')
+    }
+  })
+
+  function handleEditClick(id: string, transaction: Transactions) {
+    setEditingId(id);
+    setEditedData(transaction);
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    const { name, value, type } = e.target;
+    if (type === 'date') {
+      // Mantém o formato "YYYY-MM-DD" diretamente
+      setEditedData({ ...editedData, [name]: value });
+    } else {
+      setEditedData({ ...editedData, [name]: value });
+    }
+  }
+
+
+
+  async function handleSave() {
+    if (editingId) {
+      try {
+        const existingTransaction = currentTransactions?.find(
+          (t) => t.transaction_id === editingId
+        );
+
+        if (existingTransaction) {
+          // Verifica se editedData.payment_date é uma string e converte para Date
+          const paymentDate =
+            editedData.payment_date && typeof editedData.payment_date === 'string'
+              ? new Date(editedData.payment_date) // Converte string para Date
+              : existingTransaction.payment_date ?? null; // Usa a data original se não houver edição ou null
+
+          await updateTransaction({
+            id: editingId,
+            title: editedData.title ?? existingTransaction.title,
+            category: editedData.category ?? existingTransaction.category,
+            value: editedData.value ? parseFloat(editedData.value.toString()) : existingTransaction.value,
+            type: editedData.type ?? existingTransaction.type,
+            scheduling: editedData.scheduling ?? existingTransaction.scheduling,
+            payment_date: paymentDate ? paymentDate.toISOString() : null, // Converte Date para ISO String
+            created_at: existingTransaction.created_at,
+            updated_at: new Date(),
+          });
+
+          setEditingId(null);
+          setEditedData({});
+        }
+      } catch (err) {
+        console.error('Erro ao atualizar transação:', err);
+        toast.error('Erro ao atualizar a transação');
+      }
+    }
+  }
+
+
+
+
 
   const { mutateAsync: transaction } = useMutation({
     mutationFn: removeTransaction,
@@ -78,7 +152,6 @@ export function TableTransaction({ setVisible, setInputType, setCurrentPage, cur
       toast.error('Falha ao excluir transação.');
     }
   });
-
 
   async function handleConfirmRemove(data: transactionID) {
     try {
@@ -138,13 +211,70 @@ export function TableTransaction({ setVisible, setInputType, setCurrentPage, cur
           </TableRow>
         </TableHeader>
         <TableBody className="text-sm">
-          {currentTransactions?.map((t, index) => (
-            <TableRow key={t.transaction_id} className="border-muted">
-              <TableCell>{index + 1}{". " + t.title}</TableCell>
-              <TableCell>{t.value}</TableCell>
-              <TableCell>{t.category}</TableCell>
-              <TableCell>{t.scheduling ? 'Sim' : 'Não'}</TableCell>
-              <TableCell>{t.payment_date ? new Date(t.payment_date).toLocaleDateString() : new Date(t.created_at).toLocaleDateString()}</TableCell>
+          {currentTransactions?.map((t) => (
+            <TableRow key={t.transaction_id} className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''}`}
+            >
+              <TableCell>
+                {editingId === t.transaction_id ? (
+                  <Input
+                    type='text'
+                    name='title'
+                    value={editedData.title}
+                    onChange={handleChange} />
+                ) : (
+                  t.title
+                )}
+              </TableCell>
+              <TableCell>
+                {editingId === t.transaction_id ? (
+                  <Input
+                    type='number'
+                    name='value'
+                    value={Number(editedData.value)}
+                    onChange={handleChange} />
+                ) : (
+                  t.value
+                )}
+              </TableCell>
+              <TableCell>
+                {editingId === t.transaction_id ? (
+                  <Input
+                    type='text'
+                    name='category'
+                    value={editedData.category}
+                    onChange={handleChange} />
+                ) : (
+                  t.category
+                )}
+              </TableCell>
+              <TableCell>
+                {editingId === t.transaction_id ? (
+                  <Select onValueChange={() => handleChange} value={t.scheduling ? 'sim' : 'nao'}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='sim'>Sim</SelectItem>
+                      <SelectItem value='nao'>Não</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  t.scheduling
+                )}
+              </TableCell>
+              <TableCell>
+                {editingId === t.transaction_id ? (
+                  <Input
+                    type='date'
+                    name='payment_date'
+                    value={editedData.payment_date ? new Date(editedData.payment_date).toISOString().split('T')[0] : ''}
+                    onChange={handleChange}
+                  />
+
+                ) : (
+                  t.payment_date ? new Date(t.payment_date).toLocaleDateString() : new Date(t.created_at).toLocaleDateString()
+                )}
+              </TableCell>
               <TableCell>
                 <Link to={t.annex ? t.annex : '#'}>
                   <File className="size-4 text-muted-foreground" />
@@ -152,36 +282,63 @@ export function TableTransaction({ setVisible, setInputType, setCurrentPage, cur
               </TableCell>
               <TableCell>
                 <Button
-                  className={t.type === 'entrada' ? 'rounded-full bg-green-100 p-3 text-xs text-green-400 hover:cursor-default hover:bg-green-100' :
-                    'rounded-full bg-red-400 p-3 text-xs text-red-50 hover:cursor-default hover:bg-red-400'}
+                  className={t.type === 'entrada' ? 'rounded-full bg-green-100 w-16 text-xs text-green-400 hover:cursor-default hover:bg-green-100' :
+                    'rounded-full bg-red-400 w-16 text-xs text-red-50 hover:cursor-default hover:bg-red-400'}
                 >
                   {t.type}
                 </Button>
               </TableCell>
               <TableCell>
-                <Button variant="ghost" className="rounded-full">
-                  <Wrench className="size-4 text-muted-foreground" />
-                </Button>
+                {editingId === t.transaction_id ? (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={handleSave}
+                      className="text-green-500"
+                    >
+                      Salvar
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={() => handleEditClick(t.transaction_id, t)}
+                  >
+                    <Wrench className="size-4 text-muted-foreground" />
+                  </Button>
+                )}
               </TableCell>
               <TableCell>
-                <AlertDialog>
-                  <AlertDialogTrigger>
-                    <Button variant='ghost' className='hover:bg-red-400  text-red-400 hover:text-white
-                    '>
-                      <X className='size-4' />
+                {editingId === t.transaction_id ? (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setEditingId(null)}
+                      className="text-red-500"
+                    >
+                      Cancelar
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Tem certeza que deseja excluir essa transação?</AlertDialogTitle>
-                      <AlertDialogDescription>Ao exlcuir você não tera mais acesso a essa transação.</AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleConfirmRemove({ id: t.transaction_id })}>Excluir</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                  </div>
+                ) : (
+                  <AlertDialog>
+                    <AlertDialogTrigger>
+                      <Button variant='ghost' className='hover:bg-red-400  text-red-400 hover:text-white'>
+                        <X className='size-4' />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Tem certeza que deseja excluir essa transação?</AlertDialogTitle>
+                        <AlertDialogDescription>Ao excluir você não terá mais acesso a essa transação.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleConfirmRemove({ id: t.transaction_id })}>Excluir</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </TableCell>
             </TableRow>
           ))}

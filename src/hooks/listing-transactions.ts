@@ -16,7 +16,7 @@ export interface Transactions {
 
 const ITEMS_PER_PAGE = 10
 
-export function listingtransaction(currentPage: number, inputType: string) {
+export function useListingtransaction(currentPage: number, inputType: string) {
   const { data: transactions } = useQuery<Transactions[]>({
     queryKey: ['transactions'],
     queryFn: getTransactions
