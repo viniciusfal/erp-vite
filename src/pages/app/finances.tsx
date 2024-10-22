@@ -26,7 +26,6 @@ import { Helmet } from 'react-helmet-async'
 import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
 import { TooltipTrigger } from '@radix-ui/react-tooltip'
 import { Link } from 'react-router-dom'
-import { useListingtransaction } from '@/hooks/listing-transactions'
 import { useListingPayments } from '@/hooks/listing-payments'
 
 export function Finances() {
@@ -35,9 +34,7 @@ export function Finances() {
   const [inputType, setInputType] = useState('full')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const handleListingTransactios = useListingtransaction(currentPage, inputType)
-  const currentTransactions = handleListingTransactios.currentTransactions
-  const totalPages = handleListingTransactios.totalPages
+
 
   const allPayments = useListingPayments(1, 'unpaid')
   const currentPayments = allPayments.paymentTransactions
@@ -78,7 +75,7 @@ export function Finances() {
       </div>
 
       <div className="flex gap-2">
-        <TableTransaction currentPage={currentPage} setVisible={setVisible} currentTransactions={currentTransactions} totalPages={totalPages} setCurrentPage={setCurrentPage} setInputType={setInputType} inputType={inputType}
+        <TableTransaction currentPage={currentPage} setVisible={setVisible} setCurrentPage={setCurrentPage} setInputType={setInputType} inputType={inputType}
         />
 
         <div className="flex w-1/3 flex-col gap-2">

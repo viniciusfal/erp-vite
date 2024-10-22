@@ -1,8 +1,7 @@
 'use client'
 
-import * as React from 'react'
 import { CalendarIcon } from '@radix-ui/react-icons'
-import { addDays, format } from 'date-fns'
+import { format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 
 import { cn } from '@/lib/utils'
@@ -10,14 +9,48 @@ import { Popover, PopoverContent } from './ui/popover'
 import { PopoverTrigger } from '@radix-ui/react-popover'
 import { Button } from './ui/button'
 import { Calendar } from './ui/calendar'
+import { useState } from 'react'
+
+import { z } from 'zod'
+import { toast } from 'sonner'
+import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
+
+const inDates = z.object({
+  start_date: z.date(),
+  end_date: z.date()
+})
+
+type InDates = z.infer<typeof inDates>
 
 export function CalendarDateRangePicker({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2023, 0, 20),
-    to: addDays(new Date(2023, 0, 20), 20),
+  const { transactionsByDate } = useListingtransactionByDate()
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date())
+  const [endDate, setEndDate] = useState<Date | undefined>(new Date())
+
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: startDate,
+    to: endDate
   })
+
+  async function handleTransactionByDate(data: InDates) {
+    try {
+      await transactionsByDate({
+        start_date: data.start_date,
+        end_date: data.end_date
+      })
+
+      setStartDate(data.start_date)
+      setEndDate(data.end_date)
+      setDate({ from: data.start_date, to: data.end_date })
+
+      console.log(data)
+    } catch (err) {
+      toast.error(`Erro ao tentar buscar transações por data: ${err}`)
+    }
+  }
+
 
   return (
     <div className={cn('grid gap-2', className)}>
@@ -52,7 +85,7 @@ export function CalendarDateRangePicker({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={setDate}
+            onSelect={(range) => range?.from && range.to && handleTransactionByDate({ start_date: range?.from, end_date: range?.to })}
             numberOfMonths={2}
           />
         </PopoverContent>
