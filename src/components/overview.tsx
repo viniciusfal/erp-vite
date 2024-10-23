@@ -17,17 +17,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
+import { useGroupTransactionByMonth } from '@/hooks/group-transaction-by-mounth'
+import { useListingtransaction } from '@/hooks/listing-transactions'
+import { useEffect, useState } from 'react'
 
 export const description = 'A multiple bar chart'
 
-const chartData = [
-  { month: 'Janeiro', desktop: 186, mobile: 80 },
-  { month: 'Fevereiro', desktop: 305, mobile: 200 },
-  { month: 'Março', desktop: 237, mobile: 120 },
-  { month: 'Abril', desktop: 73, mobile: 190 },
-  { month: 'Maio', desktop: 209, mobile: 130 },
-  { month: 'Junho', desktop: 214, mobile: 140 },
-]
 
 const chartConfig = {
   desktop: {
@@ -41,6 +36,47 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function Overview() {
+  const { currentTransactions } = useListingtransaction(1, 'full')
+  const [totalIncome, setTotalIncome] = useState(0)
+  const [totalOutcome, setTotalOutcome] = useState(0)
+
+  const transactions = currentTransactions?.filter((t) => {
+    const date = t.payment_date?.getMonth() === 1
+
+    return date
+  })
+
+
+
+  useEffect(() => {
+    const incomes = transactions?.reduce((acc, transaction) => {
+      if (transaction.type === 'entrada') {
+        return acc + transaction.value
+      }
+      return acc
+    }, 0) || 0
+
+    const outcomes = currentTransactions?.reduce((acc, transaction) => {
+      if (transaction.type === 'saida') {
+        return acc + transaction.value
+      }
+      return acc
+    }, 0) || 0
+
+    setTotalIncome(incomes)
+    setTotalOutcome(outcomes)
+  }, [currentTransactions])
+
+
+  const chartData = [
+    { month: 'janeiro', desktop: 186, mobile: 80 },
+    { month: 'Fevereiro', desktop: 305, mobile: 200 },
+    { month: 'Março', desktop: 237, mobile: 120 },
+    { month: 'Abril', desktop: 73, mobile: 190 },
+    { month: 'Maio', desktop: 209, mobile: 130 },
+    { month: 'Junho', desktop: 214, mobile: 140 },
+  ]
+
   return (
     <Card>
       <CardHeader>
