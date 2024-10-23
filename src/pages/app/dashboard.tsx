@@ -11,9 +11,37 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useDateRange } from '@/hooks/date-ranger-context'
+import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
 import { Bolt, CircleMinus, CirclePlus, Download } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export function Dashboard() {
+  const { dateRange } = useDateRange()
+  const { startDate, endDate } = dateRange
+  const { currentTransactions } = useListingtransactionByDate(startDate, endDate, 1, 'full')
+  const [totalIncome, setTotalIncome] = useState(0)
+  const [totalOutcome, setTotalOutcome] = useState(0)
+
+  useEffect(() => {
+    const incomes = currentTransactions?.reduce((acc, transaction) => {
+      if (transaction.type === 'entrada') {
+        return acc + transaction.value
+      }
+      return acc
+    }, 0) || 0
+
+    const outcomes = currentTransactions?.reduce((acc, transaction) => {
+      if (transaction.type === 'saida') {
+        return acc + transaction.value
+      }
+      return acc
+    }, 0) || 0
+
+    setTotalIncome(incomes)
+    setTotalOutcome(outcomes)
+  }, [currentTransactions])
+
   return (
     <div className="bg-primary-foreground">
       <Header />
@@ -70,7 +98,7 @@ export function Dashboard() {
               <Card className="bg-gradient-to-tr from-sky-800 to-sky-500 text-white">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Faturamento Total
+                    Balanço
                   </CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +114,10 @@ export function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">R$45,231.89</div>
+                  <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  }).format(totalIncome - totalOutcome)}</div>
                   <p className="text-xs text-muted">
                     +20.1% do que o mês passado
                   </p>
@@ -100,7 +131,10 @@ export function Dashboard() {
                   <CirclePlus className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">R$ 10,000.25</div>
+                  <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  }).format(totalIncome)}</div>
                   <p className="text-xs text-muted-foreground">
                     +180.1% que no mês passado
                   </p>
@@ -112,7 +146,10 @@ export function Dashboard() {
                   <CircleMinus className="size-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">R$ 2,000.14</div>
+                  <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  }).format(totalOutcome)}</div>
                   <p className="text-xs text-muted-foreground">
                     +19% from last month
                   </p>

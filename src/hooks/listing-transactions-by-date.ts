@@ -15,10 +15,6 @@ interface Transaction {
   pay: boolean;
 }
 
-interface GetTransactionRequest {
-  start_date: string;
-  end_date: string;
-}
 
 const ITEMS_PER_PAGE = 10;
 
