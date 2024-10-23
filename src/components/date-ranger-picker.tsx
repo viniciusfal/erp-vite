@@ -13,7 +13,7 @@ import { useState } from 'react'
 
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
+import { useDateRange } from '@/hooks/date-ranger-context'
 
 const inDates = z.object({
   start_date: z.date(),
@@ -25,9 +25,8 @@ type InDates = z.infer<typeof inDates>
 export function CalendarDateRangePicker({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const { transactionsByDate } = useListingtransactionByDate()
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date())
-  const [endDate, setEndDate] = useState<Date | undefined>(new Date())
+  const { dateRange, setDateRange } = useDateRange()
+  const { startDate, endDate } = dateRange
 
   const [date, setDate] = useState<DateRange | undefined>({
     from: startDate,
@@ -36,21 +35,16 @@ export function CalendarDateRangePicker({
 
   async function handleTransactionByDate(data: InDates) {
     try {
-      await transactionsByDate({
-        start_date: data.start_date,
-        end_date: data.end_date
-      })
 
-      setStartDate(data.start_date)
-      setEndDate(data.end_date)
+      setDateRange({ startDate: data.start_date, endDate: data.end_date })
+      setDate({ from: data.start_date, to: data.end_date })
       setDate({ from: data.start_date, to: data.end_date })
 
-      console.log(data)
+
     } catch (err) {
       toast.error(`Erro ao tentar buscar transações por data: ${err}`)
     }
   }
-
 
   return (
     <div className={cn('grid gap-2', className)}>

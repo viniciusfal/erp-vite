@@ -4,8 +4,6 @@ import { setTransaction } from '@/api/set-transactions';
 import { toast } from 'sonner';
 import { queryClient } from '@/lib/query-client';
 import { Card, CardContent } from './ui/card';
-import { Input } from './ui/input';
-import { Select } from './ui/select';
 import { TableCell } from './ui/table';
 import { Link } from 'react-router-dom';
 import { File } from 'lucide-react';

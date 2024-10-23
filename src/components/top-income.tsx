@@ -6,7 +6,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { useListingtransaction } from '@/hooks/listing-transactions';
+import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date';
+import { useDateRange } from '@/hooks/date-ranger-context';
 
 export const description = 'A bar chart';
 
@@ -19,7 +20,9 @@ const chartConfig = {
 
 
 export function TopIncome() {
-  const { currentTransactions } = useListingtransaction(1, 'entrada')
+  const { dateRange } = useDateRange()
+  const { startDate, endDate } = dateRange
+  const { currentTransactions } = useListingtransactionByDate(startDate, endDate, 1, 'entrada')
 
   // Agrupar e somar as entradas por categoria
   const totals = (currentTransactions || [])

@@ -1,8 +1,8 @@
 import { api } from '@/lib/axios'
 
 interface GetTransactionRequest {
-  start_date: Date
-  end_date: Date
+  start_date: string
+  end_date: string
 }
 
 interface GetTransactionResponse {
@@ -20,8 +20,11 @@ interface GetTransactionResponse {
 }
 
 
-export async function getTransactionsByDate(data: GetTransactionRequest) {
-  const response = await api.post<GetTransactionResponse[]>('/transaction/by-date', data)
+
+
+
+export async function getTransactionsByDate({ start_date, end_date }: GetTransactionRequest) {
+  const response = await api.get<GetTransactionResponse[]>(`/transaction/byDate/${start_date}/${end_date}`)
 
   return response.data
 }

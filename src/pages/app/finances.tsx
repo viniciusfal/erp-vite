@@ -31,10 +31,6 @@ import { useListingPayments } from '@/hooks/listing-payments'
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
   const [visiblePayment, setVisiblePayment] = useState<boolean>(false)
-  const [inputType, setInputType] = useState('full')
-  const [currentPage, setCurrentPage] = useState(1)
-
-
 
   const allPayments = useListingPayments(1, 'unpaid')
   const currentPayments = allPayments.paymentTransactions
@@ -75,8 +71,7 @@ export function Finances() {
       </div>
 
       <div className="flex gap-2">
-        <TableTransaction currentPage={currentPage} setVisible={setVisible} setCurrentPage={setCurrentPage} setInputType={setInputType} inputType={inputType}
-        />
+        <TableTransaction setVisible={setVisible} />
 
         <div className="flex w-1/3 flex-col gap-2">
           <div className="flex h-1/2 w-full flex-col justify-between rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">

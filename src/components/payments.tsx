@@ -1,5 +1,4 @@
 import { File, Wrench, X } from "lucide-react";
-import { CalendarDateRangePicker } from "./date-ranger-picker";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -57,7 +56,7 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
           <div className="flex justify-between items-center">
             <CardTitle>Historico de Agendamentos</CardTitle>
             <div className="flex gap-2">
-              <CalendarDateRangePicker />
+
               <Select onValueChange={setValuePaymentFilter}>
                 <SelectTrigger className="w-[180px]" value={valuePaymentFilter}>
                   <SelectValue placeholder="Escolha..." />

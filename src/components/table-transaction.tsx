@@ -25,7 +25,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-
 import {
   Select,
   SelectContent,
@@ -44,18 +43,15 @@ import { removeTransaction } from '@/api/remove-transaction'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { queryClient } from '@/lib/query-client'
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import type { Transactions } from '@/hooks/listing-transactions'
 import { setTransaction } from '@/api/set-transactions'
 import { Input } from './ui/input'
+import { useDateRange } from '@/hooks/date-ranger-context'
 import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
 
 interface TableProps {
   setVisible: Dispatch<SetStateAction<boolean>>;
-  setCurrentPage: Dispatch<SetStateAction<number>>;
-  setInputType: Dispatch<SetStateAction<string>>;
-  inputType: string;
-  currentPage: number
 }
 
 const TransactionID = z.object({
@@ -64,9 +60,22 @@ const TransactionID = z.object({
 
 type transactionID = z.infer<typeof TransactionID>
 
-export function TableTransaction({ setVisible, setInputType, setCurrentPage, inputType, currentPage }: TableProps) {
+export function TableTransaction({ setVisible }: TableProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editedData, setEditedData] = useState<Partial<Transactions>>({})
+  const [currentPage, setCurrentPage] = useState(1);
+  const [inputType, setInputType] = useState('full');
+  const { dateRange } = useDateRange()
+  const { startDate, endDate } = dateRange
+
+
+  const { currentTransactions, totalPages } = useListingtransactionByDate(
+    startDate,
+    endDate,
+    currentPage,
+    inputType
+  );
+
 
   const { mutateAsync: updateTransaction } = useMutation({
     mutationFn: setTransaction,
@@ -80,8 +89,6 @@ export function TableTransaction({ setVisible, setInputType, setCurrentPage, inp
       toast.error('Falha ao atualizar transação')
     }
   })
-
-
 
   function handleEditClick(id: string, transaction: Transactions) {
     setEditingId(id);
@@ -98,11 +105,10 @@ export function TableTransaction({ setVisible, setInputType, setCurrentPage, inp
     }
   }
 
-
   async function handleSave() {
     if (editingId) {
       try {
-        const existingTransaction = currentTransactions.find(
+        const existingTransaction = currentTransactions?.find(
           (t) => t.transaction_id === editingId
         );
 
@@ -134,6 +140,7 @@ export function TableTransaction({ setVisible, setInputType, setCurrentPage, inp
       }
     }
   }
+
 
 
   const { mutateAsync: transaction } = useMutation({
