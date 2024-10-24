@@ -17,9 +17,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-import { useGroupTransactionByMonth } from '@/hooks/group-transaction-by-mounth'
 import { useListingtransaction } from '@/hooks/listing-transactions'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 
 export const description = 'A multiple bar chart'
 
@@ -37,44 +36,37 @@ const chartConfig = {
 
 export function Overview() {
   const { currentTransactions } = useListingtransaction(1, 'full')
-  const [totalIncome, setTotalIncome] = useState(0)
-  const [totalOutcome, setTotalOutcome] = useState(0)
-
-  const transactions = currentTransactions?.filter((t) => {
-    const date = t.payment_date?.getMonth() === 1
-
-    return date
-  })
 
 
+  const monthlyTotals = useMemo(() => {
+    const totals = Array.from({ length: 12 }, () => ({
+      income: 0,
+      outcome: 0
+    }))
 
-  useEffect(() => {
-    const incomes = transactions?.reduce((acc, transaction) => {
-      if (transaction.type === 'entrada') {
-        return acc + transaction.value
+    currentTransactions?.forEach((t) => {
+      if (t.payment_date) {
+        const month = new Date(t.payment_date).getMonth()
+
+        if (t.type === 'entrada') {
+          totals[month].income += t.value
+        } else if (t.type === 'saida') {
+          totals[month].outcome += t.value
+        }
       }
-      return acc
-    }, 0) || 0
+    })
 
-    const outcomes = currentTransactions?.reduce((acc, transaction) => {
-      if (transaction.type === 'saida') {
-        return acc + transaction.value
-      }
-      return acc
-    }, 0) || 0
-
-    setTotalIncome(incomes)
-    setTotalOutcome(outcomes)
+    return totals
   }, [currentTransactions])
 
 
   const chartData = [
-    { month: 'janeiro', desktop: 186, mobile: 80 },
-    { month: 'Fevereiro', desktop: 305, mobile: 200 },
-    { month: 'Março', desktop: 237, mobile: 120 },
-    { month: 'Abril', desktop: 73, mobile: 190 },
-    { month: 'Maio', desktop: 209, mobile: 130 },
-    { month: 'Junho', desktop: 214, mobile: 140 },
+    { month: 'Julho', desktop: monthlyTotals[6]?.income || 0, mobile: monthlyTotals[6]?.outcome || 0 },
+    { month: 'Agosto', desktop: monthlyTotals[7]?.income || 0, mobile: monthlyTotals[7]?.outcome || 0 },
+    { month: 'Setembro', desktop: monthlyTotals[8]?.income || 0, mobile: monthlyTotals[8]?.outcome || 0 },
+    { month: 'Outubro', desktop: monthlyTotals[9]?.income || 0, mobile: monthlyTotals[9]?.outcome || 0 },
+    { month: 'Novembro', desktop: monthlyTotals[10]?.income || 0, mobile: monthlyTotals[10]?.outcome || 0 },
+    { month: 'Dezembro', desktop: monthlyTotals[11]?.income || 0, mobile: monthlyTotals[11]?.outcome || 0 },
   ]
 
   return (
@@ -92,7 +84,7 @@ export function Overview() {
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value = '') => value.slice(0, 3)}
             />
             <ChartTooltip
               cursor={false}

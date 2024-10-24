@@ -27,22 +27,30 @@ export function CalendarDateRangePicker({
 }: React.HTMLAttributes<HTMLDivElement>) {
   const { dateRange, setDateRange } = useDateRange()
   const { startDate, endDate } = dateRange
-
   const [date, setDate] = useState<DateRange | undefined>({
     from: startDate,
     to: endDate
   })
+  const [selectedDates, setSelectedDates] = useState<DateRange | undefined>(date)
+
 
   async function handleTransactionByDate(data: InDates) {
     try {
-
       setDateRange({ startDate: data.start_date, endDate: data.end_date })
-      setDate({ from: data.start_date, to: data.end_date })
-      setDate({ from: data.start_date, to: data.end_date })
-
 
     } catch (err) {
       toast.error(`Erro ao tentar buscar transações por data: ${err}`)
+    }
+  }
+
+  async function handleSearch() {
+    if (selectedDates?.from && selectedDates?.to) {
+      await handleTransactionByDate({
+        start_date: selectedDates.from,
+        end_date: selectedDates.to,
+      })
+    } else {
+      toast.error('Por favor selecione um intervalo válido')
     }
   }
 
@@ -79,9 +87,15 @@ export function CalendarDateRangePicker({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={(range) => range?.from && range.to && handleTransactionByDate({ start_date: range?.from, end_date: range?.to })}
+            onSelect={(range) => {
+              if (range) {
+                setSelectedDates(range);
+                setDate(range);
+              }
+            }}
             numberOfMonths={2}
           />
+          <Button className='my-2 ml-4' onClick={handleSearch}>Buscar</Button>
         </PopoverContent>
       </Popover>
     </div>

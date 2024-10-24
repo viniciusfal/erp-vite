@@ -1,3 +1,4 @@
+import { Analyses } from '@/components/analyses'
 import { CalendarDateRangePicker } from '@/components/date-ranger-picker'
 import { Header } from '@/components/header'
 import { Overview } from '@/components/overview'
@@ -22,6 +23,7 @@ export function Dashboard() {
   const { currentTransactions } = useListingtransactionByDate(startDate, endDate, 1, 'full')
   const [totalIncome, setTotalIncome] = useState(0)
   const [totalOutcome, setTotalOutcome] = useState(0)
+  const [pagineAtual, setPagineAtual] = useState('overview')
 
   useEffect(() => {
     const incomes = currentTransactions?.reduce((acc, transaction) => {
@@ -77,109 +79,119 @@ export function Dashboard() {
             <TabsList>
               <TabsTrigger
                 value="overview"
-                className="rounded-full bg-gradient-to-r from-slate-800 to-slate-950 text-muted"
+                className={pagineAtual === 'overview' ? "rounded-full bg-gradient-to-r from-slate-800 to-slate-950 text-muted" : "rounded-full"}
+                onClick={() => setPagineAtual('overview')}
               >
                 Visão Geral
               </TabsTrigger>
-              <TabsTrigger value="analytics" disabled>
+              <TabsTrigger
+                value="analytics"
+                className={pagineAtual === 'analytics' ? "rounded-full bg-gradient-to-r from-slate-800 to-slate-950 text-muted" : "rounded-full"}
+                onClick={() => setPagineAtual('analytics')}
+              >
                 Analises
               </TabsTrigger>
-              <TabsTrigger value="reports" disabled>
+              <TabsTrigger value="reports" >
                 Relatorios
               </TabsTrigger>
-              <TabsTrigger value="notifications" disabled>
+              <TabsTrigger value="notifications" >
                 Agendamentos
               </TabsTrigger>
             </TabsList>
             <CalendarDateRangePicker />
           </div>
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="bg-gradient-to-tr from-sky-800 to-sky-500 text-white">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Balanço
-                  </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted"
-                  >
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  }).format(totalIncome - totalOutcome)}</div>
-                  <p className="text-xs text-muted">
-                    +20.1% do que o mês passado
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Entradas
-                  </CardTitle>
-                  <CirclePlus className="size-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  }).format(totalIncome)}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +180.1% que no mês passado
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Saídas</CardTitle>
-                  <CircleMinus className="size-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  }).format(totalOutcome)}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +19% from last month
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <Card className="col-span-4">
-                <CardHeader>
-                  <CardTitle>Visão Geral</CardTitle>
-                </CardHeader>
-                <CardContent className="pl-2">
-                  <Overview />
-                </CardContent>
-              </Card>
-              <Card className="col-span-3">
-                <CardHeader>
-                  <CardTitle>Registros recentes</CardTitle>
-                  <CardDescription>
-                    Você fez 265 registros nesse mês.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <RecentSales />
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+          {pagineAtual === 'overview' ? (
+            <TabsContent value="overview" className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Card className="bg-gradient-to-tr from-sky-800 to-sky-500 text-white">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Balanço
+                    </CardTitle>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      className="h-4 w-4 text-muted"
+                    >
+                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(totalIncome - totalOutcome)}</div>
+                    <p className="text-xs text-muted">
+                      +20.1% do que o mês passado
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Entradas
+                    </CardTitle>
+                    <CirclePlus className="size-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(totalIncome)}</div>
+                    <p className="text-xs text-muted-foreground">
+                      +180.1% que no mês passado
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Saídas</CardTitle>
+                    <CircleMinus className="size-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(totalOutcome)}</div>
+                    <p className="text-xs text-muted-foreground">
+                      +19% from last month
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <Card className="col-span-4">
+                  <CardHeader>
+                    <CardTitle>Visão Geral</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pl-2">
+                    <Overview />
+                  </CardContent>
+                </Card>
+                <Card className="col-span-3">
+                  <CardHeader>
+                    <CardTitle>Registros recentes</CardTitle>
+                    <CardDescription>
+                      Você fez 265 registros nesse mês.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <RecentSales />
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          ) : pagineAtual === 'analytics' ? (
+            <Analyses />
+          ) : <div></div>}
+
         </Tabs>
-      </div>
-    </div>
+      </div >
+    </div >
   )
 }

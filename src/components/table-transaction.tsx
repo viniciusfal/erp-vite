@@ -76,11 +76,10 @@ export function TableTransaction({ setVisible }: TableProps) {
     inputType
   );
 
-
   const { mutateAsync: updateTransaction } = useMutation({
     mutationFn: setTransaction,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['transactionsByDate'] })
       toast.success('transação atualizada com sucesso')
       setEditingId(null) // para sair do modo de edição
     },
@@ -141,13 +140,11 @@ export function TableTransaction({ setVisible }: TableProps) {
     }
   }
 
-
-
   const { mutateAsync: transaction } = useMutation({
     mutationFn: removeTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['transactions'],
+        queryKey: ['transactionsByDate'],
         exact: false, // Se quiser invalidar todas as consultas que começam com 'transactions'
       });
       toast.warning('Transação Deletada com sucesso.');

@@ -7,7 +7,7 @@ interface DateRange {
 }
 
 interface DateRangeContextType {
-  dateRange: DateRange;
+  dateRange: DateRange
   setDateRange: (range: DateRange) => void;
 }
 

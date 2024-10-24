@@ -48,7 +48,7 @@ export function CardTransaction({ setVisible }: any) {
     mutationFn: registerTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['transactions']
+        queryKey: ['transactionsByDate']
       })
       toast.success("Transação cadastrada com sucesso.");
     },

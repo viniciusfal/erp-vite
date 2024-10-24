@@ -3,7 +3,7 @@ import { ArrowRightLeft } from 'lucide-react'
 import { format, isSameDay } from 'date-fns'
 
 export function RecentSales() {
-  const { currentTransactions } = useListingtransaction(2, 'full')
+  const { currentTransactions } = useListingtransaction(3, 'full')
 
   const today = new Date()
 

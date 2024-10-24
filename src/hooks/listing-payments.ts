@@ -19,14 +19,13 @@ const ITEMS_PER_PAGE = 4
 
 export function useListingPayments(currentPage: number, valuePaymentFilter: string) {
   const { data: transactions, isLoading } = useQuery<Transactions[]>({
-    queryKey: ['transactions'],
+    queryKey: ['transactionsByDate'],
     queryFn: getTransactions
   })
 
   if (isLoading) {
     return { paymentTransactions: [], totalPages: 0 }; // ou retornar algum estado de carregamento
   }
-
 
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE

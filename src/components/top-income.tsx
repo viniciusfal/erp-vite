@@ -18,7 +18,6 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-
 export function TopIncome() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
@@ -44,8 +43,9 @@ export function TopIncome() {
     ))
     .sort((a, b) => b.desktop - a.desktop) // Ordenando de forma descrescente
     .slice(0, 3) // Pegar o top 3
+
   return (
-    <ChartContainer config={chartConfig}>
+    <ChartContainer config={chartConfig} className='h-full pb-2.5'>
       <BarChart
         accessibilityLayer
         data={chartData}
@@ -53,6 +53,7 @@ export function TopIncome() {
         barCategoryGap="0%"
 
       >
+
         <defs>
           <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" style={{ stopColor: '#003f5c', stopOpacity: 1 }} />

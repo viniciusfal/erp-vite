@@ -20,9 +20,6 @@ interface GetTransactionResponse {
 }
 
 
-
-
-
 export async function getTransactionsByDate({ start_date, end_date }: GetTransactionRequest) {
   const response = await api.get<GetTransactionResponse[]>(`/transaction/byDate/${start_date}/${end_date}`)
 

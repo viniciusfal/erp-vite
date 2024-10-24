@@ -99,10 +99,9 @@ export function Finances() {
 
             <TopIncome />
 
-
           </div>
 
-          <div className="flex h-1/2 w-full flex-col rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
+          <div className="flex h-full w-full flex-col rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
             <div className="flex justify-between">
               <h2 className="text-lg font-medium">Proximos Agendamentos</h2>
               <Button
