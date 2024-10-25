@@ -17,15 +17,15 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
+
 import { useListingtransaction } from '@/hooks/listing-transactions'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { IncomesPizza } from './incomes-pizza'
 import { Meta } from './meta'
-import { Button } from './ui/button'
 import { InteractiveForDay } from './interactive-for-day'
+import { DrawerMeta } from './drawer'
 
 export const description = 'A multiple bar chart'
-
 
 const chartConfig = {
   desktop: {
@@ -39,8 +39,8 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function Analyses() {
-  const { currentTransactions } = useListingtransaction(1, 'full')
-
+  const { currentTransactions } = useListingtransaction('full')
+  const [meta, setMeta] = useState(0)
 
   const monthlyTotals = useMemo(() => {
     const totals = Array.from({ length: 12 }, () => ({
@@ -62,7 +62,6 @@ export function Analyses() {
 
     return totals
   }, [currentTransactions])
-
 
   const chartData = [
     { month: 'Janeiro', desktop: monthlyTotals[0]?.income || 0, mobile: monthlyTotals[0]?.outcome || 0 },
@@ -118,22 +117,19 @@ export function Analyses() {
       </Card>
 
       <Card className='row-span-1 col-span-2'>
+        <CardContent>
+          <Meta monthlyTotals={monthlyTotals} meta={meta} />
+        </CardContent>
         <CardHeader>
           <div className='flex items-center justify-between'>
-            <CardTitle>Meta de entradas para esse Mês</CardTitle>
-            <Button>Criar Meta</Button>
+            <div className='invisible'></div>
+            <DrawerMeta setNewMeta={setMeta} />
           </div>
         </CardHeader>
-        <CardContent>
-          <Meta />
-        </CardContent>
       </Card>
 
       <Card className='row-span-1 col-span-2'>
-        <CardHeader className=''>
-          <CardTitle>Distribuição de Entradas Por categoria</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className='mt-3'>
           <IncomesPizza />
         </CardContent>
       </Card>
@@ -142,7 +138,6 @@ export function Analyses() {
         <CardTitle className='mb-4'>Entradas e Saidas por Dia</CardTitle>
         <InteractiveForDay />
       </Card>
-
     </div>
 
   )

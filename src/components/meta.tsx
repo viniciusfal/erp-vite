@@ -19,28 +19,45 @@ import {
 } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
 
-export const description = "A radial chart with text"
+interface MetaProps {
+  monthlyTotals: {
+    income: number;
+    outcome: number;
+  }[]
+  meta: number | undefined
+}
+export function Meta({ monthlyTotals, meta }: MetaProps) {
+  const monthAtual = new Date().getMonth()
 
-const chartData = [
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-]
+  const month = monthlyTotals[monthAtual]
+  const progresso = meta && (month.income / meta) * 100 // Calcula o progresso em relação à meta
 
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig
+  const chartData = [
+    {
+      browser: "safari",
+      incomes: month.income,
+      fill: "var(--color-safari)",
+    },
+  ]
 
-export function Meta() {
+  const chartConfig = {
+    incomes: {
+      label: "Entradas",
+    },
+    safari: {
+      label: "Safari",
+      color: progresso ? progresso < 50 ? "hsl(var(--chart-2))" : progresso >= 50 && progresso < 100 ? "hsl(var(--chart-4))" : "hsl(var(--chart-1))" : undefined,
+    },
+  } satisfies ChartConfig
+
+  const startAngle = 90
+  const endAngle = progresso && 90 + (360 * progresso) / 100
+
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Radial Chart - Text</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+    <Card className="flex flex-col mt-2">
+      <CardHeader className="items-center">
+        <CardTitle>Progresso da Meta Mensal</CardTitle>
+        <CardDescription>{`Meta de R$${meta}`}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -49,8 +66,8 @@ export function Meta() {
         >
           <RadialBarChart
             data={chartData}
-            startAngle={0}
-            endAngle={250}
+            startAngle={startAngle}
+            endAngle={endAngle}
             innerRadius={80}
             outerRadius={110}
           >
@@ -61,7 +78,12 @@ export function Meta() {
               className="first:fill-muted last:fill-background"
               polarRadius={[86, 74]}
             />
-            <RadialBar dataKey="visitors" background cornerRadius={10} />
+            <RadialBar
+              dataKey="incomes"
+              background
+              cornerRadius={10}
+              fill={progresso && progresso >= 100 ? "var(--color-success)" : "var(--color-safari)"}
+            />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
@@ -78,14 +100,14 @@ export function Meta() {
                           y={viewBox.cy}
                           className="fill-foreground text-4xl font-bold"
                         >
-                          {chartData[0].visitors.toLocaleString()}
+                          {`${progresso && progresso.toFixed(1)}%`}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Atingido
                         </tspan>
                       </text>
                     )
@@ -98,10 +120,11 @@ export function Meta() {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          {`Progresso: R$${month.income} de R$${meta}`}
+          <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          {`Meta para o mês atual`}
         </div>
       </CardFooter>
     </Card>

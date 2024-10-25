@@ -35,7 +35,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function Overview() {
-  const { currentTransactions } = useListingtransaction(1, 'full')
+  const { currentTransactions } = useListingtransaction('full')
 
 
   const monthlyTotals = useMemo(() => {

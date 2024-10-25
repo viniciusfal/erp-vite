@@ -25,52 +25,81 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useListingtransactionByDate } from "@/hooks/listing-transactions-by-date"
+import { useDateRange } from "@/hooks/date-ranger-context"
 
 export const description = "An interactive pie chart"
 
-const desktopData = [
-  { month: "january", desktop: 186, fill: "var(--color-january)" },
-  { month: "february", desktop: 305, fill: "var(--color-february)" },
-  { month: "march", desktop: 237, fill: "var(--color-march)" },
-  { month: "april", desktop: 173, fill: "var(--color-april)" },
-  { month: "may", desktop: 209, fill: "var(--color-may)" },
-]
-
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  desktop: {
-    label: "Desktop",
-  },
-  mobile: {
-    label: "Mobile",
-  },
-  january: {
-    label: "January",
-    color: "hsl(var(--chart-1))",
-  },
-  february: {
-    label: "February",
-    color: "hsl(var(--chart-2))",
-  },
-  march: {
-    label: "March",
-    color: "hsl(var(--chart-3))",
-  },
-  april: {
-    label: "April",
-    color: "hsl(var(--chart-4))",
-  },
-  may: {
-    label: "May",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig
-
 export function IncomesPizza() {
+  const { dateRange } = useDateRange()
+  const { startDate, endDate } = dateRange
+  const { currentTransactions } = useListingtransactionByDate(startDate, endDate, 1, 'full')
+  const [totalIncome, setTotalIncome] = React.useState(0)
+  const [totalOutcome, setTotalOutcome] = React.useState(0)
+
   const id = "pie-interactive"
+
+  React.useEffect(() => {
+    const incomes = currentTransactions?.reduce((acc, transaction) => {
+      if (transaction.type === 'entrada') {
+        return acc + transaction.value
+      }
+      return acc
+    }, 0) || 0
+
+    const outcomes = currentTransactions?.reduce((acc, transaction) => {
+      if (transaction.type === 'saida') {
+        return acc + transaction.value
+      }
+      return acc
+    }, 0) || 0
+
+    setTotalIncome(incomes)
+    setTotalOutcome(outcomes)
+  }, [currentTransactions])
+
+
+  const desktopData = [
+    { month: "january", desktop: totalIncome, fill: "var(--color-january)" },
+    { month: "february", desktop: 305, fill: "var(--color-february)" },
+    { month: "march", desktop: 237, fill: "var(--color-march)" },
+    { month: "april", desktop: 173, fill: "var(--color-april)" },
+    { month: "may", desktop: 209, fill: "var(--color-may)" },
+  ]
+
   const [activeMonth, setActiveMonth] = React.useState(desktopData[0].month)
+
+  const chartConfig = {
+    visitors: {
+      label: "Visitors",
+    },
+    desktop: {
+      label: "Desktop",
+    },
+    mobile: {
+      label: "Mobile",
+    },
+    Outubro: {
+      label: "january",
+      color: "hsl(var(--chart-1))",
+    },
+    february: {
+      label: "February",
+      color: "hsl(var(--chart-2))",
+    },
+    march: {
+      label: "March",
+      color: "hsl(var(--chart-3))",
+    },
+    april: {
+      label: "April",
+      color: "hsl(var(--chart-4))",
+    },
+    may: {
+      label: "May",
+      color: "hsl(var(--chart-5))",
+    },
+  } satisfies ChartConfig
 
   const activeIndex = React.useMemo(
     () => desktopData.findIndex((item) => item.month === activeMonth),
@@ -100,7 +129,6 @@ export function IncomesPizza() {
               if (!config) {
                 return null
               }
-
               return (
                 <SelectItem
                   key={key}

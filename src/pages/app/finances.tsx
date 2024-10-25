@@ -35,7 +35,6 @@ export function Finances() {
   const allPayments = useListingPayments(1, 'unpaid')
   const currentPayments = allPayments.paymentTransactions
 
-
   const today = new Date();
 
   const filteredPayments = currentPayments
