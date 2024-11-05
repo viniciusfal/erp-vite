@@ -1,4 +1,4 @@
-import { useState, type Dispatch } from 'react'
+import { useEffect, useState, type Dispatch } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -14,23 +14,35 @@ import { useMutation } from '@tanstack/react-query'
 import { registerSafe } from '@/api/register-safe'
 import { queryClient } from '@/lib/query-client'
 import { toast } from 'sonner'
+import { setSafe } from '@/api/set-safe'
+import { format } from 'date-fns'
+import { inactiveSafe } from '@/api/inactive-safe'
+
+interface Safe {
+  id: string
+  send_date: string
+  send_amount: number
+  active: boolean
+}
 
 interface SafeProps {
   setVisibleSafe: Dispatch<React.SetStateAction<boolean>>
 }
 
 const inSafes = z.object({
-  send_date: z.date(),
+  send_date: z.string(),
   send_amount: z.number()
 })
 
 type InSafes = z.infer<typeof inSafes>
 
+
 export default function Safe({ setVisibleSafe }: SafeProps) {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
   const [startDate, endDate] = dateRange
-  const safes = useListingSafesByDate(startDate, endDate).data
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const safes = useListingSafesByDate(startDate, endDate).data as Safe[] | undefined
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editableSafes, setEditableSafes] = useState(safes || []) 
   const { handleSubmit, register } = useForm<InSafes>()
 
   const { mutateAsync: safe } = useMutation({
@@ -44,10 +56,31 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
     }
   })
 
+  const { mutateAsync: newSafe } = useMutation({
+    mutationFn: setSafe,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['safesByDate'] })
+      toast.success('Informação alterada com sucesso.')
+    },
+    onError: () => {
+      toast.error('Não foi possível alterar as informações')
+    }
+  })
+
+  const {mutateAsync: isActiveSafe} = useMutation({
+    mutationFn: inactiveSafe,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['safesByDate']})
+    },
+    onError: () => {
+      toast.error('Não foi possível remover essa informação do cofre.')
+    }
+  })
+
   const handleSafe = async (data: InSafes) => {
     try {
       await safe({
-        send_date: new Date(data.send_date),
+        send_date:  new Date(data.send_date),
         send_amount: parseFloat(data.send_amount.toString()),
       })
     } catch (err) {
@@ -55,19 +88,56 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
     }
   }
 
-  const handleEdit = (id: number) => {
+  const handleEdit = (id: string) => {
     setEditingId(id)
   }
 
-  const handleSave = (id: number) => {
-    setEditingId(null)
+
+  const handleChange = (id: string, field: 'send_date' | 'send_amount', value: string | number) => {
+    setEditableSafes(prevSafes =>
+      prevSafes.map(safe =>
+        safe.id === id ? { 
+          ...safe, 
+          [field]: field === 'send_amount' ? parseFloat(value.toString()) : value // Para send_date, o valor já é uma string
+        } : safe
+      )
+    );
+  };
+
+  const handleSave = async (id: string) => {
+    const editedSafe = editableSafes.find(safe => safe.id === id)
+    if (editedSafe) {
+      try {
+        await newSafe({
+          id: editedSafe.id,
+          send_date: new Date(editedSafe.send_date).toISOString(), 
+          send_amount: editedSafe.send_amount,
+        })
+        setEditingId(null)
+      } catch (err) {
+        toast.error("Erro ao salvar alterações: " + err)
+      }
+    }
   }
 
-  const handleChange = (id: string, field: 'dataSent' | 'amount', value: number) => {
-    setEntries(safes?.map(safe =>
-      safe.id === id ? { ...safe, [field]: field === 'amount' ? parseFloat(value) : value } : safe
-    ))
-  }
+  const handleInactive = async (data: Safe) => {
+    try {
+      await isActiveSafe({
+        id: data.id,
+        active: false
+      })
+    } catch(err) {
+      console.log(err)
+    }
+  } 
+
+  const filteredSafes = editableSafes.filter((s) => s.active === true) 
+
+  useEffect(() => {
+    if (safes) {
+      setEditableSafes(safes);
+    }
+  }, [safes])
 
   return (
     <div className='container mx-auto p-4'>
@@ -123,22 +193,21 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
               <TableRow>
                 <TableHead>Data de envio</TableHead>
                 <TableHead>Valor enviado</TableHead>
-                <TableHead>Usuário responsável</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {Array.isArray(safes) && safes.map(safe => (
+              {filteredSafes.map(safe => (
                 <TableRow key={safe.id}>
                   <TableCell>
                     {editingId === safe.id ? (
                       <Input
                         type="date"
-                        value={safe.send_date}
-                        onChange={(e) => handleChange(safe.send_date, 'dataSent', e.target.value)}
+                        value={safe.send_date ? format(new Date(safe.send_date), 'yyyy-MM-dd') : ''}
+                        onChange={(e) => handleChange(safe.id, 'send_date', e.target.value)}
                       />
                     ) : (
-                      safe.send_date ? new Date(safe.send_date).toLocaleDateString() : 'Sem data'
+                      safe.send_date ? format(new Date(safe.send_date), 'dd-MM-yyyy') : 'Sem data'
                     )}
                   </TableCell>
                   <TableCell>
@@ -146,13 +215,12 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
                       <Input
                         type="number"
                         value={safe.send_amount}
-                        onChange={(e) => handleChange(safe.id, 'amount', e.target.value)}
+                        onChange={(e) => handleChange(safe.id, 'send_amount', e.target.value)}
                       />
                     ) : (
                       `R$ ${safe.send_amount.toFixed(2)}`
                     )}
                   </TableCell>
-                  <TableCell>{safe.user_resp}</TableCell>
                   <TableCell>
                     {editingId === safe.id ? (
                       <Button onClick={() => handleSave(safe.id)}>Salvar</Button>
@@ -174,7 +242,7 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction>Desativar</AlertDialogAction>
+                              <AlertDialogAction onClick={() => handleInactive(safe)}>Remover</AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
