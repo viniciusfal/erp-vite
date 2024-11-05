@@ -25,6 +25,7 @@ import { Meta } from './meta'
 import { InteractiveForDay } from './interactive-for-day'
 import { DrawerMeta } from './drawer'
 
+
 export const description = 'A multiple bar chart'
 
 const chartConfig = {
@@ -37,6 +38,7 @@ const chartConfig = {
     color: 'hsl(var(--chart-2))',
   },
 } satisfies ChartConfig
+
 
 export function Analyses() {
   const { currentTransactions } = useListingtransaction('full')

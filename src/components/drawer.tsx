@@ -14,25 +14,60 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { Input } from "./ui/input"
+import { useMutation } from "@tanstack/react-query"
+import { registerMeta } from "@/api/register-meta"
+import { toast } from "sonner"
+import { z } from "zod"
 
 interface DrawerMetaProps {
   setNewMeta: React.Dispatch<React.SetStateAction<number | undefined>>;
 }
+interface Meta {
+  id: string
+  month: string
+  metaValue: number
+}
+
+const inMeta = z.object({
+  metaValue: z.number(),
+})
+
+type InMeta = z.infer<typeof inMeta>
+
 export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
+  const [visible, setVisible] = React.useState(false)
+  
+  const {mutateAsync: registerNewMeta} = useMutation({
+    mutationFn: registerMeta,
+    mutationKey: ['meta'],
+    onSuccess: () => {
+      toast.success('meta registrada com sucesso')
+    }
+  })
+
+  const handleNewMeta = async (data: InMeta) => {
+    try {
+      await registerNewMeta({
+        metaValue: data.metaValue
+      })
+      setNewMeta(metaValue)
+      setVisible(false)
+      console.log(data.metaValue)
+    } catch(err){
+      toast.error('Erro ao tentar criar meta.')
+    }
+  }
+  
   const [metaValue, setMetaValue] = React.useState(0)
 
   function handleMeta(value: number) {
     setMetaValue(value)
   }
 
-  function handleSaveMeta() {
-    setNewMeta(metaValue)
-  }
-
   return (
-    <Drawer>
+    <Drawer open={visible} onOpenChange={setVisible}>
       <DrawerTrigger asChild>
-        <Button >Criar Meta</Button>
+        <Button>Criar Meta</Button>
       </DrawerTrigger>
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
@@ -93,7 +128,7 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
             </div>
           </div>
           <DrawerFooter>
-            <Button onClick={handleSaveMeta}>Salvar</Button>
+            <Button onClick={() => handleNewMeta({metaValue}) }>Salvar</Button>
             <DrawerClose asChild>
               <Button variant="outline">Cancel</Button>
             </DrawerClose>

@@ -1,6 +1,6 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
+import { Currency, TrendingUp } from "lucide-react"
 import {
   Label,
   PolarGrid,
@@ -18,6 +18,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
+import { useQuery } from "@tanstack/react-query"
+import { getMetaByMonth } from "@/api/get-meta"
 
 interface MetaProps {
   monthlyTotals: {
@@ -26,11 +28,31 @@ interface MetaProps {
   }[]
   meta: number | undefined
 }
-export function Meta({ monthlyTotals, meta }: MetaProps) {
-  const monthAtual = new Date().getMonth()
 
-  const month = monthlyTotals[monthAtual]
-  const progresso = meta && (month.income / meta) * 100 // Calcula o progresso em relação à meta
+interface Meta {
+  id: string
+  month: string
+  metaValue: number
+}
+
+export function Meta({ monthlyTotals, meta }: MetaProps) {
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const currentDate = new Date();
+  const currentMonthName = months[currentDate.getMonth()];
+
+  const {data: mounthMeta} = useQuery<Meta>({
+    queryKey: ['meta'],
+    queryFn: () => getMetaByMonth(currentMonthName)
+  })
+
+  meta  = mounthMeta?.metaValue
+  const month = monthlyTotals[currentDate.getMonth()]
+  const progresso = meta ? (month.income / meta) * 100 : 0 // Calcula o progresso em relação à meta
 
   const chartData = [
     {
@@ -57,7 +79,11 @@ export function Meta({ monthlyTotals, meta }: MetaProps) {
     <Card className="flex flex-col mt-2">
       <CardHeader className="items-center">
         <CardTitle>Progresso da Meta Mensal</CardTitle>
-        <CardDescription>{`Meta de R$${meta}`}</CardDescription>
+        <CardDescription>{mounthMeta && `Meta de ${new Intl.NumberFormat('pt-BR', {
+          style: "currency",
+          currency: "BRL",
+        }).format(mounthMeta.metaValue)}`}</CardDescription>
+
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -120,7 +146,7 @@ export function Meta({ monthlyTotals, meta }: MetaProps) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          {`Progresso: R$${month.income} de R$${meta}`}
+          {`Progresso: R$${month.income} de R$${mounthMeta?.metaValue}`}
           <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
