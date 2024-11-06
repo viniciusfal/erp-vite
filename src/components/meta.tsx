@@ -1,6 +1,6 @@
 "use client"
 
-import { Currency, TrendingUp } from "lucide-react"
+import {  TrendingUp } from "lucide-react"
 import {
   Label,
   PolarGrid,
@@ -18,8 +18,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
-import { useQuery } from "@tanstack/react-query"
-import { getMetaByMonth } from "@/api/get-meta"
+
+import { useListMeta } from "@/hooks/list-meta"
 
 interface MetaProps {
   monthlyTotals: {
@@ -29,28 +29,13 @@ interface MetaProps {
   meta: number | undefined
 }
 
-interface Meta {
-  id: string
-  month: string
-  metaValue: number
-}
-
 export function Meta({ monthlyTotals, meta }: MetaProps) {
-
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
+  
+  const {mounthMeta} = useListMeta()
   const currentDate = new Date();
-  const currentMonthName = months[currentDate.getMonth()];
-
-  const {data: mounthMeta} = useQuery<Meta>({
-    queryKey: ['meta'],
-    queryFn: () => getMetaByMonth(currentMonthName)
-  })
 
   meta  = mounthMeta?.metaValue
+  console.log(currentDate.getMonth())
   const month = monthlyTotals[currentDate.getMonth()]
   const progresso = meta ? (month.income / meta) * 100 : 0 // Calcula o progresso em relação à meta
 
