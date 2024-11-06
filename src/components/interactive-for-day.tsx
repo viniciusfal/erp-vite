@@ -128,6 +128,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function InteractiveForDay() {
+
   const [activeChart, setActiveChart] =
     React.useState<keyof typeof chartConfig>("desktop")
 

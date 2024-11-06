@@ -11,10 +11,21 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Separator } from '@/components/ui/separator'
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useDateRange } from '@/hooks/date-ranger-context'
 import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
-import { Bolt, CircleMinus, CirclePlus, Download } from 'lucide-react'
+import { Bolt, CircleHelp, CircleMinus, CirclePlus, Download, LogOut, UserRound } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export function Dashboard() {
@@ -67,9 +78,30 @@ export function Dashboard() {
                 Exportar Dados
               </Button>
 
-              <Button variant={'outline'} className="rounded-full">
-                <Bolt className="size-5 text-muted-foreground" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button variant={'outline'} className="rounded-full">
+                  <Bolt className="size-5 text-muted-foreground" />
+                </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel className='text-muted-foreground'>Meu Perfil</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className='flex gap-2 py-2'>
+                    <UserRound className='size-4 text-muted-foreground'/>
+                    <p>Alterar Dados</p>
+                    </DropdownMenuItem>
+                  <DropdownMenuItem className='flex gap-2 py-2'>
+                    <CircleHelp className='size-4 text-muted-foreground'/>
+                    <p className=''>Ajuda</p>
+                    </DropdownMenuItem>
+                    <Separator />
+                  <DropdownMenuItem className='flex gap-2 py-3'>
+                    <LogOut  className='size-5 text-red-400'/>
+                    <p>Sair</p>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

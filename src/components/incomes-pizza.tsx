@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
 import {
   ChartConfig,
   ChartContainer,
@@ -18,6 +19,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+
 import {
   Select,
   SelectContent,
@@ -25,11 +27,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
 import { useListingtransactionByDate } from "@/hooks/listing-transactions-by-date"
 import { useDateRange } from "@/hooks/date-ranger-context"
 
 export const description = "An interactive pie chart"
-
 export function IncomesPizza() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
@@ -70,8 +72,8 @@ export function IncomesPizza() {
   }, [currentTransactions])
 
   const desktopData = [
-    { month: incomeByCategory[0]?.category, desktop: incomeByCategory[0]?.category, fill: "var(--color-january)" },
-    { month: "february", desktop: 305, fill: "var(--color-february)" },
+    { month: "Pro labore", desktop: incomeByCategory[0]?.value, fill: "var(--color-february)" },
+    { month: "Folha d epagamento", desktop: incomeByCategory[1]?.value, fill: "var(--color-february)" },
   ]
 
   const [activeMonth, setActiveMonth] = React.useState(desktopData[0].month)
