@@ -26,13 +26,12 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
     mutationFn: markPayment,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['transactions']
+        queryKey: ['transactionsByDate']
       })
     },
     onError: () => {
       toast.error("Erro ao tentar marcar como pago")
     }
-
   })
 
   async function handleMarkAsPaid(id: string) {
@@ -93,7 +92,6 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-
                     </div>
 
                     <div>

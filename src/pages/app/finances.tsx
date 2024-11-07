@@ -26,20 +26,34 @@ import { Helmet } from 'react-helmet-async'
 import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
 import { TooltipTrigger } from '@radix-ui/react-tooltip'
 import { Link } from 'react-router-dom'
-import { useListingPayments } from '@/hooks/listing-payments'
 import Safe from '@/components/safe'
+import { useListingPaymentsNeverPag } from '@/hooks/list-payments-never-pagination'
+import { markPayment } from '@/api/mark-payment'
+import { queryClient } from '@/lib/query-client'
+import { toast } from 'sonner'
+import { useMutation } from '@tanstack/react-query'
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
   const [visiblePayment, setVisiblePayment] = useState<boolean>(false)
   const [visibleSafe, setVisibleSafe] = useState<boolean>(false)
+  const { finalFilteredPayments } = useListingPaymentsNeverPag('unpaid')
 
-  const allPayments = useListingPayments(1, 'unpaid')
-  const currentPayments = allPayments.paymentTransactions
+  const { mutateAsync: transaction } = useMutation({
+    mutationFn: markPayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['transactionsByDate']
+      })
+    },
+    onError: () => {
+      toast.error("Erro ao tentar marcar como pago")
+    }
+  })
 
   const today = new Date();
 
-  const filteredPayments = currentPayments
+  const filteredPayments = finalFilteredPayments
     ?.filter((p) => !p.pay && p.payment_date) // Filtra pagamentos não pagos e com data válida
     .filter((p) => p.payment_date && new Date(p.payment_date) >= today) // Adiciona filtro para pagamentos a vencer
     .sort((a, b) => {
@@ -48,6 +62,16 @@ export function Finances() {
       return dateA.getTime() - dateB.getTime(); // Ordena por data crescente
     })
     .slice(0, 2)
+
+  async function handleMarkAsPaid(id: string) {
+    try {
+      await transaction({ id })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+
 
   return (
     <div className="min-h-screen">
@@ -195,7 +219,7 @@ export function Finances() {
                   </span>
 
 
-                  < Button className="bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90">
+                  < Button onClick={() => handleMarkAsPaid(payment.transaction_id)} className="bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90">
                     Marcar como Pago
                   </Button>
                 </CardContent>

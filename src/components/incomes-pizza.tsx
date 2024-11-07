@@ -72,8 +72,9 @@ export function IncomesPizza() {
   }, [currentTransactions])
 
   const desktopData = [
-    { month: "Pro labore", desktop: incomeByCategory[0]?.value, fill: "var(--color-february)" },
-    { month: "Folha d epagamento", desktop: incomeByCategory[1]?.value, fill: "var(--color-february)" },
+    { month: "Pro labore", desktop: incomeByCategory[0]?.value, fill: "var(--chart-1)" },
+    { month: "Folha de pagamento", desktop: incomeByCategory[1]?.value, fill: "var(--chart-2)" },
+    { month: "Etc", desktop: incomeByCategory[3]?.value, fill: "var(--chart-3)" },
   ]
 
   const [activeMonth, setActiveMonth] = React.useState(desktopData[0].month)

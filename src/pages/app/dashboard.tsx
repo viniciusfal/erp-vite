@@ -23,15 +23,21 @@ import {
 import { Separator } from '@/components/ui/separator'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useDateRange } from '@/hooks/date-ranger-context'
+import { useGetAnaliticsTransactions } from '@/hooks/get-analitics-transactions'
+import { useListingtransaction } from '@/hooks/listing-transactions'
 import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
-import { Bolt, CircleHelp, CircleMinus, CirclePlus, Download, LogOut, UserRound } from 'lucide-react'
+import { isSameDay } from 'date-fns'
+import { Bolt, CircleHelp, CircleMinus, CirclePlus, Download, Info, LogOut, UserRound } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export function Dashboard() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
   const { currentTransactions } = useListingtransactionByDate(startDate, endDate, 1, 'full')
+  const { currentTransactions: allTransactions } = useListingtransaction('full')
+  const { totalBalanceTransactions } = useGetAnaliticsTransactions()
   const [totalIncome, setTotalIncome] = useState(0)
   const [totalOutcome, setTotalOutcome] = useState(0)
   const [pagineAtual, setPagineAtual] = useState('overview')
@@ -54,6 +60,16 @@ export function Dashboard() {
     setTotalIncome(incomes)
     setTotalOutcome(outcomes)
   }, [currentTransactions])
+
+  const today = new Date()
+
+  let filteredLastsActivities = allTransactions
+    ?.filter((t) => isSameDay(new Date(t.created_at), today))
+    .sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime()
+      const dateB = new Date(b.created_at).getTime()
+      return dateB - dateA
+    })
 
   return (
     <div className="bg-primary-foreground">
@@ -81,23 +97,23 @@ export function Dashboard() {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Button variant={'outline'} className="rounded-full">
-                  <Bolt className="size-5 text-muted-foreground" />
-                </Button>
+                    <Bolt className="size-5 text-muted-foreground" />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuLabel className='text-muted-foreground'>Meu Perfil</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className='flex gap-2 py-2'>
-                    <UserRound className='size-4 text-muted-foreground'/>
+                    <UserRound className='size-4 text-muted-foreground' />
                     <p>Alterar Dados</p>
-                    </DropdownMenuItem>
+                  </DropdownMenuItem>
                   <DropdownMenuItem className='flex gap-2 py-2'>
-                    <CircleHelp className='size-4 text-muted-foreground'/>
+                    <CircleHelp className='size-4 text-muted-foreground' />
                     <p className=''>Ajuda</p>
-                    </DropdownMenuItem>
-                    <Separator />
+                  </DropdownMenuItem>
+                  <Separator />
                   <DropdownMenuItem className='flex gap-2 py-3'>
-                    <LogOut  className='size-5 text-red-400'/>
+                    <LogOut className='size-5 text-red-400' />
                     <p>Sair</p>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -158,9 +174,22 @@ export function Dashboard() {
                       style: 'currency',
                       currency: 'BRL'
                     }).format(totalIncome - totalOutcome)}</div>
-                    <p className="text-xs text-muted">
-                      +20.1% do que o mês passado
-                    </p>
+                    <div className='flex items-center gap-1.5 pt-1'>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Info className='size-3' />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>A analise por porcentagem sempre é comparando o mês atual e o anterior. <br />Independente da data que você selecione essa informação não mudará.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <p className="text-xs text-muted">
+                        {totalBalanceTransactions?.total_balance.toFixed(2)}% do que o mês passado.
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
                 <Card className="">
@@ -176,7 +205,21 @@ export function Dashboard() {
                       currency: 'BRL'
                     }).format(totalIncome)}</div>
                     <p className="text-xs text-muted-foreground">
-                      +180.1% que no mês passado
+                      <div className='flex items-center gap-1.5 pt-1'>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className='size-3' />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>A analise por porcentagem sempre é comparando o mês atual e o anterior. <br />Independente da data que você selecione essa informação não mudará.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <p className='text-xs text-muted-foreground'>
+                          {totalBalanceTransactions?.total_entries.toFixed(2)}% do que o mês passado.
+                        </p>
+                      </div>
                     </p>
                   </CardContent>
                 </Card>
@@ -190,9 +233,22 @@ export function Dashboard() {
                       style: 'currency',
                       currency: 'BRL'
                     }).format(totalOutcome)}</div>
-                    <p className="text-xs text-muted-foreground">
-                      +19% from last month
-                    </p>
+                    <div className='flex items-center gap-1.5 pt-1'>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Info className='size-3' />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>A analise por porcentagem sempre é comparando o mês atual e o anterior. <br />Independente da data que você selecione essa informação não mudará.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <p className="text-xs text-muted-foreground">
+                        {totalBalanceTransactions?.total_outcomes.toFixed(2)}% do que o mês passado.
+                      </p>
+                    </div>
+
                   </CardContent>
                 </Card>
               </div>
@@ -209,7 +265,7 @@ export function Dashboard() {
                   <CardHeader>
                     <CardTitle>Registros recentes</CardTitle>
                     <CardDescription>
-                      Você fez 265 registros nesse mês.
+                      Você fez {filteredLastsActivities?.length} registros no dia.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

@@ -24,6 +24,7 @@ import { IncomesPizza } from './incomes-pizza'
 import { Meta } from './meta'
 import { InteractiveForDay } from './interactive-for-day'
 import { DrawerMeta } from './drawer'
+import { useGetAnaliticsTransactions } from '@/hooks/get-analitics-transactions'
 
 
 export const description = 'A multiple bar chart'
@@ -42,6 +43,7 @@ const chartConfig = {
 
 export function Analyses() {
   const { currentTransactions } = useListingtransaction('full')
+  const {totalBalanceTransactions} = useGetAnaliticsTransactions()
   const [meta, setMeta] = useState(0)
 
   const monthlyTotals = useMemo(() => {
@@ -109,11 +111,12 @@ export function Analyses() {
         </CardContent>
         <CardFooter className="flex-col items-start gap-2 text-sm ">
           <div className="flex gap-2 font-medium leading-none">
-            Tendência de alta de 5.2% nesse mês
+          Tendência de {totalBalanceTransactions && totalBalanceTransactions.total_balance > 0 ? "alta" : "baixa" } de 
+            {" "} {totalBalanceTransactions && totalBalanceTransactions && parseFloat(totalBalanceTransactions.total_balance.toString()).toFixed(2)}% nesse mês
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
-            Mostrando o total de entradas e saidas dos ultimos 6 meses
+            Mostrando o total de entradas e saidas do último ano.
           </div>
         </CardFooter>
       </Card>

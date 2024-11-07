@@ -19,9 +19,9 @@ import {
 } from '@/components/ui/chart'
 import { useListingtransaction } from '@/hooks/listing-transactions'
 import { useMemo } from 'react'
+import { useGetAnaliticsTransactions } from '@/hooks/get-analitics-transactions'
 
 export const description = 'A multiple bar chart'
-
 
 const chartConfig = {
   desktop: {
@@ -36,7 +36,7 @@ const chartConfig = {
 
 export function Overview() {
   const { currentTransactions } = useListingtransaction('full')
-
+  const { totalBalanceTransactions } = useGetAnaliticsTransactions()
 
   const monthlyTotals = useMemo(() => {
     const totals = Array.from({ length: 12 }, () => ({
@@ -59,7 +59,6 @@ export function Overview() {
     return totals
   }, [currentTransactions])
 
-
   const chartData = [
     { month: 'Julho', desktop: monthlyTotals[6]?.income || 0, mobile: monthlyTotals[6]?.outcome || 0 },
     { month: 'Agosto', desktop: monthlyTotals[7]?.income || 0, mobile: monthlyTotals[7]?.outcome || 0 },
@@ -73,7 +72,7 @@ export function Overview() {
     <Card>
       <CardHeader>
         <CardTitle>Grafico - Entradas e saídas</CardTitle>
-        <CardDescription>Janeiro - Junho 2024</CardDescription>
+        <CardDescription>Julho - Dezembro {new Date().getFullYear()}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -97,7 +96,8 @@ export function Overview() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Tendência de alta de 5.2% nesse mês
+          Tendência de {totalBalanceTransactions && totalBalanceTransactions.total_balance > 0 ? "alta" : "baixa"} de
+          {" "} {totalBalanceTransactions && totalBalanceTransactions && parseFloat(totalBalanceTransactions.total_balance.toString()).toFixed(2)}% nesse mês
           <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
