@@ -7,17 +7,17 @@ import { toast } from 'sonner';
 import "react-datepicker/dist/react-datepicker.css";
 
 interface DateRangerSafeProps {
-  startDate: Date | null;
+  startDate?: Date | null;
   endDate: Date | null;
   setDateRange: React.Dispatch<React.SetStateAction<[Date | null, Date | null]>>;
 }
 
 export default function DateRangerSafe({ startDate, endDate, setDateRange }: DateRangerSafeProps) {
-  const [localStartDate, setLocalStartDate] = useState<Date | null>(startDate);
+  const [localStartDate, setLocalStartDate] = useState<Date | null>(startDate || null);
   const [localEndDate, setLocalEndDate] = useState<Date | null>(endDate);
 
   useEffect(() => {
-    setLocalStartDate(startDate);
+    setLocalStartDate(startDate || null);
     setLocalEndDate(endDate);
   }, [startDate, endDate]);
 
@@ -48,8 +48,8 @@ export default function DateRangerSafe({ startDate, endDate, setDateRange }: Dat
         <PopoverContent className="w-auto p-0" align="start">
           <DatePicker
             selectsRange
-            startDate={localStartDate} // Passar diretamente
-            endDate={localEndDate} // Passar diretamente
+            startDate={localStartDate || undefined} // Passar diretamente
+            endDate={localEndDate || undefined} // Passar diretamente
             onChange={(dates: [Date | null, Date | null]) => {
               setLocalStartDate(dates[0]);
               setLocalEndDate(dates[1]);

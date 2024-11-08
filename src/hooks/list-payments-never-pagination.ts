@@ -15,7 +15,6 @@ export interface Transactions {
   pay: boolean
 }
 
-
 export function useListingPaymentsNeverPag(valuePaymentFilter: string) {
   const { data: transactions, isLoading } = useQuery<Transactions[]>({
     queryKey: ['transactionsByDate'],

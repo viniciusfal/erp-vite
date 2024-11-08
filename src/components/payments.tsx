@@ -140,7 +140,7 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
                     Pago dia: {new Date().toLocaleDateString()}
                   </span>
                 )}
-                <Button disabled={t.pay} variant="outline" className={!t.pay ? "bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90" : "hidden"} onClick={() => handleMarkAsPaid(t.transaction_id)}>
+                <Button disabled={t.pay} variant="outline" className={!t.pay ? "bg-gradient-to-tr from-emerald-700 to-emerald-500 text-xs text-white hover:from-emerald-600 hover:to-emerald-500/90" : "hidden"} onClick={() => handleMarkAsPaid(t.transaction_id)}>
                   Marcar como Pago
                 </Button>
               </CardContent>

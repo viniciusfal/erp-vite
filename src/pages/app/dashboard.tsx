@@ -1,5 +1,6 @@
 import { Analyses } from '@/components/analyses'
 import { CalendarDateRangePicker } from '@/components/date-ranger-picker'
+import { DropSettings } from '@/components/drop-settings'
 import { Header } from '@/components/header'
 import { Overview } from '@/components/overview'
 import { RecentSales } from '@/components/recent-sales'
@@ -12,16 +13,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Separator } from '@/components/ui/separator'
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useDateRange } from '@/hooks/date-ranger-context'
@@ -29,7 +20,7 @@ import { useGetAnaliticsTransactions } from '@/hooks/get-analitics-transactions'
 import { useListingtransaction } from '@/hooks/listing-transactions'
 import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
 import { isSameDay } from 'date-fns'
-import { Bolt, CircleHelp, CircleMinus, CirclePlus, Download, Info, LogOut, UserRound } from 'lucide-react'
+import { Asterisk, CircleMinus, CirclePlus, Download, Info } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export function Dashboard() {
@@ -94,30 +85,7 @@ export function Dashboard() {
                 Exportar Dados
               </Button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button variant={'outline'} className="rounded-full">
-                    <Bolt className="size-5 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel className='text-muted-foreground'>Meu Perfil</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className='flex gap-2 py-2'>
-                    <UserRound className='size-4 text-muted-foreground' />
-                    <p>Alterar Dados</p>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className='flex gap-2 py-2'>
-                    <CircleHelp className='size-4 text-muted-foreground' />
-                    <p className=''>Ajuda</p>
-                  </DropdownMenuItem>
-                  <Separator />
-                  <DropdownMenuItem className='flex gap-2 py-3'>
-                    <LogOut className='size-5 text-red-400' />
-                    <p>Sair</p>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <DropSettings />
             </div>
           </div>
         </div>
@@ -151,10 +119,11 @@ export function Dashboard() {
           {pagineAtual === 'overview' ? (
             <TabsContent value="overview" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card className="bg-gradient-to-tr from-sky-800 to-sky-500 text-white">
+                <Card className="bg-gradient-to-tr from-emerald-700 to-emerald-500 text-white">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                    <CardTitle className="flex gap-0.5 items-baseline text-sm font-medium">
                       Balanço
+                      <Asterisk className='size-2.5 text-muted' />
                     </CardTitle>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -170,10 +139,12 @@ export function Dashboard() {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
+                    <div className="flex items-baseline gap-0.5 text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'
-                    }).format(totalIncome - totalOutcome)}</div>
+                    }).format(totalIncome - totalOutcome)}
+
+                    </div>
                     <div className='flex items-center gap-1.5 pt-1'>
                       <TooltipProvider>
                         <Tooltip>
@@ -194,16 +165,18 @@ export function Dashboard() {
                 </Card>
                 <Card className="">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
+                    <CardTitle className="flex gap-0.5 items-baseline text-sm font-medium">
                       Entradas
+                      <Asterisk className='size-2.5 text-muted-foreground' />
                     </CardTitle>
                     <CirclePlus className="size-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
+                    <div className="flex gap-0.5 items-baseline text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'
-                    }).format(totalIncome)}</div>
+                    }).format(totalIncome)}
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       <div className='flex items-center gap-1.5 pt-1'>
                         <TooltipProvider>
@@ -225,14 +198,19 @@ export function Dashboard() {
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Saídas</CardTitle>
+                    <CardTitle className="flex items-baseline gap-0.5 text-sm font-medium">
+                      Saídas
+                      <Asterisk className='size-2.5 text-muted-foreground' />
+                    </CardTitle>
                     <CircleMinus className="size-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
+                    <div className="flex items-baseline gap-0.5 text-2xl font-bold">{new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'
-                    }).format(totalOutcome)}</div>
+                    }).format(totalOutcome)}
+
+                    </div>
                     <div className='flex items-center gap-1.5 pt-1'>
                       <TooltipProvider>
                         <Tooltip>
@@ -265,7 +243,7 @@ export function Dashboard() {
                   <CardHeader>
                     <CardTitle>Registros recentes</CardTitle>
                     <CardDescription>
-                      Você fez {filteredLastsActivities?.length} registros no dia.
+                      Você fez {filteredLastsActivities?.length} registros hoje.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

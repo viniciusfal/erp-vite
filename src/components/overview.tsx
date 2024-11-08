@@ -26,7 +26,7 @@ export const description = 'A multiple bar chart'
 const chartConfig = {
   desktop: {
     label: 'Entrada',
-    color: 'hsl(var(--chart-1))',
+    color: '#10b981',
   },
   mobile: {
     label: 'Saída',

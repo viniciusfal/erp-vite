@@ -34,7 +34,7 @@ import {
 } from '@/components/ui/select'
 
 import { SelectGroup } from '@radix-ui/react-select'
-import { File, Plus, Wrench, X } from 'lucide-react'
+import { Asterisk, File, Plus, Wrench, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
@@ -167,7 +167,10 @@ export function TableTransaction({ setVisible }: TableProps) {
   return (
     <div className="flex w-2/3 flex-col  rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
       <div className="flex justify-between">
-        <strong className="text-2xl font-medium">Lista de transações</strong>
+        <strong className="flex gap-0.5 items-baseline text-2xl font-medium">
+          Lista de transações
+          <Asterisk className='size-2.5 text-muted-foreground' />
+        </strong>
         <div className="flex gap-2">
           <Select onValueChange={setInputType}>
             <SelectTrigger className="w-[180px]" value={inputType}>
@@ -195,7 +198,7 @@ export function TableTransaction({ setVisible }: TableProps) {
       <Table className="my-6">
         <TableHeader className="text-xs">
           <TableRow className="">
-            <TableHead className="w-[300px] font-medium">Titulo</TableHead>
+            <TableHead className="w-[300px] font-medium">Descrição</TableHead>
             <TableHead className="w-[100px]">Valor</TableHead>
             <TableHead className="w-[250px]">Categoria</TableHead>
 
@@ -215,7 +218,7 @@ export function TableTransaction({ setVisible }: TableProps) {
           {currentTransactions?.map((t) => (
             <TableRow key={t.transaction_id} className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''}`}
             >
-              <TableCell>
+              <TableCell className='text-xs text-secondary-foreground'>
                 {editingId === t.transaction_id ? (
                   <Input
                     type='text'
@@ -226,7 +229,7 @@ export function TableTransaction({ setVisible }: TableProps) {
                   t.title
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className='text-secondary-foreground'>
                 {editingId === t.transaction_id ? (
                   <Input
                     type='number'
@@ -234,10 +237,13 @@ export function TableTransaction({ setVisible }: TableProps) {
                     value={Number(editedData.value)}
                     onChange={handleChange} />
                 ) : (
-                  t.value
+                  new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                  }).format(t.value)
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className='text-secondary-foreground'>
                 {editingId === t.transaction_id ? (
                   <Input
                     type='text'
@@ -283,7 +289,7 @@ export function TableTransaction({ setVisible }: TableProps) {
               </TableCell>
               <TableCell>
                 <Button
-                  className={t.type === 'entrada' ? 'rounded-full bg-green-100 w-16 text-xs text-green-400 hover:cursor-default hover:bg-green-100' :
+                  className={t.type === 'entrada' ? 'rounded-full bg-green-100 w-16 text-xs text-emerald-400 hover:cursor-default hover:bg-emerald-100' :
                     'rounded-full bg-red-400 w-16 text-xs text-red-50 hover:cursor-default hover:bg-red-400'}
                 >
                   {t.type}

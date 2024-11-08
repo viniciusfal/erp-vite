@@ -1,6 +1,6 @@
 'use client'
 
-import { TrendingUp } from 'lucide-react'
+import { Asterisk, TrendingUp } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
 import {
@@ -32,7 +32,7 @@ export const description = 'A multiple bar chart'
 const chartConfig = {
   desktop: {
     label: 'Entrada',
-    color: 'hsl(var(--chart-1))',
+    color: '#10b981',
   },
   mobile: {
     label: 'Saída',
@@ -43,7 +43,7 @@ const chartConfig = {
 
 export function Analyses() {
   const { currentTransactions } = useListingtransaction('full')
-  const {totalBalanceTransactions} = useGetAnaliticsTransactions()
+  const { totalBalanceTransactions } = useGetAnaliticsTransactions()
   const [meta, setMeta] = useState(0)
 
   const monthlyTotals = useMemo(() => {
@@ -111,7 +111,7 @@ export function Analyses() {
         </CardContent>
         <CardFooter className="flex-col items-start gap-2 text-sm ">
           <div className="flex gap-2 font-medium leading-none">
-          Tendência de {totalBalanceTransactions && totalBalanceTransactions.total_balance > 0 ? "alta" : "baixa" } de 
+            Tendência de {totalBalanceTransactions && totalBalanceTransactions.total_balance > 0 ? "alta" : "baixa"} de
             {" "} {totalBalanceTransactions && totalBalanceTransactions && parseFloat(totalBalanceTransactions.total_balance.toString()).toFixed(2)}% nesse mês
             <TrendingUp className="h-4 w-4" />
           </div>
@@ -135,12 +135,16 @@ export function Analyses() {
 
       <Card className='row-span-1 col-span-2'>
         <CardContent className='mt-3'>
+          <div className="py-4 flex items-baseline gap-0.5">
+            <CardTitle className="">Resumo por Categoria</CardTitle>
+            <Asterisk className='size-2.5 text-muted-foreground' />
+          </div>
           <IncomesPizza />
         </CardContent>
       </Card>
 
       <Card className='col-span-5 row-span-1 p-4'>
-        <CardTitle className='mb-4'>Entradas e Saidas por Dia</CardTitle>
+        <CardTitle className='mb-4'>Analise do Trimestre</CardTitle>
         <InteractiveForDay />
       </Card>
     </div>

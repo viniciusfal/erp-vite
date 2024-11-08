@@ -1,6 +1,6 @@
 "use client"
 
-import {  TrendingUp } from "lucide-react"
+import { TrendingUp } from "lucide-react"
 import {
   Label,
   PolarGrid,
@@ -30,11 +30,11 @@ interface MetaProps {
 }
 
 export function Meta({ monthlyTotals, meta }: MetaProps) {
-  
-  const {mounthMeta} = useListMeta()
+
+  const { mounthMeta } = useListMeta()
   const currentDate = new Date();
 
-  meta  = mounthMeta?.metaValue
+  meta = mounthMeta?.metaValue
   console.log(currentDate.getMonth())
   const month = monthlyTotals[currentDate.getMonth()]
   const progresso = meta ? (month.income / meta) * 100 : 0 // Calcula o progresso em relação à meta
@@ -53,7 +53,7 @@ export function Meta({ monthlyTotals, meta }: MetaProps) {
     },
     safari: {
       label: "Safari",
-      color: progresso ? progresso < 50 ? "hsl(var(--chart-2))" : progresso >= 50 && progresso < 100 ? "hsl(var(--chart-4))" : "hsl(var(--chart-1))" : undefined,
+      color: progresso ? progresso < 50 ? "hsl(var(--chart-2))" : progresso >= 50 && progresso < 100 ? "hsl(var(--chart-4))" : "#10b981" : undefined,
     },
   } satisfies ChartConfig
 

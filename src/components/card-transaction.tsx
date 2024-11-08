@@ -25,6 +25,7 @@ import { useMutation } from "@tanstack/react-query";
 import { registerTransaction } from "@/api/register-transaction";
 import { toast } from "sonner";
 import { queryClient } from "@/lib/query-client";
+import { categories } from "@/services/categories";
 
 const inCredits = z.object({
   title: z.string(),
@@ -42,6 +43,8 @@ type Incredits = z.infer<typeof inCredits>;
 export function CardTransaction({ setVisible }: any) {
   const { control, handleSubmit, register, watch } = useForm<Incredits>();
   const type = watch('type')
+
+  const listCategories = categories()
 
 
   const { mutateAsync: transaction } = useMutation({
@@ -89,8 +92,8 @@ export function CardTransaction({ setVisible }: any) {
         <form onSubmit={handleSubmit(handleTransaction)}>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
-              <Label>Titulo</Label>
-              <Input id="title" placeholder="Dê um titulo a sua transação" {...register("title")} />
+              <Label>Descrição</Label>
+              <Input id="title" placeholder="Dê uma descrição a sua transação" {...register("title")} />
             </div>
 
             <div>
@@ -119,23 +122,24 @@ export function CardTransaction({ setVisible }: any) {
             <div className="flex flex-col space-y-1.5">
               <Label>Categoria</Label>
               <Controller
+                // Adiciona uma key única para cada Controller
                 name="category"
                 control={control}
                 render={({ field }) => (
-                  <Select {...field} onValueChange={field.onChange} >
+                  <Select {...field} onValueChange={field.onChange}>
+
                     <SelectTrigger id="category">
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
-                    <SelectContent position="popper">
-                      <SelectItem value="despesas adm">Despesas Administrativas</SelectItem>
-                      <SelectItem value="folha de pagamento">Folha de pagamento</SelectItem>
-                      <SelectItem value="pro-labore">Pro Labore</SelectItem>
-                      <SelectItem value="etc1">Despesas tal</SelectItem>
-                      <SelectItem value="etc2">Despesas tal</SelectItem>
+                    <SelectContent position="popper"  >
+                      {listCategories.map((c, index) => (
+                        <SelectItem value={c} key={index}>{c}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}
               />
+
             </div>
 
             <Separator className="my-2" />

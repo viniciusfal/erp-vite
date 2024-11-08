@@ -20,7 +20,7 @@ import {
   SelectGroup,
 } from '@/components/ui/select'
 
-import { Bolt, File, MoveUpRight, ShieldCheck, Wrench, X } from 'lucide-react'
+import { Asterisk, File, MoveUpRight, ShieldCheck, Wrench, X } from 'lucide-react'
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
@@ -32,6 +32,7 @@ import { markPayment } from '@/api/mark-payment'
 import { queryClient } from '@/lib/query-client'
 import { toast } from 'sonner'
 import { useMutation } from '@tanstack/react-query'
+import { DropSettings } from '@/components/drop-settings'
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
@@ -71,8 +72,6 @@ export function Finances() {
     }
   }
 
-
-
   return (
     <div className="min-h-screen">
       <div className="flex items-center justify-between">
@@ -102,9 +101,7 @@ export function Finances() {
             </Tooltip>
           </TooltipProvider>
 
-          <Button variant={'outline'} className="rounded-full">
-            <Bolt className="size-5 text-muted-foreground" />
-          </Button>
+          <DropSettings />
         </div>
       </div>
 
@@ -114,7 +111,10 @@ export function Finances() {
         <div className="flex w-1/3 flex-col gap-2">
           <div className="flex h-1/2 w-full flex-col justify-between rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium">Top 3 Entradas</h2>
+              <h2 className="flex items-baseline gap-0.5 text-lg font-medium">
+                Top 3 Entradas
+                <Asterisk className='size-2.5 text-muted-foreground' />
+              </h2>
               <Select>
                 <SelectTrigger className="w-[100px] text-xs font-medium">
                   <SelectValue placeholder="diario" />
@@ -219,7 +219,7 @@ export function Finances() {
                   </span>
 
 
-                  < Button onClick={() => handleMarkAsPaid(payment.transaction_id)} className="bg-gradient-to-tr from-sky-800 to-sky-500 text-xs text-white hover:from-sky-600 hover:to-sky-500/90">
+                  < Button onClick={() => handleMarkAsPaid(payment.transaction_id)} className="bg-gradient-to-tr from-emerald-700 to-emerald-500 text-xs text-white hover:from-emerald-600 hover:to-emerald-500/90">
                     Marcar como Pago
                   </Button>
                 </CardContent>

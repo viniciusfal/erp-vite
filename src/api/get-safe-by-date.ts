@@ -5,16 +5,15 @@ interface GetSafeRequest {
   endDate: string
 }
 
-interface GetSafeResponse {
+interface Safe {
   id: string
-  sen_date: Date
+  send_date: string
   send_amount: number
   active: boolean
 }
 
-
-export async function getSafesbyDate({ startDate, endDate }: GetSafeRequest) {
-  const response = await api.get<GetSafeResponse[]>(`/safe/${startDate}/${endDate}`)
+export async function getSafesbyDate({ startDate, endDate }: GetSafeRequest): Promise<Safe[]> {
+  const response = await api.get<Safe[]>(`/safe/${startDate}/${endDate}`)
 
   return response.data
 }

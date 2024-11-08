@@ -4,9 +4,8 @@ import { format } from "date-fns"
 
 interface Safe {
   id: string
-  send_date: Date | null
+  send_date: string
   send_amount: number
-  user_resp: string
   active: boolean
 }
 

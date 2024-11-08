@@ -14,8 +14,6 @@ export interface Transactions {
   updated_at: Date
 }
 
-
-
 export function useListingtransaction(inputType: string) {
   const { data: transactions } = useQuery<Transactions[]>({
     queryKey: ['transactions'],

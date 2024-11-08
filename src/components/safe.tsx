@@ -40,9 +40,9 @@ type InSafes = z.infer<typeof inSafes>
 export default function Safe({ setVisibleSafe }: SafeProps) {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
   const [startDate, endDate] = dateRange
-  const safes = useListingSafesByDate(startDate, endDate).data as Safe[] | undefined
+  const safes = useListingSafesByDate(startDate, endDate).data as Safe[] | null
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editableSafes, setEditableSafes] = useState(safes || []) 
+  const [editableSafes, setEditableSafes] = useState(safes || [])
   const { handleSubmit, register } = useForm<InSafes>()
 
   const { mutateAsync: safe } = useMutation({
@@ -67,10 +67,10 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
     }
   })
 
-  const {mutateAsync: isActiveSafe} = useMutation({
+  const { mutateAsync: isActiveSafe } = useMutation({
     mutationFn: inactiveSafe,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['safesByDate']})
+      queryClient.invalidateQueries({ queryKey: ['safesByDate'] })
     },
     onError: () => {
       toast.error('Não foi possível remover essa informação do cofre.')
@@ -80,7 +80,7 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
   const handleSafe = async (data: InSafes) => {
     try {
       await safe({
-        send_date:  new Date(data.send_date),
+        send_date: new Date(data.send_date),
         send_amount: parseFloat(data.send_amount.toString()),
       })
     } catch (err) {
@@ -96,8 +96,8 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
   const handleChange = (id: string, field: 'send_date' | 'send_amount', value: string | number) => {
     setEditableSafes(prevSafes =>
       prevSafes.map(safe =>
-        safe.id === id ? { 
-          ...safe, 
+        safe.id === id ? {
+          ...safe,
           [field]: field === 'send_amount' ? parseFloat(value.toString()) : value // Para send_date, o valor já é uma string
         } : safe
       )
@@ -110,7 +110,7 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
       try {
         await newSafe({
           id: editedSafe.id,
-          send_date: new Date(editedSafe.send_date).toISOString(), 
+          send_date: new Date(editedSafe.send_date).toISOString(),
           send_amount: editedSafe.send_amount,
         })
         setEditingId(null)
@@ -126,12 +126,16 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
         id: data.id,
         active: false
       })
-    } catch(err) {
+    } catch (err) {
       console.log(err)
     }
-  } 
+  }
 
-  const filteredSafes = editableSafes.filter((s) => s.active === true) 
+  const filteredSafes = editableSafes.filter((s) => s.active === true)
+  const total = filteredSafes.reduce((acc, t) => {
+    const result = acc + t.send_amount
+    return result
+  }, 0)
 
   useEffect(() => {
     if (safes) {
@@ -155,15 +159,15 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
                     <Plus className='size-4' />
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="w-1/5 max-lg:w-1/2 max-sm:w-full">
+                <AlertDialogContent className="w-1/4 max-lg:w-1/2 max-sm:w-full">
                   <CardContent>
                     <form onSubmit={handleSubmit(handleSafe)}>
-                      <CardHeader>
+                      <CardHeader className='px-0'>
                         <CardTitle>Registrar Cofre</CardTitle>
                         <CardDescription>Insira os dados do recolhimento ao cofre.</CardDescription>
                       </CardHeader>
 
-                      <div>
+                      <div className='mb-2'>
                         <Label>Data de envio:</Label>
                         <Input type="date" {...register("send_date")} />
                       </div>
@@ -172,7 +176,7 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
                         <Input type="number" {...register("send_amount")} />
                       </div>
 
-                      <CardFooter className="flex justify-between mt-8">
+                      <CardFooter className="flex justify-between mt-8 px-0">
                         <AlertDialogCancel asChild>
                           <Button variant="outline">Cancelar</Button>
                         </AlertDialogCancel>
@@ -198,59 +202,68 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
             </TableHeader>
             <TableBody>
               {filteredSafes.map(safe => (
-                <TableRow key={safe.id}>
-                  <TableCell>
-                    {editingId === safe.id ? (
-                      <Input
-                        type="date"
-                        value={safe.send_date ? format(new Date(safe.send_date), 'yyyy-MM-dd') : ''}
-                        onChange={(e) => handleChange(safe.id, 'send_date', e.target.value)}
-                      />
-                    ) : (
-                      safe.send_date ? format(new Date(safe.send_date), 'dd-MM-yyyy') : 'Sem data'
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {editingId === safe.id ? (
-                      <Input
-                        type="number"
-                        value={safe.send_amount}
-                        onChange={(e) => handleChange(safe.id, 'send_amount', e.target.value)}
-                      />
-                    ) : (
-                      `R$ ${safe.send_amount.toFixed(2)}`
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {editingId === safe.id ? (
-                      <Button onClick={() => handleSave(safe.id)}>Salvar</Button>
-                    ) : (
-                      <div className='flex items-center gap-4'>
-                        <Button onClick={() => handleEdit(safe.id)} variant="ghost">
-                          <Wrench className='size-4 text-muted-foreground' />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger>
-                            <Button variant='ghost' className='hover:bg-red-400 text-red-400 hover:text-white'>
-                              <X className='size-4' />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Tem certeza que deseja desativar esta informação do cofre?</AlertDialogTitle>
-                              <AlertDialogDescription>Esta ação irá desativar a informação, removendo-a da visualização.</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleInactive(safe)}>Remover</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
+                <>
+                  <TableRow key={safe.id}>
+                    <TableCell>
+                      {editingId === safe.id ? (
+                        <Input
+                          type="date"
+                          value={safe.send_date ? format(new Date(safe.send_date), 'yyyy-MM-dd') : ''}
+                          onChange={(e) => handleChange(safe.id, 'send_date', e.target.value)}
+                        />
+                      ) : (
+                        safe.send_date ? format(new Date(safe.send_date), 'dd-MM-yyyy') : 'Sem data'
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {editingId === safe.id ? (
+                        <Input
+                          type="number"
+                          value={safe.send_amount}
+                          onChange={(e) => handleChange(safe.id, 'send_amount', e.target.value)}
+                        />
+                      ) : (
+                        `R$ ${safe.send_amount.toFixed(2)}`
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {editingId === safe.id ? (
+                        <Button onClick={() => handleSave(safe.id)}>Salvar</Button>
+                      ) : (
+                        <div className='flex items-center gap-4'>
+                          <Button onClick={() => handleEdit(safe.id)} variant="ghost">
+                            <Wrench className='size-4 text-muted-foreground' />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger>
+                              <Button variant='ghost' className='hover:bg-red-400 text-red-400 hover:text-white'>
+                                <X className='size-4' />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Tem certeza que deseja desativar esta informação do cofre?</AlertDialogTitle>
+                                <AlertDialogDescription>Esta ação irá desativar a informação, removendo-a da visualização.</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleInactive(safe)}>Remover</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                </>
               ))}
+              <TableRow>
+                <TableCell className='text-muted-foreground '>Total</TableCell>
+                <TableCell className='text-muted-foreground'>{new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL'
+                }).format(total)}</TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </CardContent>

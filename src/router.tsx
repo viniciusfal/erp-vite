@@ -4,8 +4,6 @@ import { Dashboard } from "./pages/app/dashboard";
 import { AppLayout } from "./pages/layouts/app";
 import { Finances } from "./pages/app/finances";
 
-
-
 export const router = createBrowserRouter([
   {
     path: '/',
