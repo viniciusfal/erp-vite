@@ -35,7 +35,7 @@ export function IncomesPizza() {
   const id = "pie-interactive-carousel"
 
   const generateColor = (index: number, isExpense: boolean) => {
-    const hue = isExpense ? 1 : 510;
+    const hue = isExpense ? 10 : 510;
     const saturation = 150 + (index % 12) * 10;
     const lightness = 40 + (index % 2) * 5;
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
@@ -146,7 +146,7 @@ export function IncomesPizza() {
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-xl  font-bold"
+                          className="fill-foreground text-lg  font-bold"
                         >
                           {hoveredCategory ? hoveredCategory.category : ''}
                         </tspan>

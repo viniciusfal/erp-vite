@@ -33,8 +33,17 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
 import { SelectGroup } from '@radix-ui/react-select'
-import { Asterisk, File, Plus, Wrench, X } from 'lucide-react'
+import { ArrowLeftRight, Asterisk, BadgeCent, BookMarked, CalendarDays, DollarSign, Eye, File, ListCollapse, MoveUpRight, Paperclip, Plus, Tag, Wrench, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
@@ -49,6 +58,21 @@ import { setTransaction } from '@/api/set-transactions'
 import { Input } from './ui/input'
 import { useDateRange } from '@/hooks/date-ranger-context'
 import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
+import { CardInfoTransaction } from './card-Info-transaction'
+
+interface TransactionProps {
+  transaction_id: string
+  title: string
+  value: number
+  type: string
+  category: string
+  scheduling: boolean
+  annex: string | null
+  payment_date: Date | null
+  created_at: Date
+  updated_at: Date
+  pay: boolean
+}
 
 interface TableProps {
   setVisible: Dispatch<SetStateAction<boolean>>;
@@ -58,13 +82,17 @@ const TransactionID = z.object({
   id: z.string().uuid()
 })
 
+
 type transactionID = z.infer<typeof TransactionID>
 
 export function TableTransaction({ setVisible }: TableProps) {
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionProps | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editedData, setEditedData] = useState<Partial<Transactions>>({})
-  const [currentPage, setCurrentPage] = useState(1);
-  const [inputType, setInputType] = useState('full');
+  const [currentPage, setCurrentPage] = useState(1)
+  const [inputType, setInputType] = useState('full')
+  const [isOpen, setIsOpen] = useState(false)
+
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
 
@@ -198,18 +226,55 @@ export function TableTransaction({ setVisible }: TableProps) {
       <Table className="my-6">
         <TableHeader className="text-xs">
           <TableRow className="">
-            <TableHead className="w-[300px] font-medium">Descrição</TableHead>
-            <TableHead className="w-[100px]">Valor</TableHead>
-            <TableHead className="w-[250px]">Categoria</TableHead>
+            <TableHead className='w-[50px]'>
+              <div className='flex items-center gap-1'>
+                <Eye className='size-3 ' />
+                info
+              </div>
+            </TableHead>
+            <TableHead className="w-[300px] ">
+              <div className='flex items-center gap-1'>
+                <ListCollapse className='size-3' />
+                Descrição
+              </div>
+            </TableHead>
+            <TableHead className="w-[100px]">
+              <div className='flex items-center gap-1'>
+                <BadgeCent className='size-3' />
+                Valor
+              </div>
+            </TableHead>
+            <TableHead className="w-[250px]">
+              <div className='flex items-center gap-1'>
+                <Tag className='size-3' />
+                Categoria
+              </div>
+            </TableHead>
 
-            <TableHead className="w-[50px] font-medium">
-              Agendado?
+            <TableHead className="w-[50px]">
+              <div className='flex items-center gap-1'>
+                <BookMarked className='size-3' />
+                Agendado?
+              </div>
             </TableHead>
-            <TableHead className="w-[180px] font-medium">
-              Pagamento / Agendamento
+            <TableHead className="w-[180px]">
+              <div className='flex items-center gap-1'>
+                <CalendarDays className='size-3' />
+                Pagamento
+              </div>
             </TableHead>
-            <TableHead className="w-[60px] font-medium">Anexo</TableHead>
-            <TableHead className="w-[50px] font-medium">Tipo</TableHead>
+            <TableHead className="w-[60px]">
+              <div className='flex items-center gap-1'>
+                <Paperclip className='size-3' />
+                Anexo
+              </div>
+            </TableHead>
+            <TableHead className="w-[50px]">
+              <div className='flex item-center gap-1'>
+                <ArrowLeftRight className='size-3' />
+                Tipo
+              </div>
+            </TableHead>
             <TableHead className="w-[20px]"></TableHead>
             <TableHead className="w-[20px]"></TableHead>
           </TableRow>
@@ -218,6 +283,31 @@ export function TableTransaction({ setVisible }: TableProps) {
           {currentTransactions?.map((t) => (
             <TableRow key={t.transaction_id} className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''}`}
             >
+              <TableCell>
+                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="rounded-full p-2.5 text-muted-foreground "
+                      onClick={() => setSelectedTransaction(t)} // Atualiza a transação ao clicar
+                    >
+                      <Eye className="size-3" />
+                    </Button>
+                  </DialogTrigger>
+
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Detalhes da Transação</DialogTitle>
+                      <DialogDescription>
+                        Informações detalhadas sobre a transação selecionada.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <CardInfoTransaction transaction={selectedTransaction} />
+                  </DialogContent>
+                </Dialog>
+              </TableCell>
+
               <TableCell className='text-xs text-secondary-foreground'>
                 {editingId === t.transaction_id ? (
                   <Input
@@ -256,17 +346,17 @@ export function TableTransaction({ setVisible }: TableProps) {
               </TableCell>
               <TableCell>
                 {editingId === t.transaction_id ? (
-                  <Select onValueChange={() => handleChange} value={t.scheduling ? 'sim' : 'nao'}>
+                  <Select onValueChange={() => handleChange} value={t.scheduling ? 'sim' : 'pago'}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value='sim'>Sim</SelectItem>
-                      <SelectItem value='nao'>Não</SelectItem>
+                      <SelectItem value='pago'>Pago</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
-                  t.scheduling ? 'sim' : 'nao'
+                  t.scheduling ? 'sim' : 'pago'
                 )}
               </TableCell>
               <TableCell>
