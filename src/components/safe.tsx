@@ -180,7 +180,9 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
                         <AlertDialogCancel asChild>
                           <Button variant="outline">Cancelar</Button>
                         </AlertDialogCancel>
-                        <Button type="submit">Salvar</Button>
+                        <AlertDialogAction>
+                          <Button type="submit">Salvar</Button>
+                        </AlertDialogAction>
                       </CardFooter>
                     </form>
                   </CardContent>
