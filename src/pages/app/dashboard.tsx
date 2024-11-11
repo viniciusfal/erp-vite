@@ -1,7 +1,6 @@
 import { Analyses } from '@/components/analyses'
 import { CalendarDateRangePicker } from '@/components/date-ranger-picker'
 import { DropSettings } from '@/components/drop-settings'
-import { Header } from '@/components/header'
 import { Overview } from '@/components/overview'
 import { RecentSales } from '@/components/recent-sales'
 import { Button } from '@/components/ui/button'
@@ -64,7 +63,7 @@ export function Dashboard() {
 
   return (
     <div className="bg-primary-foreground">
-      <Header />
+
 
       <div className="px-8">
         <div className="flex items-center justify-between">

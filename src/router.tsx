@@ -6,22 +6,21 @@ import { Finances } from "./pages/app/finances";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: '/sign-in',
     element: <SignIn />
   },
   {
     path: '/',
-    element: <AppLayout />,
+    element: <AppLayout />,  // AppLayout vai ser usado para as rotas filhas
     children: [
       {
-        path: '/finances',
+        path: '/',  // Agora o Dashboard está dentro do AppLayout
+        element: <Dashboard />
+      },
+      {
+        path: 'finances',
         element: <Finances />
       }
     ]
-  },
-  {
-    path: '/dashboard',
-    element: <Dashboard />
   }
-
-])
+]);

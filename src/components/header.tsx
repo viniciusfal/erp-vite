@@ -24,7 +24,7 @@ export function Header() {
       </div>
 
       <nav className="flex gap-5 items-center justify-center">
-        <Link to="/dashboard">
+        <Link to="/">
           <Button
             className={`rounded-full h-12 w-32 text-sm ${activeButton === '/dashboard' ? 'bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-muted' : 'bg-transparent'}`}
             variant={"outline"}
