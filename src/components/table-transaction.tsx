@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/dialog"
 
 import { SelectGroup } from '@radix-ui/react-select'
-import { ArrowLeftRight, Asterisk, BadgeCent, BookMarked, CalendarDays, DollarSign, Eye, File, ListCollapse, MoveUpRight, Paperclip, Plus, Tag, Wrench, X } from 'lucide-react'
+import { ArrowLeftRight, Asterisk, BadgeCent, CalendarDays, Eye, File, ListCollapse, Paperclip, Plus, Tag, TrendingUp, Wrench, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
@@ -251,10 +251,10 @@ export function TableTransaction({ setVisible }: TableProps) {
               </div>
             </TableHead>
 
-            <TableHead className="w-[50px]">
+            <TableHead className="w-[80px]">
               <div className='flex items-center gap-1'>
-                <BookMarked className='size-3' />
-                Agendado?
+                <TrendingUp className='size-3' />
+                Status
               </div>
             </TableHead>
             <TableHead className="w-[180px]">
@@ -344,19 +344,19 @@ export function TableTransaction({ setVisible }: TableProps) {
                   t.category
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className=''>
                 {editingId === t.transaction_id ? (
-                  <Select onValueChange={() => handleChange} value={t.scheduling ? 'sim' : 'pago'}>
+                  <Select onValueChange={() => handleChange} value={t.scheduling ? 'agendado' : 'pago'}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value='sim'>Sim</SelectItem>
+                      <SelectItem value='agendado'>Sim</SelectItem>
                       <SelectItem value='pago'>Pago</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
-                  t.scheduling ? 'sim' : 'pago'
+                  t.scheduling ? 'agendado' : 'pago'
                 )}
               </TableCell>
               <TableCell>
