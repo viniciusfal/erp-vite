@@ -15,7 +15,7 @@ export interface Transactions {
 }
 
 export function useListingtransaction(inputType: string) {
-  const { data: transactions } = useQuery<Transactions[]>({
+  const { data: transactions, isLoading } = useQuery<Transactions[]>({
     queryKey: ['transactions'],
     queryFn: getTransactions
   })
@@ -25,5 +25,5 @@ export function useListingtransaction(inputType: string) {
     : transactions?.filter(t => t.type === inputType)
 
 
-  return { currentTransactions }
+  return { currentTransactions , isLoading}
 }

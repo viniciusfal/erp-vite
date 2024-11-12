@@ -35,11 +35,16 @@ export function IncomesPizza() {
   const id = "pie-interactive-carousel"
 
   const generateColor = (index: number, isExpense: boolean) => {
-    const hue = isExpense ? 10 : 510;
-    const saturation = 150 + (index % 12) * 10;
-    const lightness = 40 + (index % 2) * 5;
+    // Alterna o hue para gerar uma paleta mais diversificada
+    const hue = isExpense ? (index * 40) % 360 : (index * 40 + 180) % 360;
+
+    // Varie a saturação e a luminosidade em intervalos mais amplos
+    const saturation = 60 + ((index * 10) % 30); // Saturação entre 60 e 90
+    const lightness = 50 + ((index * 15) % 30);  // Luminosidade entre 50 e 80
+
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-  }
+  };
+
 
   React.useEffect(() => {
     if (!currentTransactions) return;

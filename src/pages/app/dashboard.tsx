@@ -3,6 +3,7 @@ import { CalendarDateRangePicker } from '@/components/date-ranger-picker'
 import { DropSettings } from '@/components/drop-settings'
 import { Overview } from '@/components/overview'
 import { RecentSales } from '@/components/recent-sales'
+import Spinner from '@/components/spinner'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -25,7 +26,7 @@ import { useEffect, useState } from 'react'
 export function Dashboard() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
-  const { currentTransactions } = useListingtransactionByDate(startDate, endDate, 1, 'full')
+  const { currentTransactions, isLoading } = useListingtransactionByDate(startDate, endDate, 1, 'full')
   const { currentTransactions: allTransactions } = useListingtransaction('full')
   const { totalBalanceTransactions } = useGetAnaliticsTransactions()
   const [totalIncome, setTotalIncome] = useState(0)
@@ -61,10 +62,12 @@ export function Dashboard() {
       return dateB - dateA
     })
 
+  if (isLoading) {
+
+  }
+
   return (
     <div className="bg-primary-foreground">
-
-
       <div className="px-8">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
@@ -115,7 +118,7 @@ export function Dashboard() {
             </TabsList>
             <CalendarDateRangePicker />
           </div>
-          {pagineAtual === 'overview' ? (
+          {isLoading ? <Spinner /> : pagineAtual === 'overview' ? (
             <TabsContent value="overview" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Card className="bg-gradient-to-tr from-emerald-700 to-emerald-500 text-white">

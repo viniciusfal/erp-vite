@@ -59,6 +59,7 @@ import { Input } from './ui/input'
 import { useDateRange } from '@/hooks/date-ranger-context'
 import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
 import { CardInfoTransaction } from './card-Info-transaction'
+import Spinner from './spinner'
 
 interface TransactionProps {
   transaction_id: string
@@ -97,7 +98,7 @@ export function TableTransaction({ setVisible }: TableProps) {
   const { startDate, endDate } = dateRange
 
 
-  const { currentTransactions, totalPages } = useListingtransactionByDate(
+  const { currentTransactions, totalPages, isLoading } = useListingtransactionByDate(
     startDate,
     endDate,
     currentPage,
@@ -223,224 +224,227 @@ export function TableTransaction({ setVisible }: TableProps) {
         </div>
       </div>
 
-      <Table className="my-6">
-        <TableHeader className="text-xs">
-          <TableRow className="">
-            <TableHead className='w-[50px]'>
-              <div className='flex items-center gap-1'>
-                <Eye className='size-3 ' />
-                info
-              </div>
-            </TableHead>
-            <TableHead className="w-[300px] ">
-              <div className='flex items-center gap-1'>
-                <ListCollapse className='size-3' />
-                Descrição
-              </div>
-            </TableHead>
-            <TableHead className="w-[100px]">
-              <div className='flex items-center gap-1'>
-                <BadgeCent className='size-3' />
-                Valor
-              </div>
-            </TableHead>
-            <TableHead className="w-[250px]">
-              <div className='flex items-center gap-1'>
-                <Tag className='size-3' />
-                Categoria
-              </div>
-            </TableHead>
+      {isLoading ? <Spinner /> : (
 
-            <TableHead className="w-[80px]">
-              <div className='flex items-center gap-1'>
-                <TrendingUp className='size-3' />
-                Status
-              </div>
-            </TableHead>
-            <TableHead className="w-[180px]">
-              <div className='flex items-center gap-1'>
-                <CalendarDays className='size-3' />
-                Pagamento
-              </div>
-            </TableHead>
-            <TableHead className="w-[60px]">
-              <div className='flex items-center gap-1'>
-                <Paperclip className='size-3' />
-                Anexo
-              </div>
-            </TableHead>
-            <TableHead className="w-[50px]">
-              <div className='flex item-center gap-1'>
-                <ArrowLeftRight className='size-3' />
-                Tipo
-              </div>
-            </TableHead>
-            <TableHead className="w-[20px]"></TableHead>
-            <TableHead className="w-[20px]"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="text-sm">
-          {currentTransactions?.map((t) => (
-            <TableRow key={t.transaction_id} className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''}`}
-            >
-              <TableCell>
-                <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                  <DialogTrigger asChild>
+        <Table className="my-6">
+          <TableHeader className="text-xs">
+            <TableRow className="">
+              <TableHead className='w-[50px]'>
+                <div className='flex items-center gap-1'>
+                  <Eye className='size-3 ' />
+                  info
+                </div>
+              </TableHead>
+              <TableHead className="w-[300px] ">
+                <div className='flex items-center gap-1'>
+                  <ListCollapse className='size-3' />
+                  Descrição
+                </div>
+              </TableHead>
+              <TableHead className="w-[100px]">
+                <div className='flex items-center gap-1'>
+                  <BadgeCent className='size-3' />
+                  Valor
+                </div>
+              </TableHead>
+              <TableHead className="w-[250px]">
+                <div className='flex items-center gap-1'>
+                  <Tag className='size-3' />
+                  Categoria
+                </div>
+              </TableHead>
+
+              <TableHead className="w-[80px]">
+                <div className='flex items-center gap-1'>
+                  <TrendingUp className='size-3' />
+                  Status
+                </div>
+              </TableHead>
+              <TableHead className="w-[180px]">
+                <div className='flex items-center gap-1'>
+                  <CalendarDays className='size-3' />
+                  Pagamento
+                </div>
+              </TableHead>
+              <TableHead className="w-[60px]">
+                <div className='flex items-center gap-1'>
+                  <Paperclip className='size-3' />
+                  Anexo
+                </div>
+              </TableHead>
+              <TableHead className="w-[50px]">
+                <div className='flex item-center gap-1'>
+                  <ArrowLeftRight className='size-3' />
+                  Tipo
+                </div>
+              </TableHead>
+              <TableHead className="w-[20px]"></TableHead>
+              <TableHead className="w-[20px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="text-sm">
+            {currentTransactions?.map((t) => (
+              <TableRow key={t.transaction_id} className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''}`}
+              >
+                <TableCell>
+                  <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="rounded-full p-2.5 text-muted-foreground "
+                        onClick={() => setSelectedTransaction(t)} // Atualiza a transação ao clicar
+                      >
+                        <Eye className="size-3" />
+                      </Button>
+                    </DialogTrigger>
+
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Detalhes da Transação</DialogTitle>
+                        <DialogDescription>
+                          Informações detalhadas sobre a transação selecionada.
+                        </DialogDescription>
+                      </DialogHeader>
+
+                      <CardInfoTransaction transaction={selectedTransaction} />
+                    </DialogContent>
+                  </Dialog>
+                </TableCell>
+
+                <TableCell className='text-xs text-secondary-foreground'>
+                  {editingId === t.transaction_id ? (
+                    <Input
+                      type='text'
+                      name='title'
+                      value={editedData.title}
+                      onChange={handleChange} />
+                  ) : (
+                    t.title
+                  )}
+                </TableCell>
+                <TableCell className='text-secondary-foreground'>
+                  {editingId === t.transaction_id ? (
+                    <Input
+                      type='number'
+                      name='value'
+                      value={Number(editedData.value)}
+                      onChange={handleChange} />
+                  ) : (
+                    new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(t.value)
+                  )}
+                </TableCell>
+                <TableCell className='text-secondary-foreground'>
+                  {editingId === t.transaction_id ? (
+                    <Input
+                      type='text'
+                      name='category'
+                      value={editedData.category}
+                      onChange={handleChange} />
+                  ) : (
+                    t.category
+                  )}
+                </TableCell>
+                <TableCell className=''>
+                  {editingId === t.transaction_id ? (
+                    <Select onValueChange={() => handleChange} value={t.scheduling ? 'agendado' : 'pago'}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='agendado'>Sim</SelectItem>
+                        <SelectItem value='pago'>Pago</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    t.scheduling ? 'agendado' : 'pago'
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editingId === t.transaction_id ? (
+                    <Input
+                      type='date'
+                      name='payment_date'
+                      value={editedData.payment_date ? new Date(editedData.payment_date).toISOString().split('T')[0] : ''}
+                      onChange={handleChange}
+                    />
+
+                  ) : (
+                    t.payment_date ? new Date(t.payment_date).toLocaleDateString() : new Date(t.created_at).toLocaleDateString()
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Link to={t.annex ? t.annex : '#'}>
+                    <File className="size-4 text-muted-foreground" />
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    className={t.type === 'entrada' ? 'rounded-full bg-green-100 w-16 text-xs text-emerald-400 hover:cursor-default hover:bg-emerald-100' :
+                      'rounded-full bg-red-400 w-16 text-xs text-red-50 hover:cursor-default hover:bg-red-400'}
+                  >
+                    {t.type}
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  {editingId === t.transaction_id ? (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={handleSave}
+                        className="text-green-500"
+                      >
+                        Salvar
+                      </Button>
+                    </div>
+                  ) : (
                     <Button
                       variant="ghost"
-                      className="rounded-full p-2.5 text-muted-foreground "
-                      onClick={() => setSelectedTransaction(t)} // Atualiza a transação ao clicar
+                      className="rounded-full"
+                      onClick={() => handleEditClick(t.transaction_id, t)}
                     >
-                      <Eye className="size-3" />
+                      <Wrench className="size-4 text-muted-foreground" />
                     </Button>
-                  </DialogTrigger>
-
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Detalhes da Transação</DialogTitle>
-                      <DialogDescription>
-                        Informações detalhadas sobre a transação selecionada.
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <CardInfoTransaction transaction={selectedTransaction} />
-                  </DialogContent>
-                </Dialog>
-              </TableCell>
-
-              <TableCell className='text-xs text-secondary-foreground'>
-                {editingId === t.transaction_id ? (
-                  <Input
-                    type='text'
-                    name='title'
-                    value={editedData.title}
-                    onChange={handleChange} />
-                ) : (
-                  t.title
-                )}
-              </TableCell>
-              <TableCell className='text-secondary-foreground'>
-                {editingId === t.transaction_id ? (
-                  <Input
-                    type='number'
-                    name='value'
-                    value={Number(editedData.value)}
-                    onChange={handleChange} />
-                ) : (
-                  new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  }).format(t.value)
-                )}
-              </TableCell>
-              <TableCell className='text-secondary-foreground'>
-                {editingId === t.transaction_id ? (
-                  <Input
-                    type='text'
-                    name='category'
-                    value={editedData.category}
-                    onChange={handleChange} />
-                ) : (
-                  t.category
-                )}
-              </TableCell>
-              <TableCell className=''>
-                {editingId === t.transaction_id ? (
-                  <Select onValueChange={() => handleChange} value={t.scheduling ? 'agendado' : 'pago'}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='agendado'>Sim</SelectItem>
-                      <SelectItem value='pago'>Pago</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  t.scheduling ? 'agendado' : 'pago'
-                )}
-              </TableCell>
-              <TableCell>
-                {editingId === t.transaction_id ? (
-                  <Input
-                    type='date'
-                    name='payment_date'
-                    value={editedData.payment_date ? new Date(editedData.payment_date).toISOString().split('T')[0] : ''}
-                    onChange={handleChange}
-                  />
-
-                ) : (
-                  t.payment_date ? new Date(t.payment_date).toLocaleDateString() : new Date(t.created_at).toLocaleDateString()
-                )}
-              </TableCell>
-              <TableCell>
-                <Link to={t.annex ? t.annex : '#'}>
-                  <File className="size-4 text-muted-foreground" />
-                </Link>
-              </TableCell>
-              <TableCell>
-                <Button
-                  className={t.type === 'entrada' ? 'rounded-full bg-green-100 w-16 text-xs text-emerald-400 hover:cursor-default hover:bg-emerald-100' :
-                    'rounded-full bg-red-400 w-16 text-xs text-red-50 hover:cursor-default hover:bg-red-400'}
-                >
-                  {t.type}
-                </Button>
-              </TableCell>
-              <TableCell>
-                {editingId === t.transaction_id ? (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={handleSave}
-                      className="text-green-500"
-                    >
-                      Salvar
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    className="rounded-full"
-                    onClick={() => handleEditClick(t.transaction_id, t)}
-                  >
-                    <Wrench className="size-4 text-muted-foreground" />
-                  </Button>
-                )}
-              </TableCell>
-              <TableCell>
-                {editingId === t.transaction_id ? (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setEditingId(null)}
-                      className="text-red-500"
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                ) : (
-                  <AlertDialog>
-                    <AlertDialogTrigger>
-                      <Button variant='ghost' className='hover:bg-red-400  text-red-400 hover:text-white'>
-                        <X className='size-4' />
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editingId === t.transaction_id ? (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setEditingId(null)}
+                        className="text-red-500"
+                      >
+                        Cancelar
                       </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Tem certeza que deseja excluir essa transação?</AlertDialogTitle>
-                        <AlertDialogDescription>Ao excluir você não terá mais acesso a essa transação.</AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleConfirmRemove({ id: t.transaction_id })}>Excluir</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                    </div>
+                  ) : (
+                    <AlertDialog>
+                      <AlertDialogTrigger>
+                        <Button variant='ghost' className='hover:bg-red-400  text-red-400 hover:text-white'>
+                          <X className='size-4' />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Tem certeza que deseja excluir essa transação?</AlertDialogTitle>
+                          <AlertDialogDescription>Ao excluir você não terá mais acesso a essa transação.</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleConfirmRemove({ id: t.transaction_id })}>Excluir</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
 
       <div className="flex justify-between">
         <div></div>

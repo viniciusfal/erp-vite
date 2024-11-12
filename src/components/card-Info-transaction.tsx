@@ -19,7 +19,7 @@ interface TransactionProps {
   payment_date: Date | null
   created_at: Date
   updated_at: Date
-  pay: boolean
+  pay?: boolean
 }
 
 

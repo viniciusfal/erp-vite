@@ -34,11 +34,12 @@ export function useListingtransactionByDate(
   const formattedStartDate = formatDate(startDate);
   const formattedEndDate = formatDate(endDate);
 
-  const { data: transactionsByDate } = useQuery<Transaction[]>({
+  const { data: transactionsByDate, isLoading } = useQuery<Transaction[]>({
     queryKey: ['transactionsByDate', { start_date: formattedStartDate, end_date: formattedEndDate }],
     queryFn: () => getTransactionsByDate({ start_date: formattedStartDate, end_date: formattedEndDate }),
     enabled: !!formattedStartDate && !!formattedEndDate, // Garante que a query só execute se as datas estiverem disponíveis
   });
+
 
   const totalPages = transactionsByDate ? Math.ceil(transactionsByDate.length / ITEMS_PER_PAGE) : 1;
 
@@ -52,5 +53,5 @@ export function useListingtransactionByDate(
 
   const currentTransactions = filteredForType?.slice(startIndex, endIndex);
 
-  return { currentTransactions, totalPages };
+  return { currentTransactions, totalPages, isLoading };
 }
