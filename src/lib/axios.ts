@@ -1,6 +1,6 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: 'https://erp.up.railway.app',
+  baseURL: 'https://api-erp-amazonia.up.railway.app/',
   withCredentials: true,
 })

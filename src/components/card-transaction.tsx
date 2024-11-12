@@ -98,7 +98,7 @@ export function CardTransaction({ setVisible }: any) {
 
             <div>
               <Label>Valor</Label>
-              <Input id="value" type="number" placeholder="0" {...register("value")} />
+              <Input id="value" type="number" step="any" placeholder="0" {...register("value")} />
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label>Tipo</Label>
