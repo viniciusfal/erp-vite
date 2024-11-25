@@ -15,7 +15,6 @@ import { registerSafe } from '@/api/register-safe'
 import { queryClient } from '@/lib/query-client'
 import { toast } from 'sonner'
 import { setSafe } from '@/api/set-safe'
-import { format } from 'date-fns'
 import { inactiveSafe } from '@/api/inactive-safe'
 
 interface Safe {
@@ -143,6 +142,17 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
     }
   }, [safes])
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+
+    // Extraindo dia, mês e ano da data
+    const day = String(date.getUTCDate()).padStart(2, '0');   // Garantir que o dia tenha dois dígitos
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');  // O mês começa de 0, então somamos 1
+    const year = date.getUTCFullYear();  // Pega o ano
+
+    return `${day}/${month}/${year}`;  // Retorna a data no formato "dd/MM/yyyy"
+  };
+
   return (
     <div className='container mx-auto p-4'>
       <Card>
@@ -210,11 +220,11 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
                       {editingId === safe.id ? (
                         <Input
                           type="date"
-                          value={safe.send_date ? format(new Date(safe.send_date), 'yyyy-MM-dd') : ''}
+                          value={safe.send_date ? new Date(safe.send_date).toISOString().split('')[0] : ''}
                           onChange={(e) => handleChange(safe.id, 'send_date', e.target.value)}
                         />
                       ) : (
-                        safe.send_date ? format(new Date(safe.send_date), 'dd-MM-yyyy') : 'Sem data'
+                        safe.send_date ? formatDate(safe.send_date) : 'Sem data'
                       )}
                     </TableCell>
                     <TableCell>

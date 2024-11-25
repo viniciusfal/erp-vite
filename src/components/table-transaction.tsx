@@ -193,6 +193,17 @@ export function TableTransaction({ setVisible }: TableProps) {
       console.error('Erro ao excluir transação:', error);
     }
   }
+
+  const formatDate = (dateString: Date) => {
+    const date = new Date(dateString);
+
+    // Extraindo dia, mês e ano da data
+    const day = String(date.getUTCDate()).padStart(2, '0');   // Garantir que o dia tenha dois dígitos
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');  // O mês começa de 0, então somamos 1
+    const year = date.getUTCFullYear();  // Pega o ano
+
+    return `${day}/${month}/${year}`;  // Retorna a data no formato "dd/MM/yyyy"
+  };
   return (
     <div className="flex w-2/3 flex-col  rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
       <div className="flex justify-between">
@@ -372,7 +383,7 @@ export function TableTransaction({ setVisible }: TableProps) {
                     />
 
                   ) : (
-                    t.payment_date ? new Date(t.payment_date).toLocaleDateString() : new Date(t.created_at).toLocaleDateString()
+                    t.payment_date ? formatDate(t.payment_date) : ''
                   )}
                 </TableCell>
                 <TableCell>
