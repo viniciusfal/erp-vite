@@ -24,7 +24,7 @@ export function SignIn() {
     mutationFn: signIn,
   })
 
-  async function handleSignIn(data: SignInForm) {
+  const handleSignIn = async (data: SignInForm) => {
     try {
       await session({ email: data.email, password: data.password })
 

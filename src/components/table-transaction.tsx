@@ -118,12 +118,12 @@ export function TableTransaction({ setVisible }: TableProps) {
     }
   })
 
-  function handleEditClick(id: string, transaction: Transactions) {
+  const handleEditClick = (id: string, transaction: Transactions) => {
     setEditingId(id);
     setEditedData(transaction);
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     if (type === 'date') {
       // Mantém o formato "YYYY-MM-DD" diretamente
@@ -133,7 +133,7 @@ export function TableTransaction({ setVisible }: TableProps) {
     }
   }
 
-  async function handleSave() {
+  const handleSave = async () => {
     if (editingId) {
       try {
         const existingTransaction = currentTransactions?.find(
@@ -183,7 +183,7 @@ export function TableTransaction({ setVisible }: TableProps) {
     }
   });
 
-  async function handleConfirmRemove(data: transactionID) {
+  const handleConfirmRemove = async (data: transactionID) => {
     try {
       console.log('Tentando remover a transação com ID:', data.id); // Para depuração
       await transaction({

@@ -43,7 +43,7 @@ export function CalendarDateRangePicker({
     }
   }
 
-  async function handleSearch() {
+  const handleSearch = async () => {
     if (selectedDates?.from && selectedDates?.to) {
       await handleTransactionByDate({
         start_date: selectedDates.from,

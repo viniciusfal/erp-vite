@@ -64,7 +64,7 @@ export function Finances() {
     })
     .slice(0, 2)
 
-  async function handleMarkAsPaid(id: string) {
+  const handleMarkAsPaid = async (id: string) => {
     try {
       await transaction({ id })
     } catch (err) {

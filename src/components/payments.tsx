@@ -34,7 +34,7 @@ export function Payments({ setVisiblePayment }: PaymentProps) {
     }
   })
 
-  async function handleMarkAsPaid(id: string) {
+  const handleMarkAsPaid = async (id: string) => {
     try {
       await transaction({ id })
     } catch (err) {
