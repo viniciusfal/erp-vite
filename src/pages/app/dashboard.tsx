@@ -18,7 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useDateRange } from '@/hooks/date-ranger-context'
 import { useGetAnaliticsTransactions } from '@/hooks/get-analitics-transactions'
 import { useListingtransaction } from '@/hooks/listing-transactions'
-import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
+import { useListingTransactionByDate } from '@/hooks/listing-transactions-by-date'
 import { isSameDay } from 'date-fns'
 import { Asterisk, CircleMinus, CirclePlus, Download, Info } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -26,27 +26,27 @@ import { useEffect, useState } from 'react'
 export function Dashboard() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
-  const { currentTransactions, isLoading } = useListingtransactionByDate(startDate, endDate, 1, 'full')
-  const { currentTransactions: allTransactions } = useListingtransaction('full')
+  const { currentTransactions, isLoading } = useListingTransactionByDate(startDate, endDate, 1, 'full')
+  const { currentTransactions: allTransactions = [] } = useListingtransaction('full')
   const { totalBalanceTransactions } = useGetAnaliticsTransactions()
   const [totalIncome, setTotalIncome] = useState(0)
   const [totalOutcome, setTotalOutcome] = useState(0)
   const [pagineAtual, setPagineAtual] = useState('overview')
 
   useEffect(() => {
-    const incomes = currentTransactions?.reduce((acc, transaction) => {
+    const incomes = Array.isArray(currentTransactions) ? currentTransactions?.reduce((acc, transaction) => {
       if (transaction.type === 'entrada') {
         return acc + transaction.value
       }
       return acc
-    }, 0) || 0
+    }, 0) : 0
 
-    const outcomes = currentTransactions?.reduce((acc, transaction) => {
+    const outcomes = Array.isArray(currentTransactions) ? currentTransactions?.reduce((acc, transaction) => {
       if (transaction.type === 'saida') {
         return acc + transaction.value
       }
       return acc
-    }, 0) || 0
+    }, 0) : 0
 
     setTotalIncome(incomes)
     setTotalOutcome(outcomes)
@@ -54,16 +54,17 @@ export function Dashboard() {
 
   const today = new Date()
 
-  let filteredLastsActivities = allTransactions
+  let filteredLastsActivities = Array.isArray(allTransactions) ? allTransactions
     ?.filter((t) => isSameDay(new Date(t.created_at), today))
     .sort((a, b) => {
       const dateA = new Date(a.created_at).getTime()
       const dateB = new Date(b.created_at).getTime()
       return dateB - dateA
     })
+    : []
 
   if (isLoading) {
-
+    return <div>Loading...</div>;
   }
 
   return (
@@ -160,7 +161,7 @@ export function Dashboard() {
                       </TooltipProvider>
 
                       <p className="text-xs text-muted">
-                        {totalBalanceTransactions?.total_balance.toFixed(2)}% do que o mês passado.
+                        {totalBalanceTransactions?.total_balance?.toFixed(2)}% do que o mês passado.
                       </p>
                     </div>
                   </CardContent>
@@ -179,7 +180,7 @@ export function Dashboard() {
                       currency: 'BRL'
                     }).format(totalIncome)}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                       <div className='flex items-center gap-1.5 pt-1'>
                         <TooltipProvider>
                           <Tooltip>
@@ -192,10 +193,10 @@ export function Dashboard() {
                           </Tooltip>
                         </TooltipProvider>
                         <p className='text-xs text-muted-foreground'>
-                          {totalBalanceTransactions?.total_entries.toFixed(2)}% do que o mês passado.
+                          {totalBalanceTransactions?.total_entries?.toFixed(2)}% do que o mês passado.
                         </p>
                       </div>
-                    </p>
+                    </div>
                   </CardContent>
                 </Card>
                 <Card>
@@ -225,7 +226,7 @@ export function Dashboard() {
                         </Tooltip>
                       </TooltipProvider>
                       <p className="text-xs text-muted-foreground">
-                        {totalBalanceTransactions?.total_outcomes.toFixed(2)}% do que o mês passado.
+                        {totalBalanceTransactions?.total_outcomes?.toFixed(2)}% do que o mês passado.
                       </p>
                     </div>
 

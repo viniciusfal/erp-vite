@@ -26,6 +26,7 @@ import { registerTransaction } from "@/api/register-transaction";
 import { toast } from "sonner";
 import { queryClient } from "@/lib/query-client";
 import { categories } from "@/services/categories";
+import { Textarea } from "./ui/textarea";
 
 const inCredits = z.object({
   title: z.string(),
@@ -35,7 +36,8 @@ const inCredits = z.object({
   scheduling: z.boolean(),
   annex: z.string().nullable(),
   payment_date: z.date().nullable(),
-  pay: z.boolean()
+  pay: z.boolean(),
+  details: z.string().nullable()
 });
 
 type Incredits = z.infer<typeof inCredits>;
@@ -72,7 +74,8 @@ export function CardTransaction({ setVisible }: any) {
         payment_date: data.payment_date ? new Date(data.payment_date) : null,
         annex: null, // Assumindo que você não está usando anexos
         scheduling: data.scheduling,
-        pay: data.pay
+        pay: data.pay,
+        details: data.details,
       });
 
       setVisible(false)
@@ -140,6 +143,10 @@ export function CardTransaction({ setVisible }: any) {
                 )}
               />
 
+            </div>
+            <div>
+              <Label>Detalhes</Label>
+              <Textarea className="resize-none text-sm" id="details" placeholder="Detalhes da transação" {...register("details")} />
             </div>
 
             <Separator className="my-2" />

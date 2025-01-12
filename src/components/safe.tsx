@@ -19,7 +19,7 @@ import { inactiveSafe } from '@/api/inactive-safe'
 
 interface Safe {
   id: string
-  send_date: string
+  send_date: Date
   send_amount: number
   active: boolean
 }
@@ -142,7 +142,7 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
     }
   }, [safes])
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: Date) => {
     const date = new Date(dateString);
 
     // Extraindo dia, mês e ano da data
@@ -150,7 +150,7 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
     const month = String(date.getUTCMonth() + 1).padStart(2, '0');  // O mês começa de 0, então somamos 1
     const year = date.getUTCFullYear();  // Pega o ano
 
-    return `${day}/${month}/${year}`;  // Retorna a data no formato "dd/MM/yyyy"
+    return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
   };
 
   return (
@@ -220,7 +220,7 @@ export default function Safe({ setVisibleSafe }: SafeProps) {
                       {editingId === safe.id ? (
                         <Input
                           type="date"
-                          value={safe.send_date ? new Date(safe.send_date).toISOString().split('')[0] : ''}
+                          value={safe.send_date ? new Date(safe.send_date).toISOString().split('T')[0] : ''}
                           onChange={(e) => handleChange(safe.id, 'send_date', e.target.value)}
                         />
                       ) : (

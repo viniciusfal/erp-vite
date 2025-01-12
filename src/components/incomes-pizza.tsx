@@ -19,38 +19,34 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Button } from "@/components/ui/button"
-import { useListingtransactionByDate } from "@/hooks/listing-transactions-by-date"
+import { useListingTransactionByDate } from "@/hooks/listing-transactions-by-date"
 import { useDateRange } from "@/hooks/date-ranger-context"
 
 
 export function IncomesPizza() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
-  const { currentTransactions } = useListingtransactionByDate(startDate, endDate, 1, 'full')
-  const [incomeData, setIncomeData] = React.useState<{ category: string; value: number; fill: string }[]>([])
-  const [expenseData, setExpenseData] = React.useState<{ category: string; value: number; fill: string }[]>([])
+  const { currentTransactions } = useListingTransactionByDate(startDate, endDate, 1, 'full')
   const [activeIndex, setActiveIndex] = React.useState(0)
   const [hoveredCategory, setHoveredCategory] = React.useState<{ category: string; value: number } | null>(null)
 
   const id = "pie-interactive-carousel"
 
   const generateColor = (index: number, isExpense: boolean) => {
-    // Alterna o hue para gerar uma paleta mais diversificada
     const hue = isExpense ? (index * 40) % 360 : (index * 40 + 180) % 360;
-
-    // Varie a saturação e a luminosidade em intervalos mais amplos
     const saturation = 60 + ((index * 10) % 30); // Saturação entre 60 e 90
     const lightness = 50 + ((index * 15) % 30);  // Luminosidade entre 50 e 80
-
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
   };
 
-
-  React.useEffect(() => {
-    if (!currentTransactions) return;
+  // Use useMemo para memorizar os dados processados e evitar recalculá-los em cada renderização
+  const incomeData = React.useMemo(() => {
+    if (!currentTransactions) return [];
 
     const processTransactions = (type: 'entrada' | 'saida') => {
-      const transactions = currentTransactions?.reduce<Record<string, number>>((acc, transaction) => {
+      const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : [];
+
+      const transactions = transactionsArray?.reduce<Record<string, number>>((acc, transaction) => {
         if (transaction && transaction.type === type) {
           const category = transaction.category || 'Uncategorized'
           if (!acc[category]) {
@@ -68,9 +64,35 @@ export function IncomesPizza() {
       }))
     }
 
-    setIncomeData(processTransactions('entrada'))
-    setExpenseData(processTransactions('saida'))
-  }, [currentTransactions])
+    return processTransactions('entrada')
+  }, [currentTransactions]); // Dependência para recalcular quando currentTransactions mudar
+
+  const expenseData = React.useMemo(() => {
+    if (!currentTransactions) return [];
+
+    const processTransactions = (type: 'entrada' | 'saida') => {
+      const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : [];
+
+      const transactions = transactionsArray?.reduce<Record<string, number>>((acc, transaction) => {
+        if (transaction && transaction.type === type) {
+          const category = transaction.category || 'Uncategorized'
+          if (!acc[category]) {
+            acc[category] = 0
+          }
+          acc[category] += +(transaction.value || 0)
+        }
+        return acc
+      }, {}) || {}
+
+      return Object.keys(transactions).map((category, index) => ({
+        category,
+        value: transactions[category],
+        fill: generateColor(index, type === 'saida'),
+      }))
+    }
+
+    return processTransactions('saida')
+  }, [currentTransactions]); // Dependência para recalcular quando currentTransactions mudar
 
   const chartConfig = {
     visitors: {

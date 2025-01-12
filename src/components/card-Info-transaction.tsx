@@ -1,7 +1,6 @@
 'use client'
 
-import { CalendarIcon, FileIcon, TagIcon } from "lucide-react"
-import { format, isValid, parseISO } from "date-fns"
+import { CalendarIcon, FileIcon, ReceiptText, TagIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,29 +19,21 @@ interface TransactionProps {
   created_at: Date
   updated_at: Date
   pay?: boolean
+  details?: string | null
 }
 
 
 export function CardInfoTransaction({ transaction }: { transaction: TransactionProps | null }) {
-  const formatDate = (date: Date | null): string => {
-    if (!date) return 'Data não disponível'
+  const formatDate = (dateString: Date) => {
+    const date = new Date(dateString);
 
-    let parsedDate: Date | null = null
+    // Extraindo dia, mês e ano da data
+    const day = String(date.getUTCDate()).padStart(2, '0');   // Garantir que o dia tenha dois dígitos
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');  // O mês começa de 0, então somamos 1
+    const year = date.getUTCFullYear();  // Pega o ano
 
-    if (typeof date === 'string') {
-      parsedDate = parseISO(date)
-    } else if (date instanceof Date) {
-      parsedDate = date
-    }
-
-    if (parsedDate && isValid(parsedDate)) {
-      return format(parsedDate, 'dd/MM/yyyy')
-    }
-
-    return 'Data inválida'
-  }
-
-  const formattedDate = transaction && formatDate(transaction.payment_date)
+    return `${day}/${month}/${year}`;  // Retorna a data no formato "dd/MM/yyyy"
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -60,10 +51,14 @@ export function CardInfoTransaction({ transaction }: { transaction: TransactionP
           <span className="text-sm text-muted-foreground">{transaction?.category}</span>
         </div>
         <div className="flex items-center space-x-2">
+          <ReceiptText className="size-4 text-muted-foreground " />
+          <span className="text-sm text-muted-foreground">{transaction?.details ? transaction?.details : "sem detalhes"}</span>
+        </div>
+        <div className="flex items-center space-x-2">
           <CalendarIcon className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">
             {transaction?.scheduling ? 'Agendado para: ' : 'Pago em: '}
-            {formattedDate}
+            {transaction?.payment_date && formatDate(transaction?.payment_date).toString()}
           </span>
         </div>
         <Badge variant={transaction?.scheduling ? "outline" : "default"}>

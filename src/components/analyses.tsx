@@ -52,7 +52,10 @@ export function Analyses() {
       outcome: 0
     }))
 
-    currentTransactions?.forEach((t) => {
+    const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : [];
+
+
+    transactionsArray?.forEach((t) => {
       if (t.payment_date) {
         const month = new Date(t.payment_date).getMonth()
 
@@ -98,7 +101,7 @@ export function Analyses() {
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
-                tickFormatter={(value = '') => value.slice(0, 3)}
+                tickFormatter={(value) => (value ? value.slice(0, 3) : '')}
               />
               <ChartTooltip
                 cursor={false}
@@ -112,7 +115,7 @@ export function Analyses() {
         <CardFooter className="flex-col items-start gap-2 text-sm ">
           <div className="flex gap-2 font-medium leading-none">
             Tendência de {totalBalanceTransactions && totalBalanceTransactions.total_balance > 0 ? "alta" : "baixa"} de
-            {" "} {totalBalanceTransactions && totalBalanceTransactions && parseFloat(totalBalanceTransactions.total_balance.toString()).toFixed(2)}% nesse mês
+            {" "} {totalBalanceTransactions && totalBalanceTransactions && parseFloat(totalBalanceTransactions.total_balance?.toString()).toFixed(2)}% nesse mês
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">

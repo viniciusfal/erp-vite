@@ -20,10 +20,21 @@ import {
   SelectGroup,
 } from '@/components/ui/select'
 
-import { Asterisk, File, MoveUpRight, ShieldCheck, Wrench, X } from 'lucide-react'
+import {
+  Asterisk,
+  File,
+  MoveUpRight,
+  ShieldCheck,
+  Wrench,
+  X,
+} from 'lucide-react'
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { Tooltip, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+} from '@/components/ui/tooltip'
 import { TooltipTrigger } from '@radix-ui/react-tooltip'
 import { Link } from 'react-router-dom'
 import Safe from '@/components/safe'
@@ -44,23 +55,34 @@ export function Finances() {
     mutationFn: markPayment,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['transactionsByDate']
+        queryKey: ['transactionsByDate'],
       })
     },
     onError: () => {
-      toast.error("Erro ao tentar marcar como pago")
-    }
+      toast.error('Erro ao tentar marcar como pago')
+    },
   })
 
-  const today = new Date();
+  const formatDate = (dateString: Date) => {
+    const date = new Date(dateString)
+
+    // Extraindo dia, mês e ano da data
+    const day = String(date.getUTCDate()).padStart(2, '0') // Garantir que o dia tenha dois dígitos
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0') // O mês começa de 0, então somamos 1
+    const year = date.getUTCFullYear() // Pega o ano
+
+    return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
+  }
+
+  const today = new Date()
 
   const filteredPayments = finalFilteredPayments
     ?.filter((p) => !p.pay && p.payment_date) // Filtra pagamentos não pagos e com data válida
     .filter((p) => p.payment_date && new Date(p.payment_date) >= today) // Adiciona filtro para pagamentos a vencer
     .sort((a, b) => {
-      const dateA = a.payment_date ? new Date(a.payment_date) : new Date(0); // Usa uma data padrão se null
-      const dateB = b.payment_date ? new Date(b.payment_date) : new Date(0); // Usa uma data padrão se null
-      return dateA.getTime() - dateB.getTime(); // Ordena por data crescente
+      const dateA = a.payment_date ? new Date(a.payment_date) : new Date(0) // Usa uma data padrão se null
+      const dateB = b.payment_date ? new Date(b.payment_date) : new Date(0) // Usa uma data padrão se null
+      return dateA.getTime() - dateB.getTime() // Ordena por data crescente
     })
     .slice(0, 2)
 
@@ -85,14 +107,19 @@ export function Finances() {
           </div>
         </div>
 
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           <CalendarDateRangePicker />
 
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="default" className='rounded-full' onClick={() => setVisibleSafe(true)}>
-                  <ShieldCheck className='text-muted size-5' />
+                <Button
+                  variant="default"
+                  className="flex items-center justify-center gap-1 rounded-full text-xs"
+                  onClick={() => setVisibleSafe(true)}
+                >
+                  Cofre
+                  <ShieldCheck className="size-5 text-muted" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -112,8 +139,8 @@ export function Finances() {
           <div className="flex h-1/2 w-full flex-col justify-between rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
             <div className="flex items-center justify-between">
               <h2 className="flex items-baseline gap-0.5 text-lg font-medium">
-                Top 3 Entradas
-                <Asterisk className='size-2.5 text-muted-foreground' />
+                Ranking (Entradas)
+                <Asterisk className="size-2.5 text-muted-foreground" />
               </h2>
               <Select>
                 <SelectTrigger className="w-[100px] text-xs font-medium">
@@ -136,7 +163,6 @@ export function Finances() {
             </div>
 
             <TopIncome />
-
           </div>
 
           <div className="flex h-full w-full flex-col rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
@@ -152,19 +178,22 @@ export function Finances() {
             </div>
 
             {filteredPayments?.map((payment) => (
-              <Card className="mt-2 bg-muted" key={payment.transaction_id} >
-                <CardHeader >
-                  <div className="flex justify-between items-center">
+              <Card className="mt-2 bg-muted" key={payment.transaction_id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
                     <CardTitle className="font-medium">
                       {payment.title}
                     </CardTitle>
-                    <div className="flex gap-1 items-center">
+                    <div className="flex items-center gap-1">
                       <div>
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger>
                               <Link to="#">
-                                <Button variant="outline" className="rounded-full">
+                                <Button
+                                  variant="outline"
+                                  className="rounded-full"
+                                >
                                   <File className="size-3 text-muted-foreground" />
                                 </Button>
                               </Link>
@@ -174,14 +203,16 @@ export function Finances() {
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
-
                       </div>
 
                       <div>
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger>
-                              <Button variant="outline" className="rounded-full">
+                              <Button
+                                variant="outline"
+                                className="rounded-full"
+                              >
                                 <Wrench className="size-3 text-muted-foreground" />
                               </Button>
                             </TooltipTrigger>
@@ -197,7 +228,7 @@ export function Finances() {
                           <Tooltip>
                             <TooltipTrigger className="">
                               <Button
-                                className="rounded-full  hover:bg-red-300 hover:text-white bg-red-400 text-white"
+                                className="rounded-full bg-red-400 text-white hover:bg-red-300 hover:text-white"
                                 variant="outline"
                               >
                                 <X className="size-3" />
@@ -215,11 +246,14 @@ export function Finances() {
                 </CardHeader>
                 <CardContent className="-mt-4 flex items-end justify-between">
                   <span className="text-sm text-muted-foreground">
-                    Vencimento:{payment.payment_date && new Date(payment.payment_date).toLocaleDateString()}
+                    Vencimento:
+                    {payment.payment_date && formatDate(payment.payment_date)}
                   </span>
 
-
-                  < Button onClick={() => handleMarkAsPaid(payment.transaction_id)} className="bg-gradient-to-tr from-emerald-700 to-emerald-500 text-xs text-white hover:from-emerald-600 hover:to-emerald-500/90">
+                  <Button
+                    onClick={() => handleMarkAsPaid(payment.transaction_id)}
+                    className="bg-gradient-to-tr from-emerald-700 to-emerald-500 text-xs text-white hover:from-emerald-600 hover:to-emerald-500/90"
+                  >
                     Marcar como Pago
                   </Button>
                 </CardContent>
@@ -229,31 +263,23 @@ export function Finances() {
         </div>
       </div>
 
-      {
-        visible && (
-          <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
-            <CardTransaction setVisible={setVisible} />
-          </div>
-        )
-      }
+      {visible && (
+        <div className="z-1 fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-60">
+          <CardTransaction setVisible={setVisible} />
+        </div>
+      )}
 
-      {
-        visiblePayment && (
-          <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
-            <Payments setVisiblePayment={setVisiblePayment} />
-          </div>
-        )
-      }
+      {visiblePayment && (
+        <div className="z-1 fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-60">
+          <Payments setVisiblePayment={setVisiblePayment} />
+        </div>
+      )}
 
-      {
-        visibleSafe && (
-          <div className="fixed left-0 top-0 z-1 h-full w-full flex items-center justify-center bg-black bg-opacity-60">
-            <Safe setVisibleSafe={setVisibleSafe} />
-          </div>
-        )
-      }
-    </div >
-
-
+      {visibleSafe && (
+        <div className="z-1 fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-60">
+          <Safe setVisibleSafe={setVisibleSafe} />
+        </div>
+      )}
+    </div>
   )
 }

@@ -7,7 +7,7 @@ interface GetSafeRequest {
 
 interface Safe {
   id: string
-  send_date: string
+  send_date: Date
   send_amount: number
   active: boolean
 }

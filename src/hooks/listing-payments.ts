@@ -1,5 +1,5 @@
-import { getTransactions } from "@/api/get-transactions";
-import { useQuery } from "@tanstack/react-query";
+import { getTransactions } from '@/api/get-transactions'
+import { useQuery } from '@tanstack/react-query'
 
 export interface Transactions {
   transaction_id: string
@@ -15,29 +15,43 @@ export interface Transactions {
   pay: boolean
 }
 
-const ITEMS_PER_PAGE = 4
+const ITEMS_PER_PAGE = 3
 
-export function useListingPayments(currentPage: number, valuePaymentFilter: string) {
+export function useListingPayments(
+  currentPage: number,
+  valuePaymentFilter: string,
+) {
   const { data: transactions, isLoading } = useQuery<Transactions[]>({
     queryKey: ['transactionsByDate'],
-    queryFn: getTransactions
+    queryFn: getTransactions,
   })
 
   if (isLoading) {
-    return { paymentTransactions: [], totalPages: 0 }; // ou retornar algum estado de carregamento
+    return { paymentTransactions: [], totalPages: 0 } // ou retornar algum estado de carregamento
   }
-
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
 
-  const filteredPayments = transactions?.filter((t) => t.scheduling === true && t.type === 'saida')
+  const filteredPayments = transactions?.filter(
+    (t) => t.scheduling === true && t.type === 'saida',
+  )
 
   const finalFilteredPayments = filteredPayments?.filter((payment) => {
-    return valuePaymentFilter === 'paid' ? payment.pay === true : payment.pay === false
+    return valuePaymentFilter === 'paid'
+      ? payment.pay === true
+      : payment.pay === false
   })
 
-  const totalPages = filteredPayments ? Math.ceil(filteredPayments.length / ITEMS_PER_PAGE) : 1
+  const sortedPayments = finalFilteredPayments?.sort((b, a) => {
+    const dateA = a.payment_date ? new Date(a.payment_date) : new Date(0) // Se não tiver data, considera a data mais antiga
+    const dateB = b.payment_date ? new Date(b.payment_date) : new Date(0)
+    return dateB.getTime() - dateA.getTime() // Ordem decrescente (mais recente primeiro)
+  })
+
+  const totalPages = sortedPayments
+    ? Math.ceil(sortedPayments.length / ITEMS_PER_PAGE)
+    : 1
 
   const paymentTransactions = finalFilteredPayments?.slice(startIndex, endIndex)
 

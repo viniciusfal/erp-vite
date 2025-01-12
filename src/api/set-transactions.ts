@@ -12,6 +12,7 @@ export interface setTransaction {
   created_at: Date
   updated_at: Date
   pay?: boolean
+  details?: string | null
 }
 
 export async function setTransaction(data: setTransaction) {

@@ -1,57 +1,67 @@
-import { getTransactionsByDate } from "@/api/get-transactions-by-date";
-import { useQuery } from "@tanstack/react-query";
+import { getTransactionsByDate } from '@/api/get-transactions-by-date'
+import { useQuery } from '@tanstack/react-query'
 
 interface Transaction {
-  transaction_id: string;
-  title: string;
-  value: number;
-  type: string;
-  category: string;
-  scheduling: boolean;
-  annex: string | null;
-  payment_date: Date | null;
-  created_at: Date;
-  updated_at: Date;
-  pay: boolean;
+  transaction_id: string
+  title: string
+  value: number
+  type: string
+  category: string
+  scheduling: boolean
+  annex: string | null
+  payment_date: Date | null
+  created_at: Date
+  updated_at: Date
+  pay: boolean
+  details?: string | null
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 10
 
-export function useListingtransactionByDate(
+export function useListingTransactionByDate(
   startDate: Date,
   endDate: Date,
   currentPage: number,
-  inputType: string
+  inputType: string,
 ) {
-  // Adicione a tipagem ao parâmetro 'date'
+  // Função para formatar datas no padrão "YYYY-MM-DD"
   function formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Adiciona zero à esquerda
-    const day = String(date.getDate()).padStart(2, '0'); // Adiciona zero à esquerda
-    return `${year}-${month}-${day}`; // Formato "YYYY-MM-DD"
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
 
-  const formattedStartDate = formatDate(startDate);
-  const formattedEndDate = formatDate(endDate);
+  const formattedStartDate = formatDate(startDate)
+  const formattedEndDate = formatDate(endDate)
 
-  const { data: transactionsByDate, isLoading } = useQuery<Transaction[]>({
-    queryKey: ['transactionsByDate', { start_date: formattedStartDate, end_date: formattedEndDate }],
-    queryFn: () => getTransactionsByDate({ start_date: formattedStartDate, end_date: formattedEndDate }),
-    enabled: !!formattedStartDate && !!formattedEndDate, // Garante que a query só execute se as datas estiverem disponíveis
-  });
+  const { data: transactionsByDate = [], isLoading } = useQuery<Transaction[]>({
+    queryKey: [
+      'transactionsByDate',
+      { start_date: formattedStartDate, end_date: formattedEndDate },
+    ],
+    queryFn: async () => {
+      const response = await getTransactionsByDate({
+        start_date: formattedStartDate,
+        end_date: formattedEndDate,
+      })
+      return Array.isArray(response) ? response : [] // Garante que seja sempre um array
+    },
+    enabled: !!startDate && !!endDate, // Garante que a query só execute se as datas estiverem disponíveis
+  })
 
-
-  const totalPages = transactionsByDate ? Math.ceil(transactionsByDate.length / ITEMS_PER_PAGE) : 1;
-
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-
+  // Certifique-se de que `transactionsByDate` é um array antes de aplicar `filter`
   const filteredForType =
     inputType === 'full' || !inputType
       ? transactionsByDate
-      : transactionsByDate?.filter((t) => t.type === inputType);
+      : transactionsByDate.filter((t) => t.type === inputType)
 
-  const currentTransactions = filteredForType?.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredForType.length / ITEMS_PER_PAGE)
 
-  return { currentTransactions, totalPages, isLoading };
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const endIndex = startIndex + ITEMS_PER_PAGE
+
+  const currentTransactions = filteredForType.slice(startIndex, endIndex)
+
+  return { currentTransactions, totalPages, isLoading }
 }

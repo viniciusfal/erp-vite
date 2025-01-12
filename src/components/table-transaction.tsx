@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Table,
   TableBody,
@@ -23,7 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from '@/components/ui/alert-dialog'
 
 import {
   Select,
@@ -40,10 +41,23 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog'
 
 import { SelectGroup } from '@radix-ui/react-select'
-import { ArrowLeftRight, Asterisk, BadgeCent, CalendarDays, Eye, File, ListCollapse, Paperclip, Plus, Tag, TrendingUp, Wrench, X } from 'lucide-react'
+import {
+  ArrowLeftRight,
+  Asterisk,
+  BadgeCent,
+  CalendarDays,
+  Eye,
+  File,
+  ListCollapse,
+  Paperclip,
+  Plus,
+  Tag,
+  Wrench,
+  X,
+} from 'lucide-react'
 import { Button } from './ui/button'
 import { Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
@@ -57,9 +71,10 @@ import type { Transactions } from '@/hooks/listing-transactions'
 import { setTransaction } from '@/api/set-transactions'
 import { Input } from './ui/input'
 import { useDateRange } from '@/hooks/date-ranger-context'
-import { useListingtransactionByDate } from '@/hooks/listing-transactions-by-date'
+import { useListingTransactionByDate } from '@/hooks/listing-transactions-by-date'
 import { CardInfoTransaction } from './card-Info-transaction'
 import Spinner from './spinner'
+import { Textarea } from './ui/textarea'
 
 interface TransactionProps {
   transaction_id: string
@@ -73,21 +88,22 @@ interface TransactionProps {
   created_at: Date
   updated_at: Date
   pay: boolean
+  details?: string | null
 }
 
 interface TableProps {
-  setVisible: Dispatch<SetStateAction<boolean>>;
+  setVisible: Dispatch<SetStateAction<boolean>>
 }
 
 const TransactionID = z.object({
-  id: z.string().uuid()
+  id: z.string().uuid(),
 })
-
 
 type transactionID = z.infer<typeof TransactionID>
 
 export function TableTransaction({ setVisible }: TableProps) {
-  const [selectedTransaction, setSelectedTransaction] = useState<TransactionProps | null>(null);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<TransactionProps | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editedData, setEditedData] = useState<Partial<Transactions>>({})
   const [currentPage, setCurrentPage] = useState(1)
@@ -97,13 +113,8 @@ export function TableTransaction({ setVisible }: TableProps) {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
 
-
-  const { currentTransactions, totalPages, isLoading } = useListingtransactionByDate(
-    startDate,
-    endDate,
-    currentPage,
-    inputType
-  );
+  const { currentTransactions, totalPages, isLoading } =
+    useListingTransactionByDate(startDate, endDate, currentPage, inputType)
 
   const { mutateAsync: updateTransaction } = useMutation({
     mutationFn: setTransaction,
@@ -115,21 +126,25 @@ export function TableTransaction({ setVisible }: TableProps) {
 
     onError: () => {
       toast.error('Falha ao atualizar transação')
-    }
+    },
   })
 
   const handleEditClick = (id: string, transaction: Transactions) => {
-    setEditingId(id);
-    setEditedData(transaction);
+    setEditingId(id)
+    setEditedData(transaction)
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
+    const { name, value, type } = e.target
     if (type === 'date') {
       // Mantém o formato "YYYY-MM-DD" diretamente
-      setEditedData({ ...editedData, [name]: value });
+      setEditedData({ ...editedData, [name]: value })
     } else {
-      setEditedData({ ...editedData, [name]: value });
+      setEditedData({ ...editedData, [name]: value })
     }
   }
 
@@ -137,34 +152,38 @@ export function TableTransaction({ setVisible }: TableProps) {
     if (editingId) {
       try {
         const existingTransaction = currentTransactions?.find(
-          (t) => t.transaction_id === editingId
-        );
+          (t) => t.transaction_id === editingId,
+        )
 
         if (existingTransaction) {
           // Verifica se editedData.payment_date é uma string e converte para Date
           const paymentDate =
-            editedData.payment_date && typeof editedData.payment_date === 'string'
+            editedData.payment_date &&
+              typeof editedData.payment_date === 'string'
               ? new Date(editedData.payment_date) // Converte string para Date
-              : existingTransaction.payment_date ?? null; // Usa a data original se não houver edição ou null
+              : (existingTransaction.payment_date ?? null) // Usa a data original se não houver edição ou null
 
           await updateTransaction({
             id: editingId,
             title: editedData.title ?? existingTransaction.title,
             category: editedData.category ?? existingTransaction.category,
-            value: editedData.value ? parseFloat(editedData.value.toString()) : existingTransaction.value,
+            value: editedData.value
+              ? parseFloat(editedData.value.toString())
+              : existingTransaction.value,
             type: editedData.type ?? existingTransaction.type,
             scheduling: editedData.scheduling ?? existingTransaction.scheduling,
             payment_date: paymentDate ? paymentDate.toISOString() : null, // Converte Date para ISO String
             created_at: existingTransaction.created_at,
             updated_at: new Date(),
-          });
+            details: editedData.details ?? existingTransaction.details,
+          })
 
-          setEditingId(null);
-          setEditedData({});
+          setEditingId(null)
+          setEditedData({})
         }
       } catch (err) {
-        console.error('Erro ao atualizar transação:', err);
-        toast.error('Erro ao atualizar a transação');
+        console.error('Erro ao atualizar transação:', err)
+        toast.error('Erro ao atualizar a transação')
       }
     }
   }
@@ -175,41 +194,41 @@ export function TableTransaction({ setVisible }: TableProps) {
       queryClient.invalidateQueries({
         queryKey: ['transactionsByDate'],
         exact: false, // Se quiser invalidar todas as consultas que começam com 'transactions'
-      });
-      toast.warning('Transação Deletada com sucesso.');
+      })
+      toast.warning('Transação Deletada com sucesso.')
     },
     onError: () => {
-      toast.error('Falha ao excluir transação.');
-    }
-  });
+      toast.error('Falha ao excluir transação.')
+    },
+  })
 
   const handleConfirmRemove = async (data: transactionID) => {
     try {
-      console.log('Tentando remover a transação com ID:', data.id); // Para depuração
+      console.log('Tentando remover a transação com ID:', data.id) // Para depuração
       await transaction({
-        id: data.id
-      });
+        id: data.id,
+      })
     } catch (error) {
-      console.error('Erro ao excluir transação:', error);
+      console.error('Erro ao excluir transação:', error)
     }
   }
 
   const formatDate = (dateString: Date) => {
-    const date = new Date(dateString);
+    const date = new Date(dateString)
 
     // Extraindo dia, mês e ano da data
-    const day = String(date.getUTCDate()).padStart(2, '0');   // Garantir que o dia tenha dois dígitos
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');  // O mês começa de 0, então somamos 1
-    const year = date.getUTCFullYear();  // Pega o ano
+    const day = String(date.getUTCDate()).padStart(2, '0') // Garantir que o dia tenha dois dígitos
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0') // O mês começa de 0, então somamos 1
+    const year = date.getUTCFullYear() // Pega o ano
 
-    return `${day}/${month}/${year}`;  // Retorna a data no formato "dd/MM/yyyy"
-  };
+    return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
+  }
   return (
-    <div className="flex w-2/3 flex-col  rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
+    <div className="flex w-2/3 flex-col rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
       <div className="flex justify-between">
-        <strong className="flex gap-0.5 items-baseline text-2xl font-medium">
+        <strong className="flex items-baseline gap-0.5 text-2xl font-medium">
           Lista de transações
-          <Asterisk className='size-2.5 text-muted-foreground' />
+          <Asterisk className="size-2.5 text-muted-foreground" />
         </strong>
         <div className="flex gap-2">
           <Select onValueChange={setInputType}>
@@ -235,74 +254,73 @@ export function TableTransaction({ setVisible }: TableProps) {
         </div>
       </div>
 
-      {isLoading ? <Spinner /> : (
-
+      {isLoading ? (
+        <Spinner />
+      ) : (
         <Table className="my-6">
           <TableHeader className="text-xs">
-            <TableRow className="">
-              <TableHead className='w-[50px]'>
-                <div className='flex items-center gap-1'>
-                  <Eye className='size-3 ' />
-                  info
-                </div>
-              </TableHead>
-              <TableHead className="w-[300px] ">
-                <div className='flex items-center gap-1'>
-                  <ListCollapse className='size-3' />
-                  Descrição
-                </div>
-              </TableHead>
-              <TableHead className="w-[100px]">
-                <div className='flex items-center gap-1'>
-                  <BadgeCent className='size-3' />
-                  Valor
-                </div>
-              </TableHead>
-              <TableHead className="w-[250px]">
-                <div className='flex items-center gap-1'>
-                  <Tag className='size-3' />
-                  Categoria
-                </div>
-              </TableHead>
+            <>
+              <TableRow className="">
+                <TableHead className="w-[50px]">
+                  <div className="flex items-center gap-1">
+                    <Eye className="size-3" />
+                    info
+                  </div>
+                </TableHead>
+                <TableHead className="w-[300px]">
+                  <div className="flex items-center gap-1">
+                    <ListCollapse className="size-3" />
+                    Descrição
+                  </div>
+                </TableHead>
+                <TableHead className="w-[180px]">
+                  <div className="flex items-center gap-1">
+                    <BadgeCent className="size-3" />
+                    Valor
+                  </div>
+                </TableHead>
+                <TableHead className="w-[250px]">
+                  <div className="flex items-center gap-1">
+                    <Tag className="size-3" />
+                    Categoria
+                  </div>
+                </TableHead>
 
-              <TableHead className="w-[80px]">
-                <div className='flex items-center gap-1'>
-                  <TrendingUp className='size-3' />
-                  Status
-                </div>
-              </TableHead>
-              <TableHead className="w-[180px]">
-                <div className='flex items-center gap-1'>
-                  <CalendarDays className='size-3' />
-                  Pagamento
-                </div>
-              </TableHead>
-              <TableHead className="w-[60px]">
-                <div className='flex items-center gap-1'>
-                  <Paperclip className='size-3' />
-                  Anexo
-                </div>
-              </TableHead>
-              <TableHead className="w-[50px]">
-                <div className='flex item-center gap-1'>
-                  <ArrowLeftRight className='size-3' />
-                  Tipo
-                </div>
-              </TableHead>
-              <TableHead className="w-[20px]"></TableHead>
-              <TableHead className="w-[20px]"></TableHead>
-            </TableRow>
+                <TableHead className="w-[180px]">
+                  <div className="flex items-center gap-1">
+                    <CalendarDays className="size-3" />
+                    Pagamento
+                  </div>
+                </TableHead>
+                <TableHead className="w-[60px]">
+                  <div className="flex items-center gap-1">
+                    <Paperclip className="size-3" />
+                    Anexo
+                  </div>
+                </TableHead>
+                <TableHead className="w-[50px]">
+                  <div className="item-center flex gap-1">
+                    <ArrowLeftRight className="size-3" />
+                    Tipo
+                  </div>
+                </TableHead>
+                <TableHead className="w-[20px]"></TableHead>
+                <TableHead className="w-[20px]"></TableHead>
+              </TableRow>
+            </>
           </TableHeader>
           <TableBody className="text-sm">
             {currentTransactions?.map((t) => (
-              <TableRow key={t.transaction_id} className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''}`}
+              <TableRow
+                key={t.transaction_id}
+                className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''}`}
               >
                 <TableCell>
                   <Dialog open={isOpen} onOpenChange={setIsOpen}>
                     <DialogTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="rounded-full p-2.5 text-muted-foreground "
+                        className="rounded-full p-2.5 text-muted-foreground"
                         onClick={() => setSelectedTransaction(t)} // Atualiza a transação ao clicar
                       >
                         <Eye className="size-3" />
@@ -322,68 +340,63 @@ export function TableTransaction({ setVisible }: TableProps) {
                   </Dialog>
                 </TableCell>
 
-                <TableCell className='text-xs text-secondary-foreground'>
+                <TableCell className="text-xs text-secondary-foreground">
                   {editingId === t.transaction_id ? (
                     <Input
-                      type='text'
-                      name='title'
+                      type="text"
+                      name="title"
                       value={editedData.title}
-                      onChange={handleChange} />
+                      onChange={handleChange}
+                    />
                   ) : (
                     t.title
                   )}
                 </TableCell>
-                <TableCell className='text-secondary-foreground'>
+                <TableCell className="text-secondary-foreground">
                   {editingId === t.transaction_id ? (
                     <Input
-                      type='number'
-                      name='value'
+                      type="number"
+                      name="value"
                       value={Number(editedData.value)}
-                      onChange={handleChange} />
+                      onChange={handleChange}
+                    />
                   ) : (
                     new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
-                      currency: 'BRL'
+                      currency: 'BRL',
                     }).format(t.value)
                   )}
                 </TableCell>
-                <TableCell className='text-secondary-foreground'>
+                <TableCell className="text-secondary-foreground">
                   {editingId === t.transaction_id ? (
                     <Input
-                      type='text'
-                      name='category'
+                      type="text"
+                      name="category"
                       value={editedData.category}
-                      onChange={handleChange} />
+                      onChange={handleChange}
+                    />
                   ) : (
                     t.category
-                  )}
-                </TableCell>
-                <TableCell className=''>
-                  {editingId === t.transaction_id ? (
-                    <Select onValueChange={() => handleChange} value={t.scheduling ? 'agendado' : 'pago'}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='agendado'>Sim</SelectItem>
-                        <SelectItem value='pago'>Pago</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    t.scheduling ? 'agendado' : 'pago'
                   )}
                 </TableCell>
                 <TableCell>
                   {editingId === t.transaction_id ? (
                     <Input
-                      type='date'
-                      name='payment_date'
-                      value={editedData.payment_date ? new Date(editedData.payment_date).toISOString().split('T')[0] : ''}
+                      type="date"
+                      name="payment_date"
+                      value={
+                        editedData.payment_date
+                          ? new Date(editedData.payment_date)
+                            .toISOString()
+                            .split('T')[0]
+                          : ''
+                      }
                       onChange={handleChange}
                     />
-
+                  ) : t.payment_date ? (
+                    formatDate(t.payment_date)
                   ) : (
-                    t.payment_date ? formatDate(t.payment_date) : ''
+                    ''
                   )}
                 </TableCell>
                 <TableCell>
@@ -393,8 +406,11 @@ export function TableTransaction({ setVisible }: TableProps) {
                 </TableCell>
                 <TableCell>
                   <Button
-                    className={t.type === 'entrada' ? 'rounded-full bg-green-100 w-16 text-xs text-emerald-400 hover:cursor-default hover:bg-emerald-100' :
-                      'rounded-full bg-red-400 w-16 text-xs text-red-50 hover:cursor-default hover:bg-red-400'}
+                    className={
+                      t.type === 'entrada'
+                        ? 'w-16 rounded-full bg-green-100 text-xs text-emerald-400 hover:cursor-default hover:bg-emerald-100'
+                        : 'w-16 rounded-full bg-red-400 text-xs text-red-50 hover:cursor-default hover:bg-red-400'
+                    }
                   >
                     {t.type}
                   </Button>
@@ -434,23 +450,51 @@ export function TableTransaction({ setVisible }: TableProps) {
                   ) : (
                     <AlertDialog>
                       <AlertDialogTrigger>
-                        <Button variant='ghost' className='hover:bg-red-400  text-red-400 hover:text-white'>
-                          <X className='size-4' />
+                        <Button
+                          variant="ghost"
+                          className="text-red-400 hover:bg-red-400 hover:text-white"
+                        >
+                          <X className="size-4" />
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Tem certeza que deseja excluir essa transação?</AlertDialogTitle>
-                          <AlertDialogDescription>Ao excluir você não terá mais acesso a essa transação.</AlertDialogDescription>
+                          <AlertDialogTitle>
+                            Tem certeza que deseja excluir essa transação?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Ao excluir você não terá mais acesso a essa
+                            transação.
+                          </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleConfirmRemove({ id: t.transaction_id })}>Excluir</AlertDialogAction>
+                          <AlertDialogAction
+                            onClick={() =>
+                              handleConfirmRemove({ id: t.transaction_id })
+                            }
+                          >
+                            Excluir
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
                   )}
                 </TableCell>
+                <TableRow className="hidden">
+                  <TableCell>
+                    {editingId === t.transaction_id ? (
+                      <Textarea
+                        name="details"
+                        value={editedData.details?.toString()}
+                        onChange={handleChange}
+                        className=""
+                      />
+                    ) : (
+                      t.details || ''
+                    )}
+                  </TableCell>
+                </TableRow>
               </TableRow>
             ))}
           </TableBody>
@@ -469,12 +513,10 @@ export function TableTransaction({ setVisible }: TableProps) {
                     key={index}
                     href="#"
                     className={`rounded-full ${currentPage === index + 1 ? 'bg-gradient-to-tr from-slate-800 to-slate-950 text-white' : 'border bg-muted'}`}
-                    onClick={
-                      (e) => {
-                        e.preventDefault()
-                        setCurrentPage(index + 1)
-                      }
-                    }
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setCurrentPage(index + 1)
+                    }}
                   >
                     {index + 1}
                   </PaginationLink>
@@ -484,6 +526,6 @@ export function TableTransaction({ setVisible }: TableProps) {
           </Pagination>
         </div>
       </div>
-    </div >
+    </div>
   )
 }

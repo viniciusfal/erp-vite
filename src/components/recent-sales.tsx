@@ -28,7 +28,10 @@ export function RecentSales() {
 
   const today = new Date()
 
-  let filteredLastsActivities = currentTransactions
+  const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : [];
+
+
+  let filteredLastsActivities = transactionsArray
     ?.filter((t) => isSameDay(new Date(t.created_at), today))
     .sort((a, b) => {
       const dateA = new Date(a.created_at).getTime()
@@ -36,6 +39,7 @@ export function RecentSales() {
       return dateB - dateA
     })
     .slice(0, 10)
+
 
   return (
     <div className="space-y-8">

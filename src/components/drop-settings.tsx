@@ -14,7 +14,7 @@ import { Link } from "react-router-dom"
 export function DropSettings() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button variant={'outline'} className="rounded-full">
           <Bolt className="size-5 text-muted-foreground" />
         </Button>

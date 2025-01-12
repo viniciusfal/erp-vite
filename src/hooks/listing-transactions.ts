@@ -1,5 +1,5 @@
-import { getTransactions } from "@/api/get-transactions";
-import { useQuery } from "@tanstack/react-query";
+import { getTransactions } from '@/api/get-transactions'
+import { useQuery } from '@tanstack/react-query'
 
 export interface Transactions {
   transaction_id: string
@@ -12,18 +12,19 @@ export interface Transactions {
   payment_date: Date | null
   created_at: Date
   updated_at: Date
+  details?: string | null
 }
 
 export function useListingtransaction(inputType: string) {
   const { data: transactions, isLoading } = useQuery<Transactions[]>({
     queryKey: ['transactions'],
-    queryFn: getTransactions
+    queryFn: getTransactions,
   })
 
+  const currentTransactions =
+    inputType === 'full'
+      ? transactions
+      : transactions?.filter((t) => t.type === inputType)
 
-  const currentTransactions = inputType === 'full' ? transactions
-    : transactions?.filter(t => t.type === inputType)
-
-
-  return { currentTransactions , isLoading}
+  return { currentTransactions, isLoading }
 }

@@ -24,14 +24,12 @@ export function useListingPaymentsNeverPag(valuePaymentFilter: string) {
   if (isLoading) {
     return { paymentTransactions: [], totalPages: 0 }; // ou retornar algum estado de carregamento
   }
-
-  const filteredPayments = transactions?.filter((t) => t.scheduling === true && t.type === 'saida')
+ const  ArrayList = Array.isArray(transactions) ? transactions : [];
+  const filteredPayments =  ArrayList?.filter((t) => t.scheduling === true && t.type === 'saida')
 
   const finalFilteredPayments = filteredPayments?.filter((payment) => {
     return valuePaymentFilter === 'paid' ? payment.pay === true : payment.pay === false
   })
-
-
 
   return { finalFilteredPayments }
 }
