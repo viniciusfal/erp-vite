@@ -87,23 +87,45 @@ export function Header() {
                       Financeiro
                     </Button>
                   </Link>
+                  <Link to="/payments">
+                    <Button
+                      className={`rounded-full h-12 w-full text-sm ${activeButton === "/payments" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+                        }`}
+                      variant="outline"
+                      onClick={() => handleButtonClick("/payments")}
+                    >
+                      Agendamentos
+                    </Button>
+                  </Link>
                   <Button
-                    className={`rounded-full h-12 w-full text-sm ${activeButton === "/drh" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
-                      }`}
-                    variant="outline"
-                    onClick={() => handleButtonClick("/drh")}
-                  >
-                    DRH
-                  </Button>
-                  <Button
-                    className={`rounded-full h-12 w-full text-sm ${activeButton === "/trafego"
+                    className={`rounded-full h-12 w-full text-sm ${activeButton === "/safe"
                       ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white"
                       : "bg-transparent"
                       }`}
                     variant="outline"
-                    onClick={() => handleButtonClick("/trafego")}
+                    onClick={() => handleButtonClick("/safe")}
                   >
-                    Tráfego
+                    Cofre
+                  </Button>
+                  <Button
+                    className={`rounded-full h-12 w-full text-sm ${activeButton === "/loan"
+                      ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white"
+                      : "bg-transparent"
+                      }`}
+                    variant="outline"
+                    onClick={() => handleButtonClick("/loan")}
+                  >
+                    Emprestimos
+                  </Button>
+                  <Button
+                    className={`rounded-full h-12 w-full text-sm ${activeButton === "/banks"
+                      ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white"
+                      : "bg-transparent"
+                      }`}
+                    variant="outline"
+                    onClick={() => handleButtonClick("/banks")}
+                  >
+                    Bancos
                   </Button>
 
                 </nav>
@@ -144,31 +166,41 @@ export function Header() {
               Financeiro
             </Button>
           </Link>
-          <Button
-            className={`rounded-full h-12 w-32 text-sm ${activeButton === "/drh" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
-              }`}
-            variant="outline"
-            onClick={() => handleButtonClick("/drh")}
-          >
-            DRH
-          </Button>
-          <Button
-            className={`rounded-full h-12 w-32 text-sm ${activeButton === "/trafego" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
-              }`}
-            variant="outline"
-            onClick={() => handleButtonClick("/trafego")}
-          >
-            Tráfego
-          </Button>
-          <a href="https://glpiamazoniainter.com/glpi" target="_blank" rel="noopener noreferrer">
+          <Link to="/payments">
             <Button
-              className="h-12 w-32 text-sm flex items-center hover:border-gradient-to-r from-slate-950 to-slate-800 "
-              variant="link"
+              className={`rounded-full h-12 w-32 text-sm ${activeButton === "/payments" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+                }`}
+              variant="outline"
+              onClick={() => handleButtonClick("/payments")}
             >
-              Suporte
-              <ExternalLink className="size-2.5 mb-2" />
+              Agendamentos
             </Button>
-          </a>
+          </Link>
+          <Link to="/safe">
+            <Button
+              className={`rounded-full h-12 w-32 text-sm ${activeButton === "/safe" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+                }`}
+              variant="outline"
+              onClick={() => handleButtonClick("/safe")}
+            >
+              Cofre
+            </Button>
+          </Link>
+          <Button
+            className={`rounded-full h-12 w-32 text-sm ${activeButton === "/loan" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+              }`}
+            variant="outline"
+            onClick={() => handleButtonClick("/loan")}
+          >
+            Emprestimos
+          </Button> <Button
+            className={`rounded-full h-12 w-32 text-sm ${activeButton === "/banks" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+              }`}
+            variant="outline"
+            onClick={() => handleButtonClick("/banks")}
+          >
+            Bancos
+          </Button>
         </nav>
       )}
       <div className={responsive != 'desktop' ? "hidden" : "flex gap-3 items-center"}>

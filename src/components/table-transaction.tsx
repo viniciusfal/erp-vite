@@ -224,9 +224,9 @@ export function TableTransaction({ setVisible }: TableProps) {
     return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
   }
   return (
-    <div className="flex w-2/3 flex-col rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
-      <div className="flex justify-between">
-        <strong className="flex items-baseline gap-0.5 text-2xl font-medium">
+    <div className="flex w-full flex-col rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
+      <div className="flex  justify-between">
+        <strong className="flex items-baseline gap-0.5 text-xl font-medium">
           Lista de transações
           <Asterisk className="size-2.5 text-muted-foreground" />
         </strong>

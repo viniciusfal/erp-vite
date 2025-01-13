@@ -13,9 +13,10 @@ export interface Transactions {
   created_at: Date
   updated_at: Date
   pay: boolean
+  details?: string | null 
 }
 
-const ITEMS_PER_PAGE = 3
+const ITEMS_PER_PAGE = 4
 
 export function useListingPayments(
   currentPage: number,

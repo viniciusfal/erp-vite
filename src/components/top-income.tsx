@@ -48,15 +48,16 @@ export function TopIncome() {
       desktop: total,
     }))
     .sort((a, b) => b.desktop - a.desktop) // Ordenando de forma descrescente
-    .slice(0, 3) // Pegar o top 3
+    .slice(0, 5) // Pegar o top 3
 
   return (
-    <ChartContainer config={chartConfig} className="h-full pb-2.5">
+    <ChartContainer config={chartConfig} className="pb-2.5">
       <BarChart
         accessibilityLayer
         data={chartData}
-        barGap={1}
+        barGap={0}
         barCategoryGap="0%"
+        barSize={150}
       >
         <defs>
           <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -89,6 +90,26 @@ export function TopIncome() {
               style={{ stopColor: '#ecfdf5', stopOpacity: 1 }}
             />
           </linearGradient>
+          <linearGradient id="grad4" x1="0%" y1="0%" x2="90%" y2="90%">
+            <stop
+              offset="0%"
+              style={{ stopColor: '#34d399', stopOpacity: 1 }}
+            />
+            <stop
+              offset="100%"
+              style={{ stopColor: '#ecfdf5', stopOpacity: 1 }}
+            />
+          </linearGradient>
+          <linearGradient id="grad5" x1="0%" y1="0%" x2="80%" y2="60%">
+            <stop
+              offset="0%"
+              style={{ stopColor: '#34d399', stopOpacity: 1 }}
+            />
+            <stop
+              offset="100%"
+              style={{ stopColor: '#ecfdf5', stopOpacity: 1 }}
+            />
+          </linearGradient>
         </defs>
 
         <CartesianGrid vertical={false} />
@@ -97,7 +118,7 @@ export function TopIncome() {
           tickLine={false}
           tickMargin={10}
           axisLine={false}
-          tickFormatter={(value) => value.slice(0, 3)}
+          tickFormatter={(value) => value.slice(0, 10)}
         />
 
         <ChartTooltip
@@ -111,6 +132,6 @@ export function TopIncome() {
           ))}
         </Bar>
       </BarChart>
-    </ChartContainer>
+    </ChartContainer >
   )
 }
