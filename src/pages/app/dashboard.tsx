@@ -21,7 +21,7 @@ import { useListingtransaction } from '@/hooks/listing-transactions'
 import { useListingTransactionByDate } from '@/hooks/listing-transactions-by-date'
 import { isSameDay } from 'date-fns'
 import { Asterisk, CircleMinus, CirclePlus, Download, Info } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 export function Dashboard() {
   const { dateRange } = useDateRange()
@@ -29,43 +29,29 @@ export function Dashboard() {
   const { currentTransactions, isLoading } = useListingTransactionByDate(startDate, endDate, 1, 'full')
   const { currentTransactions: allTransactions = [] } = useListingtransaction('full')
   const { totalBalanceTransactions } = useGetAnaliticsTransactions()
-  const [totalIncome, setTotalIncome] = useState(0)
-  const [totalOutcome, setTotalOutcome] = useState(0)
+  const totalIncome = Array.isArray(currentTransactions)
+    ? currentTransactions.reduce((acc, transaction) => transaction.type === 'entrada' ? acc + transaction.value : acc, 0)
+    : 0;
+
+  const totalOutcome = Array.isArray(currentTransactions)
+    ? currentTransactions.reduce((acc, transaction) => transaction.type === 'saida' ? acc + transaction.value : acc, 0)
+    : 0;
+
   const [pagineAtual, setPagineAtual] = useState('overview')
-
-  useEffect(() => {
-    const incomes = Array.isArray(currentTransactions) ? currentTransactions?.reduce((acc, transaction) => {
-      if (transaction.type === 'entrada') {
-        return acc + transaction.value
-      }
-      return acc
-    }, 0) : 0
-
-    const outcomes = Array.isArray(currentTransactions) ? currentTransactions?.reduce((acc, transaction) => {
-      if (transaction.type === 'saida') {
-        return acc + transaction.value
-      }
-      return acc
-    }, 0) : 0
-
-    setTotalIncome(incomes)
-    setTotalOutcome(outcomes)
-  }, [currentTransactions])
 
   const today = new Date()
 
-  let filteredLastsActivities = Array.isArray(allTransactions) ? allTransactions
-    ?.filter((t) => isSameDay(new Date(t.created_at), today))
-    .sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime()
-      const dateB = new Date(b.created_at).getTime()
-      return dateB - dateA
-    })
-    : []
+  const filteredLastsActivities = useMemo(() => {
+    if (!Array.isArray(allTransactions)) return [];
+    return allTransactions
+      .filter((t) => isSameDay(new Date(t.created_at), today))
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [allTransactions, today]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const MemoizedOverview = React.memo(Overview);
+  const MemoizedRecentSales = React.memo(RecentSales);
+
+
 
   return (
     <div className="bg-primary-foreground">
@@ -239,7 +225,7 @@ export function Dashboard() {
                     <CardTitle>Visão Geral</CardTitle>
                   </CardHeader>
                   <CardContent className="pl-2">
-                    <Overview />
+                    <MemoizedOverview />
                   </CardContent>
                 </Card>
                 <Card className="col-span-3">
@@ -250,7 +236,7 @@ export function Dashboard() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <RecentSales />
+                    <MemoizedRecentSales />
                   </CardContent>
                 </Card>
               </div>

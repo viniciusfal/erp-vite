@@ -59,7 +59,6 @@ import {
   X,
 } from 'lucide-react'
 import { Button } from './ui/button'
-import { Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 
 import { removeTransaction } from '@/api/remove-transaction'
@@ -89,6 +88,9 @@ interface TransactionProps {
   updated_at: Date
   pay: boolean
   details?: string | null
+  method: string
+  nf: string | null
+  account: string
 }
 
 interface TableProps {
@@ -139,14 +141,25 @@ export function TableTransaction({ setVisible }: TableProps) {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >,
   ) => {
-    const { name, value, type } = e.target
-    if (type === 'date') {
-      // Mantém o formato "YYYY-MM-DD" diretamente
-      setEditedData({ ...editedData, [name]: value })
+    const { name, value, type } = e.target;
+
+    if (type === 'file') {
+      // Certifique-se de que e.target é um HTMLInputElement
+      const input = e.target as HTMLInputElement;
+      if (input.files) {
+        const file = input.files[0];
+        if (file) {
+          setEditedData({ ...editedData, [name]: file.name });
+        }
+      }
+    } else if (type === 'date') {
+      setEditedData({ ...editedData, [name]: value });
     } else {
-      setEditedData({ ...editedData, [name]: value })
+      setEditedData({ ...editedData, [name]: value });
     }
-  }
+  };
+
+
 
   const handleSave = async () => {
     if (editingId) {
@@ -176,6 +189,10 @@ export function TableTransaction({ setVisible }: TableProps) {
             created_at: existingTransaction.created_at,
             updated_at: new Date(),
             details: editedData.details ?? existingTransaction.details,
+            annex: editedData.annex ?? existingTransaction.annex,
+            method: existingTransaction.method,
+            account: existingTransaction.account,
+            nf: existingTransaction.nf,
           })
 
           setEditingId(null)
@@ -273,6 +290,18 @@ export function TableTransaction({ setVisible }: TableProps) {
                     Descrição
                   </div>
                 </TableHead>
+                <TableHead className="w-[300px]">
+                  <div className="flex items-center gap-1">
+                    <ListCollapse className="size-3" />
+                    Detalhamento
+                  </div>
+                </TableHead>
+                <TableHead className="w-[150px]">
+                  <div className="flex items-center gap-1">
+                    <ListCollapse className="size-3" />
+                    NF
+                  </div>
+                </TableHead>
                 <TableHead className="w-[180px]">
                   <div className="flex items-center gap-1">
                     <BadgeCent className="size-3" />
@@ -292,20 +321,30 @@ export function TableTransaction({ setVisible }: TableProps) {
                     Pagamento
                   </div>
                 </TableHead>
-                <TableHead className="w-[60px]">
+                <TableHead className="w-[180px]">
+                  <div className="flex items-center gap-1">
+                    Metodo
+                  </div>
+                </TableHead>
+                <TableHead className="w-[180px]">
+                  <div className="flex items-center gap-1">
+                    Conta corrente
+                  </div>
+                </TableHead>
+                <TableHead className="w-[180px]">
                   <div className="flex items-center gap-1">
                     <Paperclip className="size-3" />
                     Anexo
                   </div>
                 </TableHead>
-                <TableHead className="w-[50px]">
+                <TableHead className="w-[100px]">
                   <div className="item-center flex gap-1">
                     <ArrowLeftRight className="size-3" />
                     Tipo
                   </div>
                 </TableHead>
-                <TableHead className="w-[20px]"></TableHead>
-                <TableHead className="w-[20px]"></TableHead>
+                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </>
           </TableHeader>
@@ -350,6 +389,30 @@ export function TableTransaction({ setVisible }: TableProps) {
                     />
                   ) : (
                     t.title
+                  )}
+                </TableCell>
+                <TableCell className="text-xs text-secondary-foreground">
+                  {editingId === t.transaction_id ? (
+                    <Textarea
+                      name="details"
+                      value={editedData.details ? editedData.details : ""}
+                      onChange={handleChange}
+                      className='resize-none'
+                    />
+                  ) : (
+                    t.details
+                  )}
+                </TableCell>
+                <TableCell className="text-xs text-secondary-foreground">
+                  {editingId === t.transaction_id ? (
+                    <Input
+                      type="text"
+                      name="nf"
+                      value={editedData.nf ? editedData.nf : ""}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    t.nf
                   )}
                 </TableCell>
                 <TableCell className="text-secondary-foreground">
@@ -399,10 +462,43 @@ export function TableTransaction({ setVisible }: TableProps) {
                     ''
                   )}
                 </TableCell>
+                <TableCell className="text-xs text-secondary-foreground">
+                  {editingId === t.transaction_id ? (
+                    <Input
+                      type="text"
+                      name="method"
+                      value={editedData.method}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    t.method
+                  )}
+                </TableCell>
+
+                <TableCell className="text-xs text-secondary-foreground">
+                  {editingId === t.transaction_id ? (
+                    <Input
+                      type="text"
+                      name="account"
+                      value={editedData.account}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    t.account
+                  )}
+                </TableCell>
                 <TableCell>
-                  <Link to={t.annex ? t.annex : '#'}>
+                  {editingId === t.transaction_id ? (
+                    <Input
+                      type="file"
+                      name="annex"
+                      onChange={handleChange}
+                    />
+                  ) : <a href={t.annex ? `https://erpnet.tech/api/${t.annex}` : "#"} target='_blank' download={false} rel="noopener noreferrer">
                     <File className="size-4 text-muted-foreground" />
-                  </Link>
+                  </a>
+                  }
+
                 </TableCell>
                 <TableCell>
                   <Button

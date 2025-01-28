@@ -14,6 +14,9 @@ interface Transaction {
   updated_at: Date
   pay: boolean
   details?: string | null
+  method: string,
+  nf: string | null,
+  account: string
 }
 
 const ITEMS_PER_PAGE = 10

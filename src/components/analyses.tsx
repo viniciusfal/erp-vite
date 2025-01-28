@@ -26,7 +26,6 @@ import { InteractiveForDay } from './interactive-for-day'
 import { DrawerMeta } from './drawer'
 import { useGetAnaliticsTransactions } from '@/hooks/get-analitics-transactions'
 
-
 export const description = 'A multiple bar chart'
 
 const chartConfig = {
@@ -40,25 +39,18 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-
 export function Analyses() {
   const { currentTransactions } = useListingtransaction('full')
   const { totalBalanceTransactions } = useGetAnaliticsTransactions()
   const [meta, setMeta] = useState(0)
 
   const monthlyTotals = useMemo(() => {
-    const totals = Array.from({ length: 12 }, () => ({
-      income: 0,
-      outcome: 0
-    }))
+    const totals = Array.from({ length: 12 }, () => ({ income: 0, outcome: 0 }))
+    const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : []
 
-    const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : [];
-
-
-    transactionsArray?.forEach((t) => {
+    transactionsArray.forEach((t) => {
       if (t.payment_date) {
         const month = new Date(t.payment_date).getMonth()
-
         if (t.type === 'entrada') {
           totals[month].income += t.value
         } else if (t.type === 'saida') {
@@ -70,20 +62,16 @@ export function Analyses() {
     return totals
   }, [currentTransactions])
 
-  const chartData = [
-    { month: 'Janeiro', desktop: monthlyTotals[0]?.income || 0, mobile: monthlyTotals[0]?.outcome || 0 },
-    { month: 'Fevereiro', desktop: monthlyTotals[1]?.income || 0, mobile: monthlyTotals[1]?.outcome || 0 },
-    { month: 'Março', desktop: monthlyTotals[2]?.income || 0, mobile: monthlyTotals[2]?.outcome || 0 },
-    { month: 'Abril', desktop: monthlyTotals[3]?.income || 0, mobile: monthlyTotals[3]?.outcome || 0 },
-    { month: 'Maio', desktop: monthlyTotals[4]?.income || 0, mobile: monthlyTotals[4]?.outcome || 0 },
-    { month: 'Junho', desktop: monthlyTotals[5]?.income || 0, mobile: monthlyTotals[5]?.outcome || 0 },
-    { month: 'Julho', desktop: monthlyTotals[6]?.income || 0, mobile: monthlyTotals[6]?.outcome || 0 },
-    { month: 'Agosto', desktop: monthlyTotals[7]?.income || 0, mobile: monthlyTotals[7]?.outcome || 0 },
-    { month: 'Setembro', desktop: monthlyTotals[8]?.income || 0, mobile: monthlyTotals[8]?.outcome || 0 },
-    { month: 'Outubro', desktop: monthlyTotals[9]?.income || 0, mobile: monthlyTotals[9]?.outcome || 0 },
-    { month: 'Novembro', desktop: monthlyTotals[10]?.income || 0, mobile: monthlyTotals[10]?.outcome || 0 },
-    { month: 'Dezembro', desktop: monthlyTotals[11]?.income || 0, mobile: monthlyTotals[11]?.outcome || 0 },
-  ]
+  const chartData = useMemo(() => {
+    return monthlyTotals.map((total, index) => ({
+      month: new Date(0, index).toLocaleString('pt-BR', { month: 'long' }),
+      desktop: total.income,
+      mobile: total.outcome,
+    }))
+  }, [monthlyTotals])
+
+  const trend = totalBalanceTransactions && totalBalanceTransactions.total_balance > 0 ? "alta" : "baixa"
+  const balancePercentage = totalBalanceTransactions ? parseFloat(totalBalanceTransactions.total_balance?.toString()).toFixed(2) : "0.00"
 
   return (
     <div className='grid grid-rows-3 grid-cols-4 gap-4'>
@@ -92,34 +80,30 @@ export function Analyses() {
           <CardTitle>Grafico - Entradas e saídas do Ano de {new Date().getFullYear()}</CardTitle>
           <CardDescription>Janeiro - Dezembro</CardDescription>
         </CardHeader>
-        <CardContent className=''>
-          <ChartContainer config={chartConfig} className=''>
-            <BarChart accessibilityLayer data={chartData} className=''>
+        <CardContent>
+          <ChartContainer config={chartConfig}>
+            <BarChart accessibilityLayer data={chartData}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="month"
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
-                tickFormatter={(value) => (value ? value.slice(0, 3) : '')}
+                tickFormatter={(value) => value?.slice(0, 3)}
               />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent indicator="dashed" />}
-              />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
               <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
               <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
             </BarChart>
           </ChartContainer>
         </CardContent>
-        <CardFooter className="flex-col items-start gap-2 text-sm ">
+        <CardFooter className="flex-col items-start gap-2 text-sm">
           <div className="flex gap-2 font-medium leading-none">
-            Tendência de {totalBalanceTransactions && totalBalanceTransactions.total_balance > 0 ? "alta" : "baixa"} de
-            {" "} {totalBalanceTransactions && totalBalanceTransactions && parseFloat(totalBalanceTransactions.total_balance?.toString()).toFixed(2)}% nesse mês
+            Tendência de {trend} de {balancePercentage}%
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
-            Mostrando o total de entradas e saidas do último ano.
+            Mostrando o total de entradas e saídas do último ano.
           </div>
         </CardFooter>
       </Card>
@@ -139,7 +123,7 @@ export function Analyses() {
       <Card className='row-span-1 col-span-2'>
         <CardContent className='mt-3'>
           <div className="py-4 flex items-baseline gap-0.5">
-            <CardTitle className="">Resumo por Categoria</CardTitle>
+            <CardTitle>Resumo por Categoria</CardTitle>
             <Asterisk className='size-2.5 text-muted-foreground' />
           </div>
           <IncomesPizza />
@@ -147,10 +131,9 @@ export function Analyses() {
       </Card>
 
       <Card className='col-span-5 row-span-1 p-4'>
-        <CardTitle className='mb-4'>Analise do Trimestre</CardTitle>
+        <CardTitle className='mb-4'>Análise do Trimestre</CardTitle>
         <InteractiveForDay />
       </Card>
     </div>
-
   )
 }

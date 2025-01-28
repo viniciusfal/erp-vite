@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -18,17 +18,24 @@ import { setSafe } from '@/api/set-safe'
 import { inactiveSafe } from '@/api/inactive-safe'
 import { DropSettings } from '@/components/drop-settings'
 import { Helmet } from 'react-helmet-async'
+import { Textarea } from '@/components/ui/textarea'
 
 interface Safe {
   id: string
   send_date: Date
   send_amount: number
   active: boolean
+  code: string
+  resp?: string
+  details?: string
 }
 
 const inSafes = z.object({
   send_date: z.string(),
-  send_amount: z.number()
+  send_amount: z.number(),
+  code: z.string(),
+  resp: z.string(),
+  details: z.string().nullable()
 })
 
 type InSafes = z.infer<typeof inSafes>
@@ -79,6 +86,9 @@ export default function Safe() {
       await safe({
         send_date: new Date(data.send_date),
         send_amount: parseFloat(data.send_amount.toString()),
+        code: Math.floor(100 + Math.random() * 900).toString() + "-" + "A",
+        details: data.details?.toString(),
+        resp: data.resp.toString()
       })
     } catch (err) {
       toast.error("Erro ao tentar salvar: " + err)
@@ -90,7 +100,7 @@ export default function Safe() {
   }
 
 
-  const handleChange = (id: string, field: 'send_date' | 'send_amount', value: string | number) => {
+  const handleChange = (id: string, field: 'send_date' | 'send_amount' | 'resp' | 'details', value: string | number) => {
     setEditableSafes(prevSafes =>
       prevSafes.map(safe =>
         safe.id === id ? {
@@ -109,6 +119,8 @@ export default function Safe() {
           id: editedSafe.id,
           send_date: new Date(editedSafe.send_date).toISOString(),
           send_amount: editedSafe.send_amount,
+          details: editedSafe?.details,
+          resp: editedSafe?.resp
         })
         setEditingId(null)
       } catch (err) {
@@ -124,15 +136,14 @@ export default function Safe() {
         active: false
       })
     } catch (err) {
-      console.log(err)
+      toast.error("Erro ao tentar remover: " + err)
     }
   }
 
-  const filteredSafes = editableSafes.filter((s) => s.active === true)
-  const total = filteredSafes.reduce((acc, t) => {
-    const result = acc + t.send_amount
-    return result
-  }, 0)
+  const filteredSafes = useMemo(() => {
+    return safes?.filter(s => s.active === true);
+  }, [safes]);
+
 
   useEffect(() => {
     if (safes) {
@@ -150,6 +161,12 @@ export default function Safe() {
 
     return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
   };
+
+  const total = useMemo(() => {
+    return filteredSafes?.reduce((acc, safe) => acc + safe.send_amount, 0);
+  }, [filteredSafes]);
+
+
 
   return (
     <div className='px-8'>
@@ -194,17 +211,25 @@ export default function Safe() {
                     <CardContent>
                       <form onSubmit={handleSubmit(handleSafe)}>
                         <CardHeader className='px-0'>
-                          <CardTitle>Registrar Cofre</CardTitle>
+                          <CardTitle className='text-xl'>Registrar Cofre</CardTitle>
                           <CardDescription>Insira os dados do recolhimento ao cofre.</CardDescription>
                         </CardHeader>
 
                         <div className='mb-2'>
-                          <Label>Data de envio:</Label>
-                          <Input type="date" {...register("send_date")} />
+                          <Label className=''>Data de envio:</Label>
+                          <Input type="date" className='w-1/2' {...register("send_date")} />
+                        </div>
+                        <div className='mb-2'>
+                          <Label>Valor Enviado:</Label>
+                          <Input type="number" className='-webkit-appearance: none' {...register("send_amount")} />
+                        </div>
+                        <div className='mb-2' >
+                          <Label>Responsavel pelo envio</Label>
+                          <Input type="text" {...register("resp")} />
                         </div>
                         <div>
-                          <Label>Valor Enviado:</Label>
-                          <Input type="number" {...register("send_amount")} />
+                          <Label>Detalhamento</Label>
+                          <Textarea className='w-full h-20 resize-none' {...register("details")} />
                         </div>
 
                         <CardFooter className="flex justify-between mt-8 px-0">
@@ -228,25 +253,20 @@ export default function Safe() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Data de envio</TableHead>
+                  <TableHead>Codigo</TableHead>
                   <TableHead>Valor enviado</TableHead>
+                  <TableHead>Data de envio</TableHead>
+                  <TableHead>Resp.envio</TableHead>
+                  <TableHead>Detalhamento</TableHead>
                   <TableHead>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredSafes.map(safe => (
+                {filteredSafes?.map(safe => (
                   <>
                     <TableRow key={safe.id}>
                       <TableCell>
-                        {editingId === safe.id ? (
-                          <Input
-                            type="date"
-                            value={safe.send_date ? new Date(safe.send_date).toISOString().split('T')[0] : ''}
-                            onChange={(e) => handleChange(safe.id, 'send_date', e.target.value)}
-                          />
-                        ) : (
-                          safe.send_date ? formatDate(safe.send_date) : 'Sem data'
-                        )}
+                        {safe.code}
                       </TableCell>
                       <TableCell>
                         {editingId === safe.id ? (
@@ -261,7 +281,35 @@ export default function Safe() {
                       </TableCell>
                       <TableCell>
                         {editingId === safe.id ? (
-                          <Button onClick={() => handleSave(safe.id)}>Salvar</Button>
+                          <Input
+                            type="date"
+                            value={safe.send_date ? new Date(safe.send_date).toISOString().split('T')[0] : ''}
+                            onChange={(e) => handleChange(safe.id, 'send_date', e.target.value)}
+                          />
+                        ) : (
+                          safe.send_date ? formatDate(safe.send_date) : 'Sem data'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingId === safe.id ? (
+                          <Input  {...register("resp")} defaultValue={safe.resp} />
+                        ) : (
+                          safe.resp
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingId === safe.id ? (
+                          <Textarea className='resize-none' onChange={(e) => handleChange(safe.id, 'details', e.target.value)} defaultValue={safe.details} />
+                        ) : (
+                          safe.details
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingId === safe.id ? (
+                          <div className='flex gap-2'>
+                            <Button onClick={() => handleSave(safe.id)}>Salvar</Button>
+                            <Button onClick={() => setEditingId(null)} variant="outline">Cancelar</Button>
+                          </div>
                         ) : (
                           <div className='flex items-center gap-4'>
                             <Button onClick={() => handleEdit(safe.id)} variant="ghost">
@@ -292,7 +340,7 @@ export default function Safe() {
                 ))}
                 <TableRow>
                   <TableCell className='text-muted-foreground '>Total</TableCell>
-                  <TableCell className='text-muted-foreground'>{new Intl.NumberFormat('pt-BR', {
+                  <TableCell className='text-muted-foreground'>{total && new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL'
                   }).format(total)}</TableCell>

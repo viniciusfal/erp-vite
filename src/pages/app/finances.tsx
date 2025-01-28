@@ -26,7 +26,7 @@ import {
   Wrench,
   X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import {
   Tooltip,
@@ -41,6 +41,8 @@ import { queryClient } from '@/lib/query-client'
 import { toast } from 'sonner'
 import { useMutation } from '@tanstack/react-query'
 import { DropSettings } from '@/components/drop-settings'
+
+const today = new Date()
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
@@ -58,28 +60,27 @@ export function Finances() {
     },
   })
 
-  const formatDate = (dateString: Date) => {
-    const date = new Date(dateString)
+  const formatDate = useCallback((dateString: Date) => {
+    const date = new Date(dateString);
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    return `${day}/${month}/${year}`;
+  }, []);
 
-    // Extraindo dia, mês e ano da data
-    const day = String(date.getUTCDate()).padStart(2, '0') // Garantir que o dia tenha dois dígitos
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0') // O mês começa de 0, então somamos 1
-    const year = date.getUTCFullYear() // Pega o ano
 
-    return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
-  }
+  const filteredPayments = useMemo(() => {
+    return finalFilteredPayments
+      ?.filter((p) => !p.pay && p.payment_date)
+      .filter((p) => p.payment_date && new Date(p.payment_date) >= today)
+      .sort((a, b) => {
+        const dateA = a.payment_date ? new Date(a.payment_date) : new Date(0);
+        const dateB = b.payment_date ? new Date(b.payment_date) : new Date(0);
+        return dateA.getTime() - dateB.getTime();
+      })
+      .slice(0, 2);
+  }, [finalFilteredPayments, today]);
 
-  const today = new Date()
-
-  const filteredPayments = finalFilteredPayments
-    ?.filter((p) => !p.pay && p.payment_date) // Filtra pagamentos não pagos e com data válida
-    .filter((p) => p.payment_date && new Date(p.payment_date) >= today) // Adiciona filtro para pagamentos a vencer
-    .sort((a, b) => {
-      const dateA = a.payment_date ? new Date(a.payment_date) : new Date(0) // Usa uma data padrão se null
-      const dateB = b.payment_date ? new Date(b.payment_date) : new Date(0) // Usa uma data padrão se null
-      return dateA.getTime() - dateB.getTime() // Ordena por data crescente
-    })
-    .slice(0, 2)
 
   const handleMarkAsPaid = async (id: string) => {
     try {
@@ -158,7 +159,7 @@ export function Finances() {
             </div>
 
             <div className='my-auto space-y-3'>
-              {filteredPayments?.map((payment) => (
+              {filteredPayments && filteredPayments.length > 0 && filteredPayments.map((payment) => (
                 <Card className="bg-muted" key={payment.transaction_id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">

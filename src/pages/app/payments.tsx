@@ -29,7 +29,7 @@ import {
   PaginationItem,
   PaginationLink,
 } from '../../components/ui/pagination'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useListingPayments } from '@/hooks/listing-payments'
 import { useMutation } from '@tanstack/react-query'
@@ -84,6 +84,8 @@ export function Payments() {
       ? payments.pay === true
       : payments.pay === false,
   )
+  const pdfViewerMemo = useMemo(() => <PdfViewer pdfUrl={pdftest} pageNumber={1} />, [pdftest]);
+
 
   return (
     <div className="min-h-screen px-8 ">
@@ -204,19 +206,29 @@ export function Payments() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="-mt-4 flex items-end justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Detalhamento: {t.details}</p>
-                      <span className="text-sm text-muted-foreground">
-                        Vencimento: {t.payment_date && formatDate(t.payment_date)}
-                      </span>
+                    <div className='flex justify-between w-full sp'>
+                      <div className='space-y-1'>
+                        <p className="text-sm text-muted-foreground">Detalhamento: {t.details}</p>
+                        <p className='text-sm text-muted-foreground'>Conta corrente: {t.account}</p>
 
+                        <span className="text-sm text-muted-foreground">
+                          Vencimento: {t.payment_date && formatDate(t.payment_date)}
+                        </span>
+                      </div>
+
+                      <div className='space-y-0.5 mr-6'>
+                        <span className='text-sm text-muted-foreground'>{"NF:" + t.nf}</span>
+                        <p className='text-sm text-muted-foreground'>Metodo: {t.method}</p>
+                      </div>
+
+                      {t.pay === true && (
+                        <span className="text-sm text-muted-foreground">
+                          Pago dia: {new Date().toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
 
-                    {t.pay === true && (
-                      <span className="text-sm text-muted-foreground">
-                        Pago dia: {new Date().toLocaleDateString()}
-                      </span>
-                    )}
+
                     <Button
                       disabled={t.pay}
                       variant="outline"
@@ -234,10 +246,8 @@ export function Payments() {
               ))}
             </CardContent>
             <div className="w-1/2">
-              <PdfViewer pdfUrl={pdftest} pageNumber={1} />
+              {pdfViewerMemo}
             </div>
-
-
 
           </div>
           <CardFooter className="absolute bottom-0 right-0 mx-auto space-x-4">

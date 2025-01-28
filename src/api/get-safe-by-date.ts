@@ -10,6 +10,9 @@ interface Safe {
   send_date: Date
   send_amount: number
   active: boolean
+  code: string
+  resp: string
+  details: string
 }
 
 export async function getSafesbyDate({ startDate, endDate }: GetSafeRequest): Promise<Safe[]> {

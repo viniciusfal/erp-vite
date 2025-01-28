@@ -18,6 +18,9 @@ interface GetTransactionResponse {
   updated_at: Date
   pay: boolean
   details: string | null
+  method: string
+  nf: string | null
+  account: string
 }
 
 export async function getTransactionsByDate({ start_date, end_date }: GetTransactionRequest) {

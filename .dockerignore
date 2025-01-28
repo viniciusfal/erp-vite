@@ -1,0 +1,11 @@
+# Ignora arquivos de log
+*.log
+
+# Ignora o diretório node_modules
+node_modules/
+
+# Ignora o diretório de testes
+test/
+
+# Ignora arquivos específicos
+secret_config.json

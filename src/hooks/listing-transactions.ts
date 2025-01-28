@@ -13,6 +13,9 @@ export interface Transactions {
   created_at: Date
   updated_at: Date
   details?: string | null
+  method: string
+  nf: string | null
+  account: string
 }
 
 export function useListingtransaction(inputType: string) {

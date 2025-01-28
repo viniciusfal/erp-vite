@@ -7,6 +7,9 @@ interface Safe {
   send_date: Date
   send_amount: number
   active: boolean
+  code: string
+  resp: string
+  details: string
 }
 
 export function useListingSafesByDate(
@@ -31,6 +34,5 @@ export function useListingSafesByDate(
     initialData: [], // Valor padrão para evitar erros
   })
 
-
-  return query 
+  return query
 }

@@ -23,8 +23,8 @@ export function Header() {
   return (
     <header className="flex justify-between py-6 px-8 items-center">
       <div className="flex items-end gap-1">
-        <div className="bg-gradient-to-tr to-slate-950 from-slate-800 rounded-2xl px-2 py-2">
-          <ChartNoAxesCombined className="size-5 text-secondary" />
+        <div className="bg-gradient-to-tr to-slate-950 from-slate-800 rounded-2xl px-2.5 py-2.5">
+          <ChartNoAxesCombined className="size-4 text-secondary" />
         </div>
         <strong className="text-lg text-muted-foreground font-[SUSE]">ERP NET</strong>
       </div>

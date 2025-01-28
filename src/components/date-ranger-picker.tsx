@@ -5,11 +5,10 @@ import { format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 
 import { cn } from '@/lib/utils'
-import { Popover, PopoverContent } from './ui/popover'
-import { PopoverTrigger } from '@radix-ui/react-popover'
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
 import { Calendar } from './ui/calendar'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { z } from 'zod'
 import { toast } from 'sonner'
@@ -26,25 +25,28 @@ export function CalendarDateRangePicker({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const { dateRange, setDateRange } = useDateRange()
-  const { startDate, endDate } = dateRange
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: startDate,
-    to: endDate
+  const [selectedDates, setSelectedDates] = useState<DateRange>({
+    from: dateRange.startDate,
+    to: dateRange.endDate
   })
-  const [selectedDates, setSelectedDates] = useState<DateRange | undefined>(date)
 
+  useEffect(() => {
+    setSelectedDates({
+      from: dateRange.startDate,
+      to: dateRange.endDate
+    })
+  }, [dateRange])
 
-  async function handleTransactionByDate(data: InDates) {
+  const handleTransactionByDate = async (data: InDates) => {
     try {
       setDateRange({ startDate: data.start_date, endDate: data.end_date })
-
     } catch (err) {
       toast.error(`Erro ao tentar buscar transações por data: ${err}`)
     }
   }
 
   const handleSearch = async () => {
-    if (selectedDates?.from && selectedDates?.to) {
+    if (selectedDates.from && selectedDates.to) {
       await handleTransactionByDate({
         start_date: selectedDates.from,
         end_date: selectedDates.to,
@@ -60,21 +62,21 @@ export function CalendarDateRangePicker({
         <PopoverTrigger asChild>
           <Button
             id="date"
-            variant={'secondary'}
+            variant="secondary"
             className={cn(
               'w-[260px] justify-start rounded-full text-left font-normal',
-              !date && 'text-muted-foreground',
+              !selectedDates.from && 'text-muted-foreground',
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date?.from ? (
-              date.to ? (
+            {selectedDates.from ? (
+              selectedDates.to ? (
                 <>
-                  {format(date.from, 'LLL dd, y')} -{' '}
-                  {format(date.to, 'LLL dd, y')}
+                  {format(selectedDates.from, 'LLL dd, y')} -{' '}
+                  {format(selectedDates.to, 'LLL dd, y')}
                 </>
               ) : (
-                format(date.from, 'LLL dd, y')
+                format(selectedDates.from, 'LLL dd, y')
               )
             ) : (
               <span>Pick a date</span>
@@ -85,17 +87,18 @@ export function CalendarDateRangePicker({
           <Calendar
             initialFocus
             mode="range"
-            defaultMonth={date?.from}
-            selected={date}
+            defaultMonth={selectedDates.from}
+            selected={selectedDates}
             onSelect={(range) => {
               if (range) {
-                setSelectedDates(range);
-                setDate(range);
+                setSelectedDates(range)
               }
             }}
             numberOfMonths={2}
           />
-          <Button className='my-2 ml-4' onClick={handleSearch}>Buscar</Button>
+          <Button className="my-2 ml-4" onClick={handleSearch}>
+            Buscar
+          </Button>
         </PopoverContent>
       </Popover>
     </div>
