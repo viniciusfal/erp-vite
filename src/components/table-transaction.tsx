@@ -160,7 +160,6 @@ export function TableTransaction({ setVisible }: TableProps) {
   };
 
 
-
   const handleSave = async () => {
     if (editingId) {
       try {

@@ -25,6 +25,7 @@ import { Meta } from './meta'
 import { InteractiveForDay } from './interactive-for-day'
 import { DrawerMeta } from './drawer'
 import { useGetAnaliticsTransactions } from '@/hooks/get-analitics-transactions'
+import { Button } from './ui/button'
 
 export const description = 'A multiple bar chart'
 
@@ -40,12 +41,15 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function Analyses() {
-  const { currentTransactions } = useListingtransaction('full')
+  const [loadData, setLoadData] = useState(false)
+
+  const { currentTransactions } = useListingtransaction(loadData ? 'full' : null)
   const { totalBalanceTransactions } = useGetAnaliticsTransactions()
   const [meta, setMeta] = useState(0)
 
   const monthlyTotals = useMemo(() => {
     const totals = Array.from({ length: 12 }, () => ({ income: 0, outcome: 0 }))
+
     const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : []
 
     transactionsArray.forEach((t) => {
@@ -74,66 +78,75 @@ export function Analyses() {
   const balancePercentage = totalBalanceTransactions ? parseFloat(totalBalanceTransactions.total_balance?.toString()).toFixed(2) : "0.00"
 
   return (
-    <div className='grid grid-rows-3 grid-cols-4 gap-4'>
-      <Card className='col-span-3 row-span-2'>
-        <CardHeader>
-          <CardTitle>Grafico - Entradas e saídas do Ano de {new Date().getFullYear()}</CardTitle>
-          <CardDescription>Janeiro - Dezembro</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig}>
-            <BarChart accessibilityLayer data={chartData}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tickFormatter={(value) => value?.slice(0, 3)}
-              />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
-              <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-              <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-            </BarChart>
-          </ChartContainer>
-        </CardContent>
-        <CardFooter className="flex-col items-start gap-2 text-sm">
-          <div className="flex gap-2 font-medium leading-none">
-            Tendência de {trend} de {balancePercentage}%
-            <TrendingUp className="h-4 w-4" />
-          </div>
-          <div className="leading-none text-muted-foreground">
-            Mostrando o total de entradas e saídas do último ano.
-          </div>
-        </CardFooter>
-      </Card>
+    <div>
+      {!loadData ? (
+        <div className='flex items-center justify-center mt-12'>
+          <Button className='w-1/4' onClick={() => setLoadData(true)}>Fazer analise</Button>
+        </div>
+      ) : (
+        <div className='grid grid-rows-3 grid-cols-4 gap-4'>
+          <Card className='col-span-3 row-span-2'>
+            <CardHeader>
+              <CardTitle>Grafico - Entradas e saídas do Ano de {new Date().getFullYear()}</CardTitle>
+              <CardDescription>Janeiro - Dezembro</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig}>
+                <BarChart accessibilityLayer data={chartData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    tickFormatter={(value) => value?.slice(0, 3)}
+                  />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+                  <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+                  <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+            <CardFooter className="flex-col items-start gap-2 text-sm">
+              <div className="flex gap-2 font-medium leading-none">
+                Tendência de {trend} de {balancePercentage}%
+                <TrendingUp className="h-4 w-4" />
+              </div>
+              <div className="leading-none text-muted-foreground">
+                Mostrando o total de entradas e saídas do último ano.
+              </div>
+            </CardFooter>
+          </Card>
 
-      <Card className='row-span-1 col-span-2'>
-        <CardContent>
-          <Meta monthlyTotals={monthlyTotals} meta={meta} />
-        </CardContent>
-        <CardHeader>
-          <div className='flex items-center justify-between'>
-            <div className='invisible'></div>
-            <DrawerMeta setNewMeta={setMeta} />
-          </div>
-        </CardHeader>
-      </Card>
+          <Card className='row-span-1 col-span-2'>
+            <CardContent>
+              <Meta monthlyTotals={monthlyTotals} meta={meta} />
+            </CardContent>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <div className='invisible'></div>
+                <DrawerMeta setNewMeta={setMeta} />
+              </div>
+            </CardHeader>
+          </Card>
 
-      <Card className='row-span-1 col-span-2'>
-        <CardContent className='mt-3'>
-          <div className="py-4 flex items-baseline gap-0.5">
-            <CardTitle>Resumo por Categoria</CardTitle>
-            <Asterisk className='size-2.5 text-muted-foreground' />
-          </div>
-          <IncomesPizza />
-        </CardContent>
-      </Card>
+          <Card className='row-span-1 col-span-2'>
+            <CardContent className='mt-3'>
+              <div className="py-4 flex items-baseline gap-0.5">
+                <CardTitle>Resumo por Categoria</CardTitle>
+                <Asterisk className='size-2.5 text-muted-foreground' />
+              </div>
+              <IncomesPizza />
+            </CardContent>
+          </Card>
 
-      <Card className='col-span-5 row-span-1 p-4'>
-        <CardTitle className='mb-4'>Análise do Trimestre</CardTitle>
-        <InteractiveForDay />
-      </Card>
+          <Card className='col-span-5 row-span-1 p-4'>
+            <CardTitle className='mb-4'>Análise do Trimestre</CardTitle>
+            <InteractiveForDay />
+          </Card>
+        </div>
+      )}
+
     </div>
   )
 }

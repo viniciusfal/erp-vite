@@ -81,7 +81,6 @@ export function Finances() {
       .slice(0, 2);
   }, [finalFilteredPayments, today]);
 
-
   const handleMarkAsPaid = async (id: string) => {
     try {
       await transaction({ id })
@@ -148,7 +147,6 @@ export function Finances() {
             <div className="flex justify-between">
               <h2 className="text-lg font-medium">Proximos Agendamentos</h2>
               <Link to="/payments">
-
                 <Button
                   variant="outline"
                   className="rounded-full p-3 text-muted-foreground hover:bg-primary hover:text-white"

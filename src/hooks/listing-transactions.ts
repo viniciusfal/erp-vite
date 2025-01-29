@@ -18,7 +18,7 @@ export interface Transactions {
   account: string
 }
 
-export function useListingtransaction(inputType: string) {
+export function useListingtransaction(inputType: string | null) {
   const { data: transactions, isLoading } = useQuery<Transactions[]>({
     queryKey: ['transactions'],
     queryFn: getTransactions,

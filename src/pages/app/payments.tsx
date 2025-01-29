@@ -42,6 +42,7 @@ import { PdfViewer } from '@/components/pdfviewer'
 
 
 export function Payments() {
+  const [loadData, setLoadData] = useState(false)
   const [valuePaymentFilter, setValuePaymentFilter] = useState('unpaid')
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -86,196 +87,202 @@ export function Payments() {
   )
   const pdfViewerMemo = useMemo(() => <PdfViewer pdfUrl={pdftest} pageNumber={1} />, [pdftest]);
 
-
   return (
     <div className="min-h-screen px-8 ">
-      <div className=''>
-        <div className="flex items-center justify-between">
-          <Helmet titleTemplate="Financeiro" />
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col gap-1">
-              <h2 className="text-4xl text-slate-900">Agendamentos</h2>
-              <span className="mb-4 text-sm text-muted-foreground">
-                Gerencie seus agendamentos financeiros.
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant={'outline'}
-              className="flex items-center gap-2 rounded-full text-muted-foreground"
-            >
-              <Download className="size-5" />
-              Exportar Dados
-            </Button>
-
-            <DropSettings />
-          </div>
+      {!loadData ? (
+        <div className='flex items-center justify-center mt-12'>
+          <Button className='w-1/4' onClick={() => setLoadData(true)}>Ver agendamentos</Button>
         </div>
+      ) :
 
-        <Card className="relative h-screen w-full max-lg:w-[80vw] ">
-          <CardHeader className="">
+        <div className=''>
+          <div className="flex items-center justify-between">
+            <Helmet titleTemplate="Financeiro" />
             <div className="flex items-center justify-between">
-              <CardTitle className='text-xl font-medium'>Historico de Agendamentos</CardTitle>
-              <div className="flex gap-2">
-                <Select onValueChange={setValuePaymentFilter}>
-                  <SelectTrigger className="w-[180px]" value={valuePaymentFilter}>
-                    <SelectValue placeholder="Escolha..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="paid">Pago</SelectItem>
-                    <SelectItem value="unpaid">Não pago</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex flex-col gap-1">
+                <h2 className="text-4xl text-slate-900">Agendamentos</h2>
+                <span className="mb-4 text-sm text-muted-foreground">
+                  Gerencie seus agendamentos financeiros.
+                </span>
               </div>
             </div>
-          </CardHeader>
-          <div className='flex'>
-            <CardContent className='w-1/2'>
-              {filteredPaids?.map((t) => (
-                <Card
-                  className="mt-2 bg-muted"
-                  key={t.transaction_id}
-                  style={
-                    t.pay ? { borderColor: '#4ade80' } : { borderColor: '#f87171' }
-                  }
-                >
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg font-medium">{t.title}</CardTitle>
-                      <div className="flex items-center gap-1">
-                        <div>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Link to="#">
-                                  <Button
-                                    variant="outline"
-                                    className="rounded-full"
-                                  >
-                                    <File className="size-3 text-muted-foreground" />
-                                  </Button>
-                                </Link>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Ver Anexo</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={'outline'}
+                className="flex items-center gap-2 rounded-full text-muted-foreground"
+              >
+                <Download className="size-5" />
+                Exportar Dados
+              </Button>
 
-                        <div>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Button variant="outline" className="rounded-full">
-                                  <Wrench className="size-3 text-muted-foreground" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Editar</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-
-                        <div>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger className="">
-                                <Button
-                                  className="rounded-full bg-red-400 text-white hover:bg-red-300 hover:text-white"
-                                  variant="outline"
-                                >
-                                  <X className="size-3" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Deletar</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      </div>
-                    </div>
-                    <CardDescription className="text-base">
-                      {new Intl.NumberFormat('pt-br', {
-                        currency: 'BRL',
-                        style: 'currency'
-                      }).format(t.value)}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="-mt-4 flex items-end justify-between">
-                    <div className='flex justify-between w-full sp'>
-                      <div className='space-y-1'>
-                        <p className="text-sm text-muted-foreground">Detalhamento: {t.details}</p>
-                        <p className='text-sm text-muted-foreground'>Conta corrente: {t.account}</p>
-
-                        <span className="text-sm text-muted-foreground">
-                          Vencimento: {t.payment_date && formatDate(t.payment_date)}
-                        </span>
-                      </div>
-
-                      <div className='space-y-0.5 mr-6'>
-                        <span className='text-sm text-muted-foreground'>{"NF:" + t.nf}</span>
-                        <p className='text-sm text-muted-foreground'>Metodo: {t.method}</p>
-                      </div>
-
-                      {t.pay === true && (
-                        <span className="text-sm text-muted-foreground">
-                          Pago dia: {new Date().toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-
-
-                    <Button
-                      disabled={t.pay}
-                      variant="outline"
-                      className={
-                        !t.pay
-                          ? 'bg-gradient-to-tr from-emerald-700 to-emerald-500 text-xs text-white hover:from-emerald-600 hover:to-emerald-500/90'
-                          : 'hidden'
-                      }
-                      onClick={() => handleMarkAsPaid(t.transaction_id)}
-                    >
-                      Marcar como Pago
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </CardContent>
-            <div className="w-1/2">
-              {pdfViewerMemo}
+              <DropSettings />
             </div>
-
           </div>
-          <CardFooter className="absolute bottom-0 right-0 mx-auto space-x-4">
-            <Pagination className="">
-              <PaginationContent className="space-x-1">
-                <PaginationItem>
-                  {Array.from({ length: totalPages }, (_, index) => (
-                    <PaginationLink
-                      key={index}
-                      href="#"
-                      className={`rounded-full ${currentPage === index + 1 ? 'bg-gradient-to-tr from-slate-800 to-slate-950 text-white' : 'border bg-muted'}`}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setCurrentPage(index + 1)
-                      }}
-                    >
-                      {index + 1}
-                    </PaginationLink>
-                  ))}
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </CardFooter>
-        </Card>
 
-        <div>
-        </div>
-      </div >
+          <Card className="relative h-screen w-full max-lg:w-[80vw] ">
+            <CardHeader className="">
+              <div className="flex items-center justify-between">
+                <CardTitle className='text-xl font-medium'>Historico de Agendamentos</CardTitle>
+                <div className="flex gap-2">
+                  <Select onValueChange={setValuePaymentFilter}>
+                    <SelectTrigger className="w-[180px]" value={valuePaymentFilter}>
+                      <SelectValue placeholder="Escolha..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="paid">Pago</SelectItem>
+                      <SelectItem value="unpaid">Não pago</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <div className='flex'>
+              <CardContent className='w-1/2'>
+                {filteredPaids?.map((t) => (
+                  <Card
+                    className="mt-2 bg-muted"
+                    key={t.transaction_id}
+                    style={
+                      t.pay ? { borderColor: '#4ade80' } : { borderColor: '#f87171' }
+                    }
+                  >
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg font-medium">{t.title}</CardTitle>
+                        <div className="flex items-center gap-1">
+                          <div>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Link to="#">
+                                    <Button
+                                      variant="outline"
+                                      className="rounded-full"
+                                    >
+                                      <File className="size-3 text-muted-foreground" />
+                                    </Button>
+                                  </Link>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Ver Anexo</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+
+                          <div>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Button variant="outline" className="rounded-full">
+                                    <Wrench className="size-3 text-muted-foreground" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Editar</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+
+                          <div>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger className="">
+                                  <Button
+                                    className="rounded-full bg-red-400 text-white hover:bg-red-300 hover:text-white"
+                                    variant="outline"
+                                  >
+                                    <X className="size-3" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Deletar</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        </div>
+                      </div>
+                      <CardDescription className="text-base">
+                        {new Intl.NumberFormat('pt-br', {
+                          currency: 'BRL',
+                          style: 'currency'
+                        }).format(t.value)}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="-mt-4 flex items-end justify-between">
+                      <div className='flex justify-between w-full sp'>
+                        <div className='space-y-1'>
+                          <p className="text-sm text-muted-foreground">Detalhamento: {t.details}</p>
+                          <p className='text-sm text-muted-foreground'>Conta corrente: {t.account}</p>
+
+                          <span className="text-sm text-muted-foreground">
+                            Vencimento: {t.payment_date && formatDate(t.payment_date)}
+                          </span>
+                        </div>
+
+                        <div className='space-y-0.5 mr-6'>
+                          <span className='text-sm text-muted-foreground'>{"NF:" + t.nf}</span>
+                          <p className='text-sm text-muted-foreground'>Metodo: {t.method}</p>
+                        </div>
+
+                        {t.pay === true && (
+                          <span className="text-sm text-muted-foreground">
+                            Pago dia: {new Date().toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+
+
+                      <Button
+                        disabled={t.pay}
+                        variant="outline"
+                        className={
+                          !t.pay
+                            ? 'bg-gradient-to-tr from-emerald-700 to-emerald-500 text-xs text-white hover:from-emerald-600 hover:to-emerald-500/90'
+                            : 'hidden'
+                        }
+                        onClick={() => handleMarkAsPaid(t.transaction_id)}
+                      >
+                        Marcar como Pago
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </CardContent>
+              <div className="w-1/2">
+                {pdfViewerMemo}
+              </div>
+
+            </div>
+            <CardFooter className="absolute bottom-0 right-0 mx-auto space-x-4">
+              <Pagination className="">
+                <PaginationContent className="space-x-1">
+                  <PaginationItem>
+                    {Array.from({ length: totalPages }, (_, index) => (
+                      <PaginationLink
+                        key={index}
+                        href="#"
+                        className={`rounded-full ${currentPage === index + 1 ? 'bg-gradient-to-tr from-slate-800 to-slate-950 text-white' : 'border bg-muted'}`}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCurrentPage(index + 1)
+                        }}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    ))}
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </CardFooter>
+          </Card>
+
+          <div>
+          </div>
+        </div >
+      }
     </div >
   )
 }
