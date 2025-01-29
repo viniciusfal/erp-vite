@@ -49,8 +49,10 @@ import {
   Asterisk,
   BadgeCent,
   CalendarDays,
+  CreditCard,
   Eye,
   File,
+  Landmark,
   ListCollapse,
   Paperclip,
   Plus,
@@ -74,6 +76,7 @@ import { useListingTransactionByDate } from '@/hooks/listing-transactions-by-dat
 import { CardInfoTransaction } from './card-Info-transaction'
 import Spinner from './spinner'
 import { Textarea } from './ui/textarea'
+import { categories } from '@/services/categories'
 
 interface TransactionProps {
   transaction_id: string
@@ -112,6 +115,7 @@ export function TableTransaction({ setVisible }: TableProps) {
   const [inputType, setInputType] = useState('full')
   const [isOpen, setIsOpen] = useState(false)
 
+  const listCategories = categories();
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
 
@@ -322,12 +326,14 @@ export function TableTransaction({ setVisible }: TableProps) {
                 </TableHead>
                 <TableHead className="w-[180px]">
                   <div className="flex items-center gap-1">
+                    <CreditCard className='size-3' />
                     Metodo
                   </div>
                 </TableHead>
                 <TableHead className="w-[180px]">
                   <div className="flex items-center gap-1">
-                    Conta corrente
+                    <Landmark className='size-3' />
+                    C/ corrente
                   </div>
                 </TableHead>
                 <TableHead className="w-[180px]">
@@ -431,16 +437,23 @@ export function TableTransaction({ setVisible }: TableProps) {
                 </TableCell>
                 <TableCell className="text-secondary-foreground">
                   {editingId === t.transaction_id ? (
-                    <Input
-                      type="text"
-                      name="category"
-                      value={editedData.category}
-                      onChange={handleChange}
-                    />
+                    <Select value={editedData.category} onValueChange={(value) => handleChange({ target: { name: 'category', value } } as React.ChangeEvent<HTMLSelectElement>)}>
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        {listCategories.map((c, index) => (
+                          <SelectItem value={c} key={index}>
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   ) : (
                     t.category
                   )}
                 </TableCell>
+
                 <TableCell>
                   {editingId === t.transaction_id ? (
                     <Input
@@ -461,14 +474,21 @@ export function TableTransaction({ setVisible }: TableProps) {
                     ''
                   )}
                 </TableCell>
-                <TableCell className="text-xs text-secondary-foreground">
+                <TableCell className="text-secondary-foreground">
                   {editingId === t.transaction_id ? (
-                    <Input
-                      type="text"
-                      name="method"
-                      value={editedData.method}
-                      onChange={handleChange}
-                    />
+                    <Select value={editedData.method} onValueChange={(value) => handleChange({ target: { name: 'method', value } } as React.ChangeEvent<HTMLSelectElement>)}>
+                      <SelectTrigger id="method">
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="credito">Crédito</SelectItem>
+                        <SelectItem value="debito">Débito</SelectItem>
+                        <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                        <SelectItem value="pix">Pix</SelectItem>
+                        <SelectItem value="ted/doc">TED / DOC</SelectItem>
+                        <SelectItem value="outros">Outros</SelectItem>
+                      </SelectContent>
+                    </Select>
                   ) : (
                     t.method
                   )}
