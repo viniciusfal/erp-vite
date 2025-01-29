@@ -189,9 +189,9 @@ export function TableTransaction({ setVisible }: TableProps) {
             updated_at: new Date(),
             details: editedData.details ?? existingTransaction.details,
             annex: editedData.annex ?? existingTransaction.annex,
-            method: existingTransaction.method,
-            account: existingTransaction.account,
-            nf: existingTransaction.nf,
+            method: editedData.method ?? existingTransaction.method,
+            account: editedData.account ?? existingTransaction.account,
+            nf: editedData.nf ?? existingTransaction.nf,
           })
 
           setEditingId(null)
