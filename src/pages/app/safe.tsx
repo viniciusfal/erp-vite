@@ -292,7 +292,7 @@ export default function Safe() {
                       </TableCell>
                       <TableCell>
                         {editingId === safe.id ? (
-                          <Input  {...register("resp")} defaultValue={safe.resp} />
+                          <Input  {...register("resp")} value={safe.resp} />
                         ) : (
                           safe.resp
                         )}
