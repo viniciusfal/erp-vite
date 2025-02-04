@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: "https://erpnet.up.railway.app/api",
+  baseURL: "https://erpnet.up.railway.app/api:8000",
   withCredentials: true,
   timeout: 10000,
 })
@@ -14,5 +14,4 @@ api.interceptors.request.use(config => {
   }
 
   return config
-
 })
