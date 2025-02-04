@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: "https://erpnet.up.railway.app/api",
   withCredentials: true,
   timeout: 10000,
 })
