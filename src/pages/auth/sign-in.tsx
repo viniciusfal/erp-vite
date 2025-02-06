@@ -75,7 +75,7 @@ export function SignIn() {
               Entrar
             </Button>
             <a
-              href="#"
+              href=""
               className="text-end text-sm text-muted-foreground underline"
             >
               Esqueci minha senha

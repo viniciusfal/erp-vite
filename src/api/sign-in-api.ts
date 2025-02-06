@@ -6,7 +6,7 @@ export interface SignInBody {
 }
 
 export async function signIn({ email, password }: SignInBody) {
-  const response = await api.post('/session', { email, password })
+  const response = await api.post('/ses/session', { email, password })
 
   const { token } = response.data
 
