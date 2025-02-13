@@ -26,7 +26,7 @@ import { useDateRange } from "@/hooks/date-ranger-context"
 export function IncomesPizza() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
-  const { currentTransactions } = useListingTransactionByDate(startDate, endDate, 1, 'full')
+  const { currentTransactions } = useListingTransactionByDate(startDate, endDate, 'full')
   const [activeIndex, setActiveIndex] = React.useState(0)
   const [hoveredCategory, setHoveredCategory] = React.useState<{ category: string; value: number } | null>(null)
 

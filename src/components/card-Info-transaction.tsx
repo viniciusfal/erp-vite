@@ -40,9 +40,9 @@ export function CardInfoTransaction({ transaction }: { transaction: TransactionP
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <span className="text-lg">{title}</span>
-          <span className={`text-xl font-bold ${isIncome ? 'text-emerald-500' : 'text-red-400'}`}>
+        <CardTitle className="flex flex-col gap-1">
+          <span className="text-base">{title}</span>
+          <span className={`text-lg font-bold ${isIncome ? 'text-emerald-500' : 'text-red-400'}`}>
             R$ {new Intl.NumberFormat('pt-BR').format(value)}
           </span>
         </CardTitle>

@@ -119,8 +119,8 @@ export function TableTransaction({ setVisible }: TableProps) {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
 
-  const { currentTransactions, totalPages, isLoading } =
-    useListingTransactionByDate(startDate, endDate, currentPage, inputType)
+  const { currentTransactions, isLoading } =
+    useListingTransactionByDate(startDate, endDate, inputType)
 
   const { mutateAsync: updateTransaction } = useMutation({
     mutationFn: setTransaction,
@@ -207,6 +207,17 @@ export function TableTransaction({ setVisible }: TableProps) {
       }
     }
   }
+
+  const itemsPerPage = 10
+
+  const paginatedData = currentTransactions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(currentTransactions.length / itemsPerPage);
+
+
 
   const { mutateAsync: transaction } = useMutation({
     mutationFn: removeTransaction,
@@ -354,7 +365,7 @@ export function TableTransaction({ setVisible }: TableProps) {
             </>
           </TableHeader>
           <TableBody className="text-sm">
-            {currentTransactions?.map((t) => (
+            {paginatedData?.map((t) => (
               <TableRow
                 key={t.transaction_id}
                 className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''}`}

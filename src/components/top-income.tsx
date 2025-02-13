@@ -24,7 +24,6 @@ export function TopIncome() {
   const { currentTransactions } = useListingTransactionByDate(
     startDate,
     endDate,
-    1,
     'entrada',
   )
 

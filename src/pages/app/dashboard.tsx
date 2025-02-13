@@ -23,21 +23,31 @@ import { isSameDay } from 'date-fns'
 import { Asterisk, CircleMinus, CirclePlus, Download, Info } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 
+
 export function Dashboard() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
-  const { currentTransactions, isLoading } = useListingTransactionByDate(startDate, endDate, 1, 'full')
+
+  const { currentTransactions, isLoading } = useListingTransactionByDate(startDate, endDate, "full")
   const { currentTransactions: allTransactions = [] } = useListingtransaction('full')
   const { totalBalanceTransactions } = useGetAnaliticsTransactions()
-  const totalIncome = Array.isArray(currentTransactions)
-    ? currentTransactions.reduce((acc, transaction) => transaction.type === 'entrada' ? acc + transaction.value : acc, 0)
-    : 0;
+  const { totalIncome, totalOutcome } = Array.isArray(currentTransactions)
+    ? currentTransactions.reduce(
+      (acc, transaction) => {
+        if (transaction.type === 'entrada') {
+          acc.totalIncome += transaction.value;
+        } else if (transaction.type === 'saida') {
+          acc.totalOutcome += transaction.value;
+        }
+        return acc;
+      },
+      { totalIncome: 0, totalOutcome: 0 }
+    )
+    : { totalIncome: 0, totalOutcome: 0 };
 
-  const totalOutcome = Array.isArray(currentTransactions)
-    ? currentTransactions.reduce((acc, transaction) => transaction.type === 'saida' ? acc + transaction.value : acc, 0)
-    : 0;
 
   const [pagineAtual, setPagineAtual] = useState('overview')
+
 
   const today = new Date()
 
@@ -50,8 +60,6 @@ export function Dashboard() {
 
   const MemoizedOverview = React.memo(Overview);
   const MemoizedRecentSales = React.memo(RecentSales);
-
-
 
   return (
     <div className="bg-primary-foreground">
@@ -147,7 +155,7 @@ export function Dashboard() {
                       </TooltipProvider>
 
                       <p className="text-xs text-muted">
-                        {totalBalanceTransactions?.total_balance?.toFixed(2)}% do que o mês passado.
+                        {totalBalanceTransactions?.total_balance?.toFixed(0)}% do que o mês passado.
                       </p>
                     </div>
                   </CardContent>
@@ -179,7 +187,7 @@ export function Dashboard() {
                           </Tooltip>
                         </TooltipProvider>
                         <p className='text-xs text-muted-foreground'>
-                          {totalBalanceTransactions?.total_entries?.toFixed(2)}% do que o mês passado.
+                          {totalBalanceTransactions?.total_entries?.toFixed(0)}% do que o mês passado.
                         </p>
                       </div>
                     </div>
@@ -212,7 +220,7 @@ export function Dashboard() {
                         </Tooltip>
                       </TooltipProvider>
                       <p className="text-xs text-muted-foreground">
-                        {totalBalanceTransactions?.total_outcomes?.toFixed(2)}% do que o mês passado.
+                        {totalBalanceTransactions?.total_outcomes?.toFixed(0)}% do que o mês passado.
                       </p>
                     </div>
 

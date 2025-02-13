@@ -19,12 +19,11 @@ interface Transaction {
   account: string
 }
 
-const ITEMS_PER_PAGE = 10
+
 
 export function useListingTransactionByDate(
   startDate: Date,
   endDate: Date,
-  currentPage: number,
   inputType: string,
 ) {
   // Função para formatar datas no padrão "YYYY-MM-DD"
@@ -59,12 +58,10 @@ export function useListingTransactionByDate(
       ? transactionsByDate
       : transactionsByDate.filter((t) => t.type === inputType)
 
-  const totalPages = Math.ceil(filteredForType.length / ITEMS_PER_PAGE)
 
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-  const endIndex = startIndex + ITEMS_PER_PAGE
 
-  const currentTransactions = filteredForType.slice(startIndex, endIndex)
+  const currentTransactions = filteredForType
 
-  return { currentTransactions, totalPages, isLoading }
+
+  return { currentTransactions, isLoading }
 }
