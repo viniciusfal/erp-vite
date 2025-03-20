@@ -6,16 +6,8 @@ import { toast, Toaster } from 'sonner'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 import { DateRangeProvider } from './hooks/date-ranger-context'
 import { ThemeProvider } from './components/theme/theme-provider'
-import { useEffect } from 'react'
 
 export function App() {
-  useEffect(() => {
-    if (window.innerWidth < 768) {
-      window.location.href = 'https://erp-amazoniainter.vercel.app/sign-in'
-      toast.error('Esse sistema nao esta disponivel para mobile no momento')
-    }
-  }, [])
-
   return (
     <HelmetProvider>
       <ThemeProvider defaultTheme="light" storageKey="deliverysync-theme">
