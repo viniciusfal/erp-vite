@@ -131,6 +131,6 @@ export function TopIncome() {
           ))}
         </Bar>
       </BarChart>
-    </ChartContainer >
+    </ChartContainer>
   )
 }

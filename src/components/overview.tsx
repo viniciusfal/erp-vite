@@ -41,9 +41,11 @@ export function Overview() {
   const monthlyTotals = useMemo(() => {
     const totals = Array.from({ length: 12 }, () => ({
       income: 0,
-      outcome: 0
+      outcome: 0,
     }))
-    const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : [];
+    const transactionsArray = Array.isArray(currentTransactions)
+      ? currentTransactions
+      : []
 
     transactionsArray?.forEach((t) => {
       if (t.payment_date) {
@@ -61,19 +63,45 @@ export function Overview() {
   }, [currentTransactions])
 
   const chartData = [
-    { month: 'Janeiro', desktop: monthlyTotals[0]?.income || 0, mobile: monthlyTotals[0]?.outcome || 0 },
-    { month: 'Fevereiro', desktop: monthlyTotals[1]?.income || 0, mobile: monthlyTotals[1]?.outcome || 0 },
-    { month: 'Março', desktop: monthlyTotals[2]?.income || 0, mobile: monthlyTotals[2]?.outcome || 0 },
-    { month: 'Abril', desktop: monthlyTotals[3]?.income || 0, mobile: monthlyTotals[3]?.outcome || 0 },
-    { month: 'Maio', desktop: monthlyTotals[4]?.income || 0, mobile: monthlyTotals[4]?.outcome || 0 },
-    { month: 'Junho', desktop: monthlyTotals[5]?.income || 0, mobile: monthlyTotals[5]?.outcome || 0 },
+    {
+      month: 'Janeiro',
+      desktop: monthlyTotals[0]?.income || 0,
+      mobile: monthlyTotals[0]?.outcome || 0,
+    },
+    {
+      month: 'Fevereiro',
+      desktop: monthlyTotals[1]?.income || 0,
+      mobile: monthlyTotals[1]?.outcome || 0,
+    },
+    {
+      month: 'Março',
+      desktop: monthlyTotals[2]?.income || 0,
+      mobile: monthlyTotals[2]?.outcome || 0,
+    },
+    {
+      month: 'Abril',
+      desktop: monthlyTotals[3]?.income || 0,
+      mobile: monthlyTotals[3]?.outcome || 0,
+    },
+    {
+      month: 'Maio',
+      desktop: monthlyTotals[4]?.income || 0,
+      mobile: monthlyTotals[4]?.outcome || 0,
+    },
+    {
+      month: 'Junho',
+      desktop: monthlyTotals[5]?.income || 0,
+      mobile: monthlyTotals[5]?.outcome || 0,
+    },
   ]
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Grafico - Entradas e saídas</CardTitle>
-        <CardDescription>Janeiro - Junho {new Date().getFullYear()}</CardDescription>
+        <CardDescription>
+          Janeiro - Junho {new Date().getFullYear()}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -97,8 +125,18 @@ export function Overview() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Tendência de {totalBalanceTransactions && totalBalanceTransactions.total_balance > 0 ? "alta" : "baixa"} de
-          {" "} {totalBalanceTransactions && totalBalanceTransactions && parseFloat(totalBalanceTransactions.total_balance?.toString()).toFixed(2)}% nesse mês
+          Tendência de{' '}
+          {totalBalanceTransactions &&
+            totalBalanceTransactions.total_balance > 0
+            ? 'alta'
+            : 'baixa'}{' '}
+          de{' '}
+          {totalBalanceTransactions &&
+            totalBalanceTransactions &&
+            parseFloat(
+              totalBalanceTransactions.total_balance?.toString(),
+            ).toFixed(2)}
+          % nesse mês
           <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
