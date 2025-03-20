@@ -39,7 +39,6 @@ import { toast } from 'sonner'
 import { Helmet } from 'react-helmet-async'
 import { DropSettings } from '@/components/drop-settings'
 import { PdfViewer } from '@/components/pdfviewer'
-import { Toast } from '@/components/ui/toast'
 import {
   AlertDialog,
   AlertDialogAction,
