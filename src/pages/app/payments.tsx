@@ -137,7 +137,7 @@ export function Payments() {
   )
 
   return (
-    <div className="h-full">
+    <div className="h-max-screen">
       {!loadData ? (
         <div className="mt-12 flex items-center justify-center">
           <Button
@@ -148,7 +148,7 @@ export function Payments() {
           </Button>
         </div>
       ) : (
-        <div className="">
+        <div className="h-max-screen">
           <div className="flex items-center justify-between">
             <Helmet titleTemplate="Financeiro" />
             <div className="flex items-center justify-between">
@@ -174,7 +174,7 @@ export function Payments() {
             </div>
           </div>
 
-          <Card className="relative h-[1000px] w-full max-lg:w-[80vw]">
+          <Card className="3xl:h-screen relative h-[1020px] w-full overflow-hidden max-lg:w-[80vw]">
             <CardHeader className="">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-medium">
