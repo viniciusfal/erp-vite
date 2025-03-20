@@ -14,12 +14,10 @@ interface Transaction {
   updated_at: Date
   pay: boolean
   details?: string | null
-  method: string,
-  nf: string | null,
+  method: string
+  nf: string | null
   account: string
 }
-
-
 
 export function useListingTransactionByDate(
   startDate: Date,
@@ -58,10 +56,7 @@ export function useListingTransactionByDate(
       ? transactionsByDate
       : transactionsByDate.filter((t) => t.type === inputType)
 
-
-
   const currentTransactions = filteredForType
-
 
   return { currentTransactions, isLoading }
 }

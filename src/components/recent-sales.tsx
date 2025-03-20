@@ -1,7 +1,14 @@
 import { useListingtransaction } from '@/hooks/listing-transactions'
 import { ArrowRightLeft } from 'lucide-react'
 import { format, isSameDay } from 'date-fns'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog'
 import { Button } from './ui/button'
 import { CardInfoTransaction } from './card-Info-transaction'
 import React, { useState, useMemo } from 'react'
@@ -32,18 +39,24 @@ const currencyFormat = new Intl.NumberFormat('pt-BR', {
 const dateFormat = 'dd/MM/yyyy | HH:mm'
 
 export function RecentSales() {
-  const [selectedTransaction, setSelectedTransaction] = useState<TransactionProps | null>(null)
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<TransactionProps | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const { currentTransactions } = useListingtransaction('full')
 
   const today = new Date()
-  const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : []
+  const transactionsArray = Array.isArray(currentTransactions)
+    ? currentTransactions
+    : []
 
   // Use useMemo to avoid unnecessary recalculations of filtered transactions
   const filteredLastsActivities = useMemo(() => {
     return transactionsArray
       .filter((t) => isSameDay(new Date(t.created_at), today))
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      )
       .slice(0, 10)
   }, [transactionsArray, today])
 
@@ -52,16 +65,20 @@ export function RecentSales() {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className={`rounded-full p-2.5 text-${transaction.type === 'saida' ? 'red' : 'emerald'}-400 bg-muted hover:bg-${transaction.type === 'saida' ? 'red' : 'emerald'}-400 hover:text-muted transition-colors`}
+          className={`rounded-full p-2.5 text-${transaction.type === 'saida' ? 'red' : 'emerald'}-400 bg-muted hover:bg-${transaction.type === 'saida' ? 'red' : 'emerald'}-400 transition-colors hover:text-muted`}
           onClick={() => setSelectedTransaction(transaction)} // Atualiza a transação ao clicar
         >
-          <ArrowRightLeft className='size-3' />
+          <ArrowRightLeft className="size-3" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Detalhes da Transação</DialogTitle>
-          <DialogDescription>Informações detalhadas sobre a transação selecionada.</DialogDescription>
+          <DialogTitle className="dark:text-foreground">
+            Detalhes da Transação
+          </DialogTitle>
+          <DialogDescription>
+            Informações detalhadas sobre a transação selecionada.
+          </DialogDescription>
         </DialogHeader>
         <CardInfoTransaction transaction={selectedTransaction} />
       </DialogContent>
@@ -75,8 +92,12 @@ export function RecentSales() {
           {renderTransactionTypeButton(transaction)}
 
           <div className="ml-4 space-y-1">
-            <p className="text-sm font-medium leading-none">{transaction.title}</p>
-            <p className="text-xs text-muted-foreground">{format(transaction.created_at, dateFormat)}</p>
+            <p className="text-sm font-medium leading-none">
+              {transaction.title}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {format(transaction.created_at, dateFormat)}
+            </p>
           </div>
           <div className="ml-auto font-medium text-muted-foreground">
             {currencyFormat.format(transaction.value)}

@@ -13,7 +13,7 @@ export interface Transactions {
   created_at: Date
   updated_at: Date
   pay: boolean
-  details?: string | null 
+  details?: string | null
   method: string
   nf: string | null
   account: string

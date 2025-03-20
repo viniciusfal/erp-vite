@@ -16,7 +16,7 @@ import { useDateRange } from '@/hooks/date-ranger-context'
 
 const inDates = z.object({
   start_date: z.date(),
-  end_date: z.date()
+  end_date: z.date(),
 })
 
 type InDates = z.infer<typeof inDates>
@@ -27,13 +27,13 @@ export function CalendarDateRangePicker({
   const { dateRange, setDateRange } = useDateRange()
   const [selectedDates, setSelectedDates] = useState<DateRange>({
     from: dateRange.startDate,
-    to: dateRange.endDate
+    to: dateRange.endDate,
   })
 
   useEffect(() => {
     setSelectedDates({
       from: dateRange.startDate,
-      to: dateRange.endDate
+      to: dateRange.endDate,
     })
   }, [dateRange])
 

@@ -40,7 +40,6 @@ import { Helmet } from 'react-helmet-async'
 import { DropSettings } from '@/components/drop-settings'
 import { PdfViewer } from '@/components/pdfviewer'
 
-
 export function Payments() {
   const [loadData, setLoadData] = useState(false)
   const [valuePaymentFilter, setValuePaymentFilter] = useState('unpaid')
@@ -85,22 +84,31 @@ export function Payments() {
       ? payments.pay === true
       : payments.pay === false,
   )
-  const pdfViewerMemo = useMemo(() => <PdfViewer pdfUrl={pdftest} pageNumber={1} />, [pdftest]);
+  const pdfViewerMemo = useMemo(
+    () => <PdfViewer pdfUrl={pdftest} pageNumber={1} />,
+    [pdftest],
+  )
 
   return (
-    <div className="min-h-screen px-8 ">
+    <div className="h-full">
       {!loadData ? (
-        <div className='flex items-center justify-center mt-12'>
-          <Button className='w-1/4' onClick={() => setLoadData(true)}>Ver agendamentos</Button>
+        <div className="mt-12 flex items-center justify-center">
+          <Button
+            className="w-1/4 dark:text-foreground"
+            onClick={() => setLoadData(true)}
+          >
+            Ver agendamentos
+          </Button>
         </div>
-      ) :
-
-        <div className=''>
+      ) : (
+        <div className="">
           <div className="flex items-center justify-between">
             <Helmet titleTemplate="Financeiro" />
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-1">
-                <h2 className="text-4xl text-slate-900">Agendamentos</h2>
+                <h2 className="text-3xl text-slate-900 dark:text-foreground">
+                  Agendamentos
+                </h2>
                 <span className="mb-4 text-sm text-muted-foreground">
                   Gerencie seus agendamentos financeiros.
                 </span>
@@ -119,13 +127,18 @@ export function Payments() {
             </div>
           </div>
 
-          <Card className="relative h-screen w-full max-lg:w-[80vw] ">
+          <Card className="relative h-[1000px] w-full max-lg:w-[80vw]">
             <CardHeader className="">
               <div className="flex items-center justify-between">
-                <CardTitle className='text-xl font-medium'>Historico de Agendamentos</CardTitle>
+                <CardTitle className="text-xl font-medium">
+                  Historico de Agendamentos
+                </CardTitle>
                 <div className="flex gap-2">
                   <Select onValueChange={setValuePaymentFilter}>
-                    <SelectTrigger className="w-[180px]" value={valuePaymentFilter}>
+                    <SelectTrigger
+                      className="w-[180px]"
+                      value={valuePaymentFilter}
+                    >
                       <SelectValue placeholder="Escolha..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -136,19 +149,23 @@ export function Payments() {
                 </div>
               </div>
             </CardHeader>
-            <div className='flex'>
-              <CardContent className='w-1/2'>
+            <div className="flex">
+              <CardContent className="w-1/2">
                 {filteredPaids?.map((t) => (
                   <Card
                     className="mt-2 bg-muted"
                     key={t.transaction_id}
                     style={
-                      t.pay ? { borderColor: '#4ade80' } : { borderColor: '#f87171' }
+                      t.pay
+                        ? { borderColor: '#4ade80' }
+                        : { borderColor: '#f87171' }
                     }
                   >
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg font-medium">{t.title}</CardTitle>
+                        <CardTitle className="text-lg font-medium">
+                          {t.title}
+                        </CardTitle>
                         <div className="flex items-center gap-1">
                           <div>
                             <TooltipProvider>
@@ -174,7 +191,10 @@ export function Payments() {
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Button variant="outline" className="rounded-full">
+                                  <Button
+                                    variant="outline"
+                                    className="rounded-full"
+                                  >
                                     <Wrench className="size-3 text-muted-foreground" />
                                   </Button>
                                 </TooltipTrigger>
@@ -207,24 +227,33 @@ export function Payments() {
                       <CardDescription className="text-base">
                         {new Intl.NumberFormat('pt-br', {
                           currency: 'BRL',
-                          style: 'currency'
+                          style: 'currency',
                         }).format(t.value)}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="-mt-4 flex items-end justify-between">
-                      <div className='flex justify-between w-full sp'>
-                        <div className='space-y-1'>
-                          <p className="text-sm text-muted-foreground">Detalhamento: {t.details}</p>
-                          <p className='text-sm text-muted-foreground'>Conta corrente: {t.account}</p>
+                      <div className="sp flex w-full justify-between">
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">
+                            Detalhamento: {t.details}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Conta corrente: {t.account}
+                          </p>
 
                           <span className="text-sm text-muted-foreground">
-                            Vencimento: {t.payment_date && formatDate(t.payment_date)}
+                            Vencimento:{' '}
+                            {t.payment_date && formatDate(t.payment_date)}
                           </span>
                         </div>
 
-                        <div className='space-y-0.5 mr-6'>
-                          <span className='text-sm text-muted-foreground'>{"NF:" + t.nf}</span>
-                          <p className='text-sm text-muted-foreground'>Metodo: {t.method}</p>
+                        <div className="mr-6 space-y-0.5">
+                          <span className="text-sm text-muted-foreground">
+                            {'NF:' + t.nf}
+                          </span>
+                          <p className="text-sm text-muted-foreground">
+                            Metodo: {t.method}
+                          </p>
                         </div>
 
                         {t.pay === true && (
@@ -233,7 +262,6 @@ export function Payments() {
                           </span>
                         )}
                       </div>
-
 
                       <Button
                         disabled={t.pay}
@@ -251,10 +279,7 @@ export function Payments() {
                   </Card>
                 ))}
               </CardContent>
-              <div className="w-1/2">
-                {pdfViewerMemo}
-              </div>
-
+              <div className="w-1/2">{pdfViewerMemo}</div>
             </div>
             <CardFooter className="absolute bottom-0 right-0 mx-auto space-x-4">
               <Pagination className="">
@@ -279,10 +304,9 @@ export function Payments() {
             </CardFooter>
           </Card>
 
-          <div>
-          </div>
-        </div >
-      }
-    </div >
+          <div></div>
+        </div>
+      )}
+    </div>
   )
 }

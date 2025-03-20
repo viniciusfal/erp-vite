@@ -1,5 +1,5 @@
-import { getMetaByMonth } from "@/api/get-meta"
-import { useQuery } from "@tanstack/react-query"
+import { getMetaByMonth } from '@/api/get-meta'
+import { useQuery } from '@tanstack/react-query'
 
 interface Meta {
   id: string
@@ -8,19 +8,28 @@ interface Meta {
 }
 
 const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ]
 
 export function useListMeta() {
-  const currentDate = new Date();
-  const currentMonthName = months[currentDate.getMonth()];
+  const currentDate = new Date()
+  const currentMonthName = months[currentDate.getMonth()]
 
-  const {data: mounthMeta} = useQuery<Meta>({
+  const { data: mounthMeta } = useQuery<Meta>({
     queryKey: ['getMeta'],
-    queryFn: () => getMetaByMonth(currentMonthName)
+    queryFn: () => getMetaByMonth(currentMonthName),
   })
 
-  return {mounthMeta}
-
+  return { mounthMeta }
 }

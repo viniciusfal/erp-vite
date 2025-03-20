@@ -255,15 +255,15 @@ export function TableTransaction({ setVisible }: TableProps) {
     return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
   }
   return (
-    <div className="flex w-full flex-col rounded-2xl border border-muted bg-white px-4 py-5 shadow-md">
+    <div className="flex w-full flex-col rounded-2xl border border-muted bg-card px-4 py-5 shadow-md ">
       <div className="flex  justify-between">
-        <strong className="flex items-baseline gap-0.5 text-xl font-medium">
+        <strong className="flex items-baseline gap-0.5 text-xl font-medium dark:text-foreground">
           Lista de transações
           <Asterisk className="size-2.5 text-muted-foreground" />
         </strong>
         <div className="flex gap-2">
           <Select onValueChange={setInputType}>
-            <SelectTrigger className="w-[180px]" value={inputType}>
+            <SelectTrigger className="w-[180px] text-foreground" value={inputType} >
               <SelectValue placeholder="Filtrar por" />
             </SelectTrigger>
             <SelectContent>
@@ -276,7 +276,7 @@ export function TableTransaction({ setVisible }: TableProps) {
           </Select>
 
           <Button
-            className="rounded-full hover:bg-primary hover:text-white"
+            className="rounded-full hover:bg-primary hover:text-white dark:hover:bg-primary dark:bg-background"
             variant="outline"
             onClick={() => setVisible(true)}
           >
@@ -288,8 +288,8 @@ export function TableTransaction({ setVisible }: TableProps) {
       {isLoading ? (
         <Spinner />
       ) : (
-        <Table className="my-6">
-          <TableHeader className="text-xs">
+        <Table className="my-6 dark:text-foreground">
+          <TableHeader className="text-xs bg-muted">
             <>
               <TableRow className="">
                 <TableHead className="w-[50px]">
@@ -364,7 +364,7 @@ export function TableTransaction({ setVisible }: TableProps) {
               </TableRow>
             </>
           </TableHeader>
-          <TableBody className="text-sm">
+          <TableBody className="text-xs">
             {paginatedData?.map((t) => (
               <TableRow
                 key={t.transaction_id}
@@ -436,6 +436,8 @@ export function TableTransaction({ setVisible }: TableProps) {
                     <Input
                       type="number"
                       name="value"
+                      step="0.01"
+                      min="0"
                       value={Number(editedData.value)}
                       onChange={handleChange}
                     />
@@ -534,9 +536,10 @@ export function TableTransaction({ setVisible }: TableProps) {
                   <Button
                     className={
                       t.type === 'entrada'
-                        ? 'w-16 rounded-full bg-green-100 text-xs text-emerald-400 hover:cursor-default hover:bg-emerald-100'
-                        : 'w-16 rounded-full bg-red-400 text-xs text-red-50 hover:cursor-default hover:bg-red-400'
+                        ? 'text-emerald-300 cursor-default hover:text-emerald-400 hover:bg-transparent w-5'
+                        : 'text-red-300  cursor-default hover:text-red-400 hover:bg-transparent w-5'
                     }
+                    variant="ghost"
                   >
                     {t.type}
                   </Button>
@@ -585,7 +588,7 @@ export function TableTransaction({ setVisible }: TableProps) {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>
+                          <AlertDialogTitle className='dark:text-foreground'>
                             Tem certeza que deseja excluir essa transação?
                           </AlertDialogTitle>
                           <AlertDialogDescription>
@@ -593,7 +596,7 @@ export function TableTransaction({ setVisible }: TableProps) {
                             transação.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
-                        <AlertDialogFooter>
+                        <AlertDialogFooter className='dark:text-foreground'>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() =>
@@ -638,7 +641,7 @@ export function TableTransaction({ setVisible }: TableProps) {
                   <PaginationLink
                     key={index}
                     href="#"
-                    className={`rounded-full ${currentPage === index + 1 ? 'bg-gradient-to-tr from-slate-800 to-slate-950 text-white' : 'border bg-muted'}`}
+                    className={`rounded-full mx-0.5 ${currentPage === index + 1 ? 'bg-gradient-to-tr from-slate-800 to-slate-950 text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-foreground' : 'border bg-muted'}`}
                     onClick={(e) => {
                       e.preventDefault()
                       setCurrentPage(index + 1)

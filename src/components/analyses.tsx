@@ -43,14 +43,18 @@ const chartConfig = {
 export function Analyses() {
   const [loadData, setLoadData] = useState(false)
 
-  const { currentTransactions } = useListingtransaction(loadData ? 'full' : null)
+  const { currentTransactions } = useListingtransaction(
+    loadData ? 'full' : null,
+  )
   const { totalBalanceTransactions } = useGetAnaliticsTransactions()
   const [meta, setMeta] = useState(0)
 
   const monthlyTotals = useMemo(() => {
     const totals = Array.from({ length: 12 }, () => ({ income: 0, outcome: 0 }))
 
-    const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : []
+    const transactionsArray = Array.isArray(currentTransactions)
+      ? currentTransactions
+      : []
 
     transactionsArray.forEach((t) => {
       if (t.payment_date) {
@@ -74,20 +78,32 @@ export function Analyses() {
     }))
   }, [monthlyTotals])
 
-  const trend = totalBalanceTransactions && totalBalanceTransactions.total_balance > 0 ? "alta" : "baixa"
-  const balancePercentage = totalBalanceTransactions ? parseFloat(totalBalanceTransactions.total_balance?.toString()).toFixed(2) : "0.00"
+  const trend =
+    totalBalanceTransactions && totalBalanceTransactions.total_balance > 0
+      ? 'alta'
+      : 'baixa'
+  const balancePercentage = totalBalanceTransactions
+    ? parseFloat(totalBalanceTransactions.total_balance?.toString()).toFixed(2)
+    : '0.00'
 
   return (
     <div>
       {!loadData ? (
-        <div className='flex items-center justify-center mt-12'>
-          <Button className='w-1/4' onClick={() => setLoadData(true)}>Fazer analise</Button>
+        <div className="mt-12 flex items-center justify-center">
+          <Button
+            className="w-1/4 dark:text-white"
+            onClick={() => setLoadData(true)}
+          >
+            Fazer analise
+          </Button>
         </div>
       ) : (
-        <div className='grid grid-rows-3 grid-cols-4 gap-4'>
-          <Card className='col-span-3 row-span-2'>
+        <div className="grid grid-cols-4 grid-rows-3 gap-4">
+          <Card className="col-span-3 row-span-2">
             <CardHeader>
-              <CardTitle>Grafico - Entradas e saídas do Ano de {new Date().getFullYear()}</CardTitle>
+              <CardTitle>
+                Grafico - Entradas e saídas do Ano de {new Date().getFullYear()}
+              </CardTitle>
               <CardDescription>Janeiro - Dezembro</CardDescription>
             </CardHeader>
             <CardContent>
@@ -101,8 +117,15 @@ export function Analyses() {
                     axisLine={false}
                     tickFormatter={(value) => value?.slice(0, 3)}
                   />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
-                  <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="dashed" />}
+                  />
+                  <Bar
+                    dataKey="desktop"
+                    fill="var(--color-desktop)"
+                    radius={4}
+                  />
                   <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
                 </BarChart>
               </ChartContainer>
@@ -118,35 +141,34 @@ export function Analyses() {
             </CardFooter>
           </Card>
 
-          <Card className='row-span-1 col-span-2'>
+          <Card className="col-span-2 row-span-1">
             <CardContent>
               <Meta monthlyTotals={monthlyTotals} meta={meta} />
             </CardContent>
             <CardHeader>
-              <div className='flex items-center justify-between'>
-                <div className='invisible'></div>
+              <div className="flex items-center justify-between">
+                <div className="invisible"></div>
                 <DrawerMeta setNewMeta={setMeta} />
               </div>
             </CardHeader>
           </Card>
 
-          <Card className='row-span-1 col-span-2'>
-            <CardContent className='mt-3'>
-              <div className="py-4 flex items-baseline gap-0.5">
+          <Card className="col-span-2 row-span-1">
+            <CardContent className="mt-3">
+              <div className="flex items-baseline gap-0.5 py-4">
                 <CardTitle>Resumo por Categoria</CardTitle>
-                <Asterisk className='size-2.5 text-muted-foreground' />
+                <Asterisk className="size-2.5 text-muted-foreground" />
               </div>
               <IncomesPizza />
             </CardContent>
           </Card>
 
-          <Card className='col-span-5 row-span-1 p-4'>
-            <CardTitle className='mb-4'>Análise do Trimestre</CardTitle>
+          <Card className="col-span-5 row-span-1 p-4">
+            <CardTitle className="mb-4">Análise do Trimestre</CardTitle>
             <InteractiveForDay />
           </Card>
         </div>
       )}
-
     </div>
   )
 }

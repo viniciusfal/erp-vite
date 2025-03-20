@@ -1,40 +1,44 @@
-import { BellDot, ChartNoAxesCombined, ExternalLink, Menu } from "lucide-react";
-import { Button } from "./ui/button";
-import { useState, useEffect } from "react";
-import { Input } from "./ui/input";
-import { Link, useLocation } from "react-router-dom";
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from "./ui/sheet";
+import { BellDot, ChartNoAxesCombined, ExternalLink, Menu } from 'lucide-react'
+import { Button } from './ui/button'
+import { useState, useEffect } from 'react'
+import { Input } from './ui/input'
+import { Link, useLocation } from 'react-router-dom'
+import { Sheet, SheetClose, SheetContent, SheetTrigger } from './ui/sheet'
+import { ThemeToggle } from './theme/theme-toggle'
 
 export function Header() {
-  const location = useLocation();
-  const [activeButton, setActiveButton] = useState(location.pathname);
-  const [responsive, setResponsive] = useState("desktop");
-  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation()
+  const [activeButton, setActiveButton] = useState(location.pathname)
+  const [responsive, setResponsive] = useState('desktop')
+  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    const handleResize = () => setResponsive(window.innerWidth < 1024 ? "tablet" : "desktop");
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    const handleResize = () =>
+      setResponsive(window.innerWidth < 1024 ? 'tablet' : 'desktop')
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
-  const handleButtonClick = (path: string) => setActiveButton(path);
+  const handleButtonClick = (path: string) => setActiveButton(path)
 
   return (
-    <header className="flex justify-between py-6 px-8 items-center">
+    <header className="flex items-center justify-between px-6 py-6">
       <div className="flex items-end gap-1">
-        <div className="bg-gradient-to-tr to-slate-950 from-slate-800 rounded-2xl px-2.5 py-2.5">
-          <ChartNoAxesCombined className="size-4 text-secondary" />
+        <div className="rounded-xl bg-gradient-to-tr from-slate-800 to-slate-950 p-2.5 dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500">
+          <ChartNoAxesCombined className="size-4 text-secondary dark:text-muted-foreground" />
         </div>
-        <strong className="text-lg text-muted-foreground font-[SUSE]">ERP NET</strong>
+        <strong className="font-[SUSE] text-muted-foreground dark:text-muted-foreground">
+          ERP NET
+        </strong>
       </div>
-      {responsive === "tablet" ? (
-        <nav className="flex gap-5 items-center">
-          <div className="flex gap-3 items-center">
+      {responsive === 'tablet' ? (
+        <nav className="flex items-center gap-5">
+          <div className="flex items-center gap-3">
             <div>
               <Input type="search" placeholder="Pesquisar..." />
             </div>
-            <div className="bg-white rounded-full p-3.5">
+            <div className="rounded-full bg-white p-3.5 dark:bg-background">
               <BellDot className="size-5 text-muted-foreground" />
             </div>
           </div>
@@ -50,8 +54,8 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px]">
-              <div className="flex flex-col h-full">
-                <div className="flex justify-between items-center mb-6">
+              <div className="flex h-full flex-col">
+                <div className="mb-6 flex items-center justify-between">
                   <span className="text-lg font-semibold">Menu</span>
                   <SheetClose asChild>
                     <Button
@@ -59,83 +63,88 @@ export function Header() {
                       size="icon"
                       className="text-muted-foreground hover:text-primary"
                       aria-label="Fechar menu"
-                    >
-
-                    </Button>
+                    ></Button>
                   </SheetClose>
                 </div>
                 <nav className="flex-grow space-y-4">
                   <Link to="/">
                     <Button
-                      className={`w-full rounded-full  h-12 text-sm ${activeButton === "/" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+                      className={`h-12 w-full rounded-full text-sm ${activeButton === '/'
+                          ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                          : 'bg-transparent'
                         }`}
                       variant="outline"
-                      onClick={() => handleButtonClick("/")}
+                      onClick={() => handleButtonClick('/')}
                     >
                       Dashboard
                     </Button>
                   </Link>
                   <Link to="/finances">
                     <Button
-                      className={`rounded-full h-12 w-full text-sm ${activeButton === "/finances"
-                        ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white"
-                        : "bg-transparent"
+                      className={`h-12 w-full rounded-full text-sm ${activeButton === '/finances'
+                          ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                          : 'bg-transparent'
                         }`}
                       variant="outline"
-                      onClick={() => handleButtonClick("/finances")}
+                      onClick={() => handleButtonClick('/finances')}
                     >
                       Financeiro
                     </Button>
                   </Link>
                   <Link to="/payments">
                     <Button
-                      className={`rounded-full h-12 w-full text-sm ${activeButton === "/payments" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+                      className={`h-12 w-full rounded-full text-sm ${activeButton === '/payments'
+                          ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                          : 'bg-transparent'
                         }`}
                       variant="outline"
-                      onClick={() => handleButtonClick("/payments")}
+                      onClick={() => handleButtonClick('/payments')}
                     >
                       Agendamentos
                     </Button>
                   </Link>
                   <Button
-                    className={`rounded-full h-12 w-full text-sm ${activeButton === "/safe"
-                      ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white"
-                      : "bg-transparent"
+                    className={`h-12 w-full rounded-full text-sm ${activeButton === '/safe'
+                        ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                        : 'bg-transparent'
                       }`}
                     variant="outline"
-                    onClick={() => handleButtonClick("/safe")}
+                    onClick={() => handleButtonClick('/safe')}
                   >
                     Cofre
                   </Button>
                   <Button
-                    className={`rounded-full h-12 w-full text-sm ${activeButton === "/loan"
-                      ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white"
-                      : "bg-transparent"
+                    className={`h-12 w-full rounded-full text-sm ${activeButton === '/loan'
+                        ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                        : 'bg-transparent'
                       }`}
                     variant="outline"
-                    onClick={() => handleButtonClick("/loan")}
+                    onClick={() => handleButtonClick('/loan')}
                   >
                     Emprestimos
                   </Button>
                   <Button
-                    className={`rounded-full h-12 w-full text-sm ${activeButton === "/banks"
-                      ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white"
-                      : "bg-transparent"
+                    className={`h-12 w-full rounded-full text-sm ${activeButton === '/banks'
+                        ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                        : 'bg-transparent'
                       }`}
                     variant="outline"
-                    onClick={() => handleButtonClick("/banks")}
+                    onClick={() => handleButtonClick('/banks')}
                   >
                     Bancos
                   </Button>
-
                 </nav>
-                <a href="https://glpiamazoniainter.com/glpi" target="_blank" rel="noopener noreferrer">
+                <a
+                  href="https://glpiamazoniainter.com/glpi"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Button
-                    className="h-12 w-full text-sm flex items-center gap-1 hover:bg-gradient-to-r from-slate-950 to-slate-800"
+                    className="flex h-12 w-full items-center gap-1 from-slate-950 to-slate-800 text-sm hover:bg-gradient-to-r"
                     variant="link"
                   >
                     Suporte
-                    <ExternalLink className="size-2.5 mb-2" />
+                    <ExternalLink className="mb-2 size-2.5" />
                   </Button>
                 </a>
               </div>
@@ -143,74 +152,92 @@ export function Header() {
           </Sheet>
         </nav>
       ) : (
-        <nav className="flex gap-5 items-center">
+        <nav className="flex items-center gap-5">
           <Link to="/">
             <Button
-              className={`rounded-full h-12 w-32 text-sm ${activeButton === "/" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+              className={`h-12 w-32 rounded-full text-sm ${activeButton === '/'
+                  ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                  : 'bg-transparent dark:border-muted'
                 }`}
               variant="outline"
-              onClick={() => handleButtonClick("/")}
+              onClick={() => handleButtonClick('/')}
             >
               Dashboard
             </Button>
           </Link>
           <Link to="/finances">
             <Button
-              className={`rounded-full h-12 w-32 text-sm ${activeButton === "/finances"
-                ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white"
-                : "bg-transparent"
+              className={`h-12 w-32 rounded-full text-sm ${activeButton === '/finances'
+                  ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                  : 'bg-transparent'
                 }`}
               variant="outline"
-              onClick={() => handleButtonClick("/finances")}
+              onClick={() => handleButtonClick('/finances')}
             >
               Financeiro
             </Button>
           </Link>
           <Link to="/payments">
             <Button
-              className={`rounded-full h-12 w-32 text-sm ${activeButton === "/payments" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+              className={`h-12 w-32 rounded-full text-sm ${activeButton === '/payments'
+                  ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                  : 'bg-transparent'
                 }`}
               variant="outline"
-              onClick={() => handleButtonClick("/payments")}
+              onClick={() => handleButtonClick('/payments')}
             >
               Agendamentos
             </Button>
           </Link>
           <Link to="/safe">
             <Button
-              className={`rounded-full h-12 w-32 text-sm ${activeButton === "/safe" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+              className={`h-12 w-32 rounded-full text-sm ${activeButton === '/safe'
+                  ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                  : 'bg-transparent'
                 }`}
               variant="outline"
-              onClick={() => handleButtonClick("/safe")}
+              onClick={() => handleButtonClick('/safe')}
             >
               Cofre
             </Button>
           </Link>
           <Button
-            className={`rounded-full h-12 w-32 text-sm ${activeButton === "/loan" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+            className={`h-12 w-32 rounded-full text-xs ${activeButton === '/loan'
+                ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                : 'bg-transparent'
               }`}
             variant="outline"
-            onClick={() => handleButtonClick("/loan")}
+            onClick={() => handleButtonClick('/loan')}
           >
             Emprestimos
-          </Button> <Button
-            className={`rounded-full h-12 w-32 text-sm ${activeButton === "/banks" ? "bg-gradient-to-r text-muted from-slate-950 to-slate-800 hover:text-white" : "bg-transparent"
+          </Button>{' '}
+          <Button
+            className={`h-12 w-32 rounded-full text-sm ${activeButton === '/banks'
+                ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                : 'bg-transparent'
               }`}
             variant="outline"
-            onClick={() => handleButtonClick("/banks")}
+            onClick={() => handleButtonClick('/banks')}
           >
             Bancos
           </Button>
         </nav>
       )}
-      <div className={responsive != 'desktop' ? "hidden" : "flex gap-3 items-center"}>
+      <div
+        className={
+          responsive != 'desktop' ? 'hidden' : 'flex items-center gap-3'
+        }
+      >
+        <div className="text-secondary-foreground" title="Trocar o Tema">
+          <ThemeToggle />
+        </div>
         <div>
           <Input type="search" placeholder="Pesquisar..." />
         </div>
-        <div className="bg-white rounded-full p-3.5">
+        <div className="rounded-full bg-white p-3.5 dark:bg-background">
           <BellDot className="size-5 text-muted-foreground" />
         </div>
       </div>
-    </header >
-  );
+    </header>
+  )
 }

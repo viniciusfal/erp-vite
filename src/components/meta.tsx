@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { TrendingUp } from "lucide-react"
+import { TrendingUp } from 'lucide-react'
 import {
   Label,
   PolarGrid,
   PolarRadiusAxis,
   RadialBar,
   RadialBarChart,
-} from "recharts"
+} from 'recharts'
 
 import {
   Card,
@@ -16,23 +16,22 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { ChartConfig, ChartContainer } from "@/components/ui/chart"
+} from '@/components/ui/card'
+import { ChartConfig, ChartContainer } from '@/components/ui/chart'
 
-import { useListMeta } from "@/hooks/list-meta"
+import { useListMeta } from '@/hooks/list-meta'
 
 interface MetaProps {
   monthlyTotals: {
-    income: number;
-    outcome: number;
+    income: number
+    outcome: number
   }[]
   meta: number | undefined
 }
 
 export function Meta({ monthlyTotals, meta }: MetaProps) {
-
   const { mounthMeta } = useListMeta()
-  const currentDate = new Date();
+  const currentDate = new Date()
 
   meta = mounthMeta?.metaValue
   console.log(currentDate.getMonth())
@@ -41,19 +40,25 @@ export function Meta({ monthlyTotals, meta }: MetaProps) {
 
   const chartData = [
     {
-      browser: "safari",
+      browser: 'safari',
       incomes: month.income,
-      fill: "var(--color-safari)",
+      fill: 'var(--color-safari)',
     },
   ]
 
   const chartConfig = {
     incomes: {
-      label: "Entradas",
+      label: 'Entradas',
     },
     safari: {
-      label: "Safari",
-      color: progresso ? progresso < 50 ? "hsl(var(--chart-2))" : progresso >= 50 && progresso < 100 ? "hsl(var(--chart-4))" : "#10b981" : undefined,
+      label: 'Safari',
+      color: progresso
+        ? progresso < 50
+          ? 'hsl(var(--chart-2))'
+          : progresso >= 50 && progresso < 100
+            ? 'hsl(var(--chart-4))'
+            : '#10b981'
+        : undefined,
     },
   } satisfies ChartConfig
 
@@ -61,14 +66,16 @@ export function Meta({ monthlyTotals, meta }: MetaProps) {
   const endAngle = progresso && 90 + (360 * progresso) / 100
 
   return (
-    <Card className="flex flex-col mt-2">
+    <Card className="mt-2 flex flex-col">
       <CardHeader className="items-center">
         <CardTitle>Progresso da Meta Mensal</CardTitle>
-        <CardDescription>{mounthMeta && `Meta de ${new Intl.NumberFormat('pt-BR', {
-          style: "currency",
-          currency: "BRL",
-        }).format(mounthMeta.metaValue)}`}</CardDescription>
-
+        <CardDescription>
+          {mounthMeta &&
+            `Meta de ${new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }).format(mounthMeta.metaValue)}`}
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -93,12 +100,16 @@ export function Meta({ monthlyTotals, meta }: MetaProps) {
               dataKey="incomes"
               background
               cornerRadius={10}
-              fill={progresso && progresso >= 100 ? "var(--color-success)" : "var(--color-safari)"}
+              fill={
+                progresso && progresso >= 100
+                  ? 'var(--color-success)'
+                  : 'var(--color-safari)'
+              }
             />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                  if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
                     return (
                       <text
                         x={viewBox.cx}

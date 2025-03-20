@@ -1,61 +1,68 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Label, Pie, PieChart, Sector } from "recharts"
-import { PieSectorDataItem } from "recharts/types/polar/Pie"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import * as React from 'react'
+import { Label, Pie, PieChart, Sector } from 'recharts'
+import { PieSectorDataItem } from 'recharts/types/polar/Pie'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   ChartConfig,
   ChartContainer,
   ChartStyle,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { Button } from "@/components/ui/button"
-import { useListingTransactionByDate } from "@/hooks/listing-transactions-by-date"
-import { useDateRange } from "@/hooks/date-ranger-context"
-
+} from '@/components/ui/chart'
+import { Button } from '@/components/ui/button'
+import { useListingTransactionByDate } from '@/hooks/listing-transactions-by-date'
+import { useDateRange } from '@/hooks/date-ranger-context'
 
 export function IncomesPizza() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
-  const { currentTransactions } = useListingTransactionByDate(startDate, endDate, 'full')
+  const { currentTransactions } = useListingTransactionByDate(
+    startDate,
+    endDate,
+    'full',
+  )
   const [activeIndex, setActiveIndex] = React.useState(0)
-  const [hoveredCategory, setHoveredCategory] = React.useState<{ category: string; value: number } | null>(null)
+  const [hoveredCategory, setHoveredCategory] = React.useState<{
+    category: string
+    value: number
+  } | null>(null)
 
-  const id = "pie-interactive-carousel"
+  const id = 'pie-interactive-carousel'
 
   const generateColor = (index: number, isExpense: boolean) => {
-    const hue = isExpense ? (index * 40) % 360 : (index * 40 + 180) % 360;
-    const saturation = 60 + ((index * 10) % 30); // Saturação entre 60 e 90
-    const lightness = 50 + ((index * 15) % 30);  // Luminosidade entre 50 e 80
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-  };
+    const hue = isExpense ? (index * 40) % 360 : (index * 40 + 180) % 360
+    const saturation = 60 + ((index * 10) % 30) // Saturação entre 60 e 90
+    const lightness = 50 + ((index * 15) % 30) // Luminosidade entre 50 e 80
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`
+  }
 
   // Use useMemo para memorizar os dados processados e evitar recalculá-los em cada renderização
   const incomeData = React.useMemo(() => {
-    if (!currentTransactions) return [];
+    if (!currentTransactions) return []
 
     const processTransactions = (type: 'entrada' | 'saida') => {
-      const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : [];
+      const transactionsArray = Array.isArray(currentTransactions)
+        ? currentTransactions
+        : []
 
-      const transactions = transactionsArray?.reduce<Record<string, number>>((acc, transaction) => {
-        if (transaction && transaction.type === type) {
-          const category = transaction.category || 'Uncategorized'
-          if (!acc[category]) {
-            acc[category] = 0
-          }
-          acc[category] += +(transaction.value || 0)
-        }
-        return acc
-      }, {}) || {}
+      const transactions =
+        transactionsArray?.reduce<Record<string, number>>(
+          (acc, transaction) => {
+            if (transaction && transaction.type === type) {
+              const category = transaction.category || 'Uncategorized'
+              if (!acc[category]) {
+                acc[category] = 0
+              }
+              acc[category] += +(transaction.value || 0)
+            }
+            return acc
+          },
+          {},
+        ) || {}
 
       return Object.keys(transactions).map((category, index) => ({
         category,
@@ -65,24 +72,30 @@ export function IncomesPizza() {
     }
 
     return processTransactions('entrada')
-  }, [currentTransactions]); // Dependência para recalcular quando currentTransactions mudar
+  }, [currentTransactions]) // Dependência para recalcular quando currentTransactions mudar
 
   const expenseData = React.useMemo(() => {
-    if (!currentTransactions) return [];
+    if (!currentTransactions) return []
 
     const processTransactions = (type: 'entrada' | 'saida') => {
-      const transactionsArray = Array.isArray(currentTransactions) ? currentTransactions : [];
+      const transactionsArray = Array.isArray(currentTransactions)
+        ? currentTransactions
+        : []
 
-      const transactions = transactionsArray?.reduce<Record<string, number>>((acc, transaction) => {
-        if (transaction && transaction.type === type) {
-          const category = transaction.category || 'Uncategorized'
-          if (!acc[category]) {
-            acc[category] = 0
-          }
-          acc[category] += +(transaction.value || 0)
-        }
-        return acc
-      }, {}) || {}
+      const transactions =
+        transactionsArray?.reduce<Record<string, number>>(
+          (acc, transaction) => {
+            if (transaction && transaction.type === type) {
+              const category = transaction.category || 'Uncategorized'
+              if (!acc[category]) {
+                acc[category] = 0
+              }
+              acc[category] += +(transaction.value || 0)
+            }
+            return acc
+          },
+          {},
+        ) || {}
 
       return Object.keys(transactions).map((category, index) => ({
         category,
@@ -92,14 +105,14 @@ export function IncomesPizza() {
     }
 
     return processTransactions('saida')
-  }, [currentTransactions]); // Dependência para recalcular quando currentTransactions mudar
+  }, [currentTransactions]) // Dependência para recalcular quando currentTransactions mudar
 
   const chartConfig = {
     visitors: {
-      label: activeIndex === 0 ? "Entradas" : "Saídas",
+      label: activeIndex === 0 ? 'Entradas' : 'Saídas',
     },
     desktop: {
-      label: "Category",
+      label: 'Category',
     },
   } satisfies ChartConfig
 
@@ -110,7 +123,7 @@ export function IncomesPizza() {
     <Card data-chart={id} className="flex flex-col">
       <ChartStyle id={id} config={chartConfig} />
       <CardHeader className="flex-row items-center justify-between pb-2">
-        <CardTitle>{activeIndex === 0 ? "Entradas" : "Saídas"}</CardTitle>
+        <CardTitle>{activeIndex === 0 ? 'Entradas' : 'Saídas'}</CardTitle>
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="icon" onClick={handlePrevious}>
             <ChevronLeft className="h-4 w-4" />
@@ -143,7 +156,8 @@ export function IncomesPizza() {
                 ...props
               }: PieSectorDataItem) => (
                 <g>
-                  <Sector {...props}
+                  <Sector
+                    {...props}
                     outerRadius={outerRadius + 10}
                     onMouseEnter={() => {
                       setHoveredCategory({
@@ -162,7 +176,7 @@ export function IncomesPizza() {
             >
               <Label
                 content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                  if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
                     return (
                       <text
                         x={viewBox.cx}
@@ -173,7 +187,7 @@ export function IncomesPizza() {
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-lg  font-bold"
+                          className="fill-foreground text-lg font-bold"
                         >
                           {hoveredCategory ? hoveredCategory.category : ''}
                         </tspan>
@@ -182,11 +196,13 @@ export function IncomesPizza() {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          {hoveredCategory ? new Intl.NumberFormat('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL',
-                            maximumFractionDigits: 2
-                          }).format(hoveredCategory.value) : "0"}
+                          {hoveredCategory
+                            ? new Intl.NumberFormat('pt-BR', {
+                              style: 'currency',
+                              currency: 'BRL',
+                              maximumFractionDigits: 2,
+                            }).format(hoveredCategory.value)
+                            : '0'}
                         </tspan>
                       </text>
                     )

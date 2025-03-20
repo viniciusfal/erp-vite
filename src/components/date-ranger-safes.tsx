@@ -1,48 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import { format } from 'date-fns';
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { toast } from 'sonner';
-import "react-datepicker/dist/react-datepicker.css";
+import React, { useState, useEffect } from 'react'
+import DatePicker from 'react-datepicker'
+import { format } from 'date-fns'
+import { Button } from '@/components/ui/button'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { toast } from 'sonner'
+import 'react-datepicker/dist/react-datepicker.css'
 
 interface DateRangerSafeProps {
-  startDate?: Date | null;
-  endDate: Date | null;
-  setDateRange: React.Dispatch<React.SetStateAction<[Date | null, Date | null]>>;
+  startDate?: Date | null
+  endDate: Date | null
+  setDateRange: React.Dispatch<React.SetStateAction<[Date | null, Date | null]>>
 }
 
-export default function DateRangerSafe({ startDate, endDate, setDateRange }: DateRangerSafeProps) {
-  const [localStartDate, setLocalStartDate] = useState<Date | null>(startDate || null);
-  const [localEndDate, setLocalEndDate] = useState<Date | null>(endDate);
+export default function DateRangerSafe({
+  startDate,
+  endDate,
+  setDateRange,
+}: DateRangerSafeProps) {
+  const [localStartDate, setLocalStartDate] = useState<Date | null>(
+    startDate || null,
+  )
+  const [localEndDate, setLocalEndDate] = useState<Date | null>(endDate)
 
   useEffect(() => {
-    setLocalStartDate(startDate || null);
-    setLocalEndDate(endDate);
-  }, [startDate, endDate]);
+    setLocalStartDate(startDate || null)
+    setLocalEndDate(endDate)
+  }, [startDate, endDate])
 
   const handleSearch = () => {
     if (!localStartDate || !localEndDate) {
-      toast.error('Por favor, selecione ambas as datas inicial e final');
-      return;
+      toast.error('Por favor, selecione ambas as datas inicial e final')
+      return
     }
-    console.log("Datas selecionadas:", localStartDate, localEndDate); // Debug
-    setDateRange([localStartDate, localEndDate]); // Atualize o estado no componente pai
-  };
+    console.log('Datas selecionadas:', localStartDate, localEndDate) // Debug
+    setDateRange([localStartDate, localEndDate]) // Atualize o estado no componente pai
+  }
 
   return (
-    <div className='flex items-center gap-1'>
+    <div className="flex items-center gap-1">
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            variant={"outline"}
-            className={`justify-start text-left font-normal ${!localStartDate ? "text-muted-foreground" : ""}`}
+            variant={'outline'}
+            className={`justify-start text-left font-normal ${!localStartDate ? 'text-muted-foreground' : ''}`}
           >
-            {localStartDate && localEndDate ? (
-              `${format(localStartDate, 'PP')} - ${format(localEndDate, 'PP')}`
-            ) : (
-              "Selecione um intervalo de datas"
-            )}
+            {localStartDate && localEndDate
+              ? `${format(localStartDate, 'PP')} - ${format(localEndDate, 'PP')}`
+              : 'Selecione um intervalo de datas'}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -51,16 +59,20 @@ export default function DateRangerSafe({ startDate, endDate, setDateRange }: Dat
             startDate={localStartDate || undefined} // Passar diretamente
             endDate={localEndDate || undefined} // Passar diretamente
             onChange={(dates: [Date | null, Date | null]) => {
-              setLocalStartDate(dates[0]);
-              setLocalEndDate(dates[1]);
+              setLocalStartDate(dates[0])
+              setLocalEndDate(dates[1])
             }}
             inline
           />
         </PopoverContent>
       </Popover>
-      <Button onClick={handleSearch} disabled={!localStartDate || !localEndDate}>
+      <Button
+        onClick={handleSearch}
+        disabled={!localStartDate || !localEndDate}
+        className="dark:text-foreground"
+      >
         Buscar
       </Button>
     </div>
-  );
+  )
 }
