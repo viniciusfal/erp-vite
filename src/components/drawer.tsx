@@ -1,8 +1,8 @@
-import * as  React from "react"
-import { MinusIcon, PlusIcon } from "@radix-ui/react-icons"
-import { Bar, BarChart, ResponsiveContainer } from "recharts"
+import * as React from 'react'
+import { MinusIcon, PlusIcon } from '@radix-ui/react-icons'
+import { Bar, BarChart, ResponsiveContainer } from 'recharts'
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   Drawer,
   DrawerClose,
@@ -12,15 +12,15 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
-import { Input } from "./ui/input"
-import { useMutation } from "@tanstack/react-query"
-import { registerMeta } from "@/api/register-meta"
-import { toast } from "sonner"
-import { z } from "zod"
-import { setUpdatedMeta } from "@/api/set-meta"
-import { queryClient } from "@/lib/query-client"
-import { useListMeta } from "@/hooks/list-meta"
+} from '@/components/ui/drawer'
+import { Input } from './ui/input'
+import { useMutation } from '@tanstack/react-query'
+import { registerMeta } from '@/api/register-meta'
+import { toast } from 'sonner'
+import { z } from 'zod'
+import { setUpdatedMeta } from '@/api/set-meta'
+import { queryClient } from '@/lib/query-client'
+import { useListMeta } from '@/hooks/list-meta'
 
 interface DrawerMetaProps {
   setNewMeta: React.Dispatch<React.SetStateAction<number>>
@@ -37,7 +37,6 @@ const inMeta = z.object({
 
 type InMeta = z.infer<typeof inMeta>
 
-
 export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
   const { mounthMeta } = useListMeta()
   const [visible, setVisible] = React.useState(false)
@@ -48,10 +47,10 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
     mutationKey: ['meta'],
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['getMeta']
+        queryKey: ['getMeta'],
       })
       toast.success('meta registrada com sucesso')
-    }
+    },
   })
 
   const { mutateAsync: setNewUpdatedMeta } = useMutation({
@@ -59,17 +58,17 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
     mutationKey: ['setMeta'],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['getMeta'] }),
-        toast.success("Meta Atualizada com sucesso")
+        toast.success('Meta Atualizada com sucesso')
     },
     onError: () => {
-      toast.error("Não foi possível atualizar sua meta.")
-    }
+      toast.error('Não foi possível atualizar sua meta.')
+    },
   })
 
   const handleNewMeta = async (data: InMeta) => {
     try {
       await registerNewMeta({
-        metaValue: data.metaValue
+        metaValue: data.metaValue,
       })
       setNewMeta(metaValue)
       setVisible(false)
@@ -83,13 +82,13 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
     try {
       await setNewUpdatedMeta({
         id: data.id,
-        metaValue: metaValue,
-        month: data.month
+        metaValue,
+        month: data.month,
       })
       setVisible2(false)
     } catch (err) {
       console.log(err)
-      toast.error("Erro ao tentar atualizar a meta" + err)
+      toast.error('Erro ao tentar atualizar a meta' + err)
     }
   }
 
@@ -103,7 +102,7 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
     <div className="flex flex-1 justify-between">
       <Drawer open={visible} onOpenChange={setVisible}>
         <div className="">
-          <DrawerTrigger asChild >
+          <DrawerTrigger asChild>
             <Button>Criar Meta</Button>
           </DrawerTrigger>
         </div>
@@ -111,7 +110,9 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
           <div className="mx-auto w-full max-w-sm">
             <DrawerHeader>
               <DrawerTitle>Criar Meta</DrawerTitle>
-              <DrawerDescription>Insira a Meta desejada para esse mês.</DrawerDescription>
+              <DrawerDescription>
+                Insira a Meta desejada para esse mês.
+              </DrawerDescription>
             </DrawerHeader>
             <div className="p-4 pb-0">
               <div className="flex items-center justify-center space-x-2">
@@ -128,7 +129,7 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
                   <div className="text-7xl font-bold tracking-tighter">
                     {metaValue}
                     <Input
-                      className="text-sm text-muted-foreground "
+                      className="text-sm text-muted-foreground"
                       value={metaValue}
                       type="number"
                       min={0}
@@ -151,12 +152,12 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
               </div>
               <div className="mt-3 h-[120px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart >
+                  <BarChart>
                     <Bar
                       dataKey="meta"
                       style={
                         {
-                          fill: "hsl(var(--foreground))",
+                          fill: 'hsl(var(--foreground))',
                           opacity: 0.9,
                         } as React.CSSProperties
                       }
@@ -166,7 +167,9 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
               </div>
             </div>
             <DrawerFooter>
-              <Button onClick={() => handleNewMeta({ metaValue })}>Salvar</Button>
+              <Button onClick={() => handleNewMeta({ metaValue })}>
+                Salvar
+              </Button>
               <DrawerClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DrawerClose>
@@ -177,15 +180,17 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
 
       <Drawer open={visible2} onOpenChange={setVisible2}>
         <div className="">
-          <DrawerTrigger asChild >
-            <Button variant={"outline"}>Alterar Meta</Button>
+          <DrawerTrigger asChild>
+            <Button variant={'outline'}>Alterar Meta</Button>
           </DrawerTrigger>
         </div>
         <DrawerContent>
           <div className="mx-auto w-full max-w-sm">
             <DrawerHeader>
-              <DrawerTitle>Alterar a Meta</DrawerTitle>
-              <DrawerDescription>Altere a Meta desejada para esse mês.</DrawerDescription>
+              <DrawerTitle className="">Alterar a Meta</DrawerTitle>
+              <DrawerDescription>
+                Altere a Meta desejada para esse mês.
+              </DrawerDescription>
             </DrawerHeader>
             <div className="p-4 pb-0">
               <div className="flex items-center justify-center space-x-2">
@@ -202,9 +207,10 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
                   <div className="text-7xl font-bold tracking-tighter">
                     {metaValue}
                     <Input
-                      className="text-sm text-muted-foreground "
+                      className="text-sm text-muted-foreground"
                       value={metaValue}
                       type="number"
+                      step="0.1"
                       min={0}
                       onChange={(e) => setMetaValue(parseInt(e.target.value))}
                     />
@@ -225,12 +231,12 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
               </div>
               <div className="mt-3 h-[120px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart >
+                  <BarChart>
                     <Bar
                       dataKey="meta"
                       style={
                         {
-                          fill: "hsl(var(--foreground))",
+                          fill: 'hsl(var(--foreground))',
                           opacity: 0.9,
                         } as React.CSSProperties
                       }
@@ -239,8 +245,12 @@ export function DrawerMeta({ setNewMeta }: DrawerMetaProps) {
                 </ResponsiveContainer>
               </div>
             </div>
-            <DrawerFooter>
-              <Button onClick={() => mounthMeta && handleUpdateMeta(mounthMeta)}>Salvar</Button>
+            <DrawerFooter className="dark:text-foreground">
+              <Button
+                onClick={() => mounthMeta && handleUpdateMeta(mounthMeta)}
+              >
+                Salvar
+              </Button>
               <DrawerClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DrawerClose>

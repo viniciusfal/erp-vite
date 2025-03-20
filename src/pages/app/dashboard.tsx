@@ -25,7 +25,14 @@ import { useGetAnaliticsTransactions } from '@/hooks/get-analitics-transactions'
 import { useListingtransaction } from '@/hooks/listing-transactions'
 import { useListingTransactionByDate } from '@/hooks/listing-transactions-by-date'
 import { isSameDay } from 'date-fns'
-import { Asterisk, CircleMinus, CirclePlus, Download, Info } from 'lucide-react'
+import {
+  Asterisk,
+  CircleMinus,
+  CirclePlus,
+  DollarSign,
+  Download,
+  Info,
+} from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 
 export function Dashboard() {
@@ -140,18 +147,7 @@ export function Dashboard() {
                       Balanço
                       <Asterisk className="size-2.5 text-muted" />
                     </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted"
-                    >
-                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                    </svg>
+                    <DollarSign className="size-4" />
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-baseline gap-0.5 text-2xl font-bold">
@@ -177,8 +173,14 @@ export function Dashboard() {
                         </Tooltip>
                       </TooltipProvider>
 
-                      <p className="text-xs text-muted">
-                        {totalBalanceTransactions?.total_balance?.toFixed(0)}%
+                      <p className="text-xs text-muted dark:text-muted-foreground">
+                        {totalBalanceTransactions?.total_balance &&
+                          new Intl.NumberFormat('pt-BR', {
+                            style: 'percent',
+                            signDisplay: 'exceptZero',
+                          }).format(
+                            totalBalanceTransactions?.total_balance / 100,
+                          )}{' '}
                         do que o mês passado.
                       </p>
                     </div>
@@ -217,7 +219,13 @@ export function Dashboard() {
                           </Tooltip>
                         </TooltipProvider>
                         <p className="text-xs text-muted-foreground">
-                          {totalBalanceTransactions?.total_entries?.toFixed(0)}%
+                          {totalBalanceTransactions?.total_entries &&
+                            new Intl.NumberFormat('pt-BR', {
+                              style: 'percent',
+                              signDisplay: 'exceptZero',
+                            }).format(
+                              totalBalanceTransactions?.total_entries / 100,
+                            )}{' '}
                           do que o mês passado.
                         </p>
                       </div>
@@ -256,7 +264,13 @@ export function Dashboard() {
                         </Tooltip>
                       </TooltipProvider>
                       <p className="text-xs text-muted-foreground">
-                        {totalBalanceTransactions?.total_outcomes?.toFixed(0)}%
+                        {totalBalanceTransactions?.total_outcomes &&
+                          new Intl.NumberFormat('pt-BR', {
+                            style: 'percent',
+                            signDisplay: 'exceptZero',
+                          }).format(
+                            totalBalanceTransactions?.total_outcomes / 100,
+                          )}{' '}
                         do que o mês passado.
                       </p>
                     </div>

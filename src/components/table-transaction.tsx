@@ -200,6 +200,7 @@ export function TableTransaction({ setVisible }: TableProps) {
 
           setEditingId(null)
           setEditedData({})
+
         }
       } catch (err) {
         console.error('Erro ao atualizar transação:', err)
@@ -258,8 +259,11 @@ export function TableTransaction({ setVisible }: TableProps) {
     <div className="flex w-full flex-col rounded-2xl border border-muted bg-card px-4 py-5 shadow-md ">
       <div className="flex  justify-between">
         <strong className="flex items-baseline gap-0.5 text-xl font-medium dark:text-foreground">
-          Lista de transações
-          <Asterisk className="size-2.5 text-muted-foreground" />
+          <div className='flex items-center gap-0.5 '>
+            <ArrowLeftRight className='text-muted-foreground size-5' />
+            Lista de transações
+            <Asterisk className="size-2.5 text-muted-foreground" />
+          </div>
         </strong>
         <div className="flex gap-2">
           <Select onValueChange={setInputType}>
@@ -597,7 +601,7 @@ export function TableTransaction({ setVisible }: TableProps) {
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter className='dark:text-foreground'>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() =>
                               handleConfirmRemove({ id: t.transaction_id })

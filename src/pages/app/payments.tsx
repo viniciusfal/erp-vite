@@ -1,4 +1,4 @@
-import { Download, File, Wrench, X } from 'lucide-react'
+import { CalendarArrowUp, Download, File, Wrench, X } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import pdftest from '@/assets/pix.pdf'
 import {
@@ -39,11 +39,46 @@ import { toast } from 'sonner'
 import { Helmet } from 'react-helmet-async'
 import { DropSettings } from '@/components/drop-settings'
 import { PdfViewer } from '@/components/pdfviewer'
+import { Toast } from '@/components/ui/toast'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+
+import { removeTransaction } from '@/api/remove-transaction'
+import { z } from 'zod'
+
+const PaymentID = z.object({
+  id: z.string().uuid(),
+})
+
+type paymentId = z.infer<typeof PaymentID>
 
 export function Payments() {
   const [loadData, setLoadData] = useState(false)
   const [valuePaymentFilter, setValuePaymentFilter] = useState('unpaid')
   const [currentPage, setCurrentPage] = useState(1)
+
+  const { mutateAsync: payment } = useMutation({
+    mutationFn: removeTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['transactionsByDate'],
+        exact: false, // Se quiser invalidar todas as consultas que começam com 'transactions'
+      })
+      toast.warning('Transação Deletada com sucesso.')
+    },
+    onError: () => {
+      toast.error('Falha ao excluir transação.')
+    },
+  })
 
   const { mutateAsync: transaction } = useMutation({
     mutationFn: markPayment,
@@ -70,6 +105,8 @@ export function Payments() {
   const handleMarkAsPaid = async (id: string) => {
     try {
       await transaction({ id })
+
+      toast.success('A transação foi marcada como paga com sucesso!')
     } catch (err) {
       console.log(err)
     }
@@ -84,6 +121,17 @@ export function Payments() {
       ? payments.pay === true
       : payments.pay === false,
   )
+
+  const handleConfirmRemove = async (data: paymentId) => {
+    try {
+      await payment({
+        id: data.id,
+      })
+      console.log(data)
+    } catch (err) {
+      toast.error('Erro ao remover agendamento' + err)
+    }
+  }
   const pdfViewerMemo = useMemo(
     () => <PdfViewer pdfUrl={pdftest} pageNumber={1} />,
     [pdftest],
@@ -131,7 +179,10 @@ export function Payments() {
             <CardHeader className="">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-medium">
-                  Historico de Agendamentos
+                  <div className="flex items-center gap-0.5">
+                    <CalendarArrowUp className="size-5 text-muted-foreground" />
+                    Historico de Agendamentos
+                  </div>
                 </CardTitle>
                 <div className="flex gap-2">
                   <Select onValueChange={setValuePaymentFilter}>
@@ -209,12 +260,43 @@ export function Payments() {
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger className="">
-                                  <Button
-                                    className="rounded-full bg-red-400 text-white hover:bg-red-300 hover:text-white"
-                                    variant="outline"
-                                  >
-                                    <X className="size-3" />
-                                  </Button>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger>
+                                      <Button
+                                        className="rounded-full bg-red-400 text-white hover:bg-red-300 hover:text-white"
+                                        variant="outline"
+                                      >
+                                        <X className="size-3" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle className="dark:text-foreground">
+                                          Tem certeza que deseja excluir esse
+                                          agendamento?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Ao excluir esse agendamento, você
+                                          consequentemente excluirá essa
+                                          transação, não podendo mais acessa-la.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter className="dark:text-foreground">
+                                        <AlertDialogCancel>
+                                          Cancelar
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() =>
+                                            handleConfirmRemove({
+                                              id: t.transaction_id,
+                                            })
+                                          }
+                                        >
+                                          Excluir
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <p>Deletar</p>
@@ -289,7 +371,7 @@ export function Payments() {
                       <PaginationLink
                         key={index}
                         href="#"
-                        className={`rounded-full ${currentPage === index + 1 ? 'bg-gradient-to-tr from-slate-800 to-slate-950 text-white' : 'border bg-muted'}`}
+                        className={`mx-0.5 rounded-full ${currentPage === index + 1 ? 'bg-gradient-to-tr from-slate-800 to-slate-950 text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-foreground' : 'border bg-muted'}`}
                         onClick={(e) => {
                           e.preventDefault()
                           setCurrentPage(index + 1)

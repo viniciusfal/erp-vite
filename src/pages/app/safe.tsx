@@ -155,6 +155,8 @@ export default function Safe() {
           resp: editedSafe?.resp,
         })
         setEditingId(null)
+
+        toast.success('Recolhimento  registrado com sucesso!')
       } catch (err) {
         toast.error('Erro ao salvar alterações: ' + err)
       }
@@ -324,6 +326,7 @@ export default function Safe() {
                         {editingId === safe.id ? (
                           <Input
                             type="number"
+                            step="0.1"
                             value={safe.send_amount}
                             onChange={(e) =>
                               handleChange(
@@ -334,7 +337,10 @@ export default function Safe() {
                             }
                           />
                         ) : (
-                          `R$ ${safe.send_amount.toFixed(2)}`
+                          `${new Intl.NumberFormat('pt-br', {
+                            style: 'currency',
+                            currency: 'BRL',
+                          }).format(safe.send_amount)}`
                         )}
                       </TableCell>
                       <TableCell>
