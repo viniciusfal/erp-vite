@@ -98,6 +98,8 @@ interface TransactionProps {
   account: string
 }
 
+
+
 interface TableProps {
   setVisible: Dispatch<SetStateAction<boolean>>
 }
@@ -147,10 +149,20 @@ export function TableTransaction({ setVisible }: TableProps) {
       if (b.payment_date && a.payment_date) {
         return new Date(b.payment_date).getTime() - new Date(a.payment_date).getTime()
       }
+
+      if (!b.payment_date && b.payment_date) return 1
+      if (b.payment_date && !b.payment_date) return -1
+
+      return 0
     } else {
       if (b.payment_date && a.payment_date) {
         return new Date(a.payment_date).getTime() - new Date(b.payment_date).getTime();
       }
+
+      if (!b.payment_date && b.payment_date) return 1
+      if (b.payment_date && !b.payment_date) return -1
+
+      return 0
     }
   });
 
