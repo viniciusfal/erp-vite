@@ -142,7 +142,17 @@ export function Meta({ monthlyTotals, meta }: MetaProps) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          {`Progresso: R$${month.income} de R$${mounthMeta?.metaValue}`}
+          {`Progresso: ${new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            maximumFractionDigits: 0,
+          }).format(month.income)} de ${mounthMeta?.metaValue &&
+            new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+              maximumFractionDigits: 0,
+            }).format(mounthMeta?.metaValue)
+            }`}
           <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">

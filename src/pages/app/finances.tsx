@@ -35,8 +35,28 @@ import { queryClient } from '@/lib/query-client'
 import { toast } from 'sonner'
 import { useMutation } from '@tanstack/react-query'
 import { DropSettings } from '@/components/drop-settings'
+import { removeTransaction } from '@/api/remove-transaction'
+import { z } from 'zod'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { TopOutcome } from '@/components/top-outcome'
 
 const today = new Date()
+
+const PaymentID = z.object({
+  id: z.string().uuid(),
+})
+
+type paymentID = z.infer<typeof PaymentID>
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
@@ -51,6 +71,20 @@ export function Finances() {
     },
     onError: () => {
       toast.error('Erro ao tentar marcar como pago')
+    },
+  })
+
+  const { mutateAsync: payment } = useMutation({
+    mutationFn: removeTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['transactionsByDate'],
+        exact: false, // Se quiser invalidar todas as consultas que começam com 'transactions'
+      })
+      toast.warning('Transação Deletada com sucesso.')
+    },
+    onError: () => {
+      toast.error('Falha ao excluir transação.')
     },
   })
 
@@ -82,6 +116,17 @@ export function Finances() {
     }
   }
 
+  const handleConfirmRemove = async (data: paymentID) => {
+    try {
+      await payment({
+        id: data.id,
+      })
+      console.log(data)
+    } catch (err) {
+      toast.error('Erro ao remover agendamento' + err)
+    }
+  }
+
   return (
     <div className="min-h-screen">
       <div className="flex items-center justify-between">
@@ -107,7 +152,7 @@ export function Finances() {
       <div className="flex flex-col gap-2">
         <TableTransaction setVisible={setVisible} />
         <div className="flex h-1/3 gap-2">
-          <div className="flex w-full flex-col justify-between rounded-2xl border border-muted bg-card px-4 py-5 shadow-md">
+          <div className="flex w-full flex-col justify-between rounded-2xl border border-muted bg-card px-4 py-5 shadow">
             <div className="flex items-center justify-between">
               <h2 className="flex items-baseline gap-0.5 text-lg font-medium dark:text-white">
                 Ranking (Entradas)
@@ -135,8 +180,36 @@ export function Finances() {
 
             <TopIncome />
           </div>
+          <div className="flex w-full flex-col justify-between rounded-2xl border border-muted bg-card px-4 py-5 shadow">
+            <div className="flex items-center justify-between">
+              <h2 className="flex items-baseline gap-0.5 text-lg font-medium dark:text-white">
+                Ranking (Saidas)
+                <Asterisk className="size-2.5 text-muted-foreground" />
+              </h2>
+              <Select>
+                <SelectTrigger className="w-[100px] text-xs font-medium dark:text-white">
+                  <SelectValue placeholder="diario" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="diario" className="text-xs">
+                      diario
+                    </SelectItem>
+                    <SelectItem value="semanal" className="text-xs">
+                      semanal
+                    </SelectItem>
+                    <SelectItem value="mensal" className="text-xs">
+                      mes
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="flex w-full flex-col rounded-2xl border border-muted bg-card px-4 py-5 shadow-md">
+            <TopOutcome />
+          </div>
+
+          <div className="flex w-full flex-col rounded-2xl border border-muted bg-card px-4 py-5 shadow">
             <div className="flex justify-between">
               <h2 className="text-lg font-medium dark:text-white">
                 Proximos Agendamentos
@@ -204,12 +277,43 @@ export function Finances() {
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger className="">
-                                  <Button
-                                    className="rounded-full bg-red-400 text-white hover:bg-red-300 hover:text-white"
-                                    variant="outline"
-                                  >
-                                    <X className="size-3" />
-                                  </Button>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger>
+                                      <Button
+                                        className="rounded-full bg-red-400 text-white hover:bg-red-300 hover:text-white"
+                                        variant="outline"
+                                      >
+                                        <X className="size-3" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle className="dark:text-foreground">
+                                          Tem certeza que deseja excluir esse
+                                          agendamento?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Ao excluir esse agendamento, você
+                                          consequentemente excluirá essa
+                                          transação, não podendo mais acessa-la.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter className="dark:text-foreground">
+                                        <AlertDialogCancel>
+                                          Cancelar
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() =>
+                                            handleConfirmRemove({
+                                              id: payment.transaction_id,
+                                            })
+                                          }
+                                        >
+                                          Excluir
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <p>Deletar</p>

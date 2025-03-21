@@ -56,6 +56,7 @@ import {
   ListCollapse,
   Paperclip,
   Plus,
+  Search,
   Tag,
   Wrench,
   X,
@@ -77,6 +78,7 @@ import { CardInfoTransaction } from './card-Info-transaction'
 import Spinner from './spinner'
 import { Textarea } from './ui/textarea'
 import { categories } from '@/services/categories'
+import { Label } from './ui/label'
 
 interface TransactionProps {
   transaction_id: string
@@ -114,6 +116,14 @@ export function TableTransaction({ setVisible }: TableProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [inputType, setInputType] = useState('full')
   const [isOpen, setIsOpen] = useState(false)
+  const [filters, setFilters] = useState({
+    type: '',
+    category: '',
+    method: '',
+    account: '',
+    title: '',
+    orderBy: 'recent',
+  })
 
   const listCategories = categories();
   const { dateRange } = useDateRange()
@@ -121,6 +131,45 @@ export function TableTransaction({ setVisible }: TableProps) {
 
   const { currentTransactions, isLoading } =
     useListingTransactionByDate(startDate, endDate, inputType)
+
+  const filteredTransactions = currentTransactions.filter(transaction => {
+    return (
+      transaction.type.toLowerCase().includes(filters.type.toLowerCase()) &&
+      transaction.category.toLowerCase().includes(filters.category.toLowerCase()) &&
+      transaction.method.toLowerCase().includes(filters.method.toLowerCase()) &&
+      transaction.account.toLowerCase().includes(filters.account.toLowerCase()) &&
+      transaction.title.toLocaleLowerCase().includes(filters.title.toLocaleLowerCase())
+    );
+  });
+
+  const sortedTransactions = filteredTransactions.sort((a, b) => {
+    if (filters.orderBy === 'recent') {
+      if (b.payment_date && a.payment_date) {
+        return new Date(b.payment_date).getTime() - new Date(a.payment_date).getTime()
+      }
+    } else {
+      if (b.payment_date && a.payment_date) {
+        return new Date(a.payment_date).getTime() - new Date(b.payment_date).getTime();
+      }
+    }
+  });
+
+
+  const itemsPerPage = 15
+
+  const paginatedData = sortedTransactions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(sortedTransactions.length / itemsPerPage);
+
+  const handleFilterChange = (filterName: string, value: string) => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [filterName]: value,
+    }));
+  };
 
   const { mutateAsync: updateTransaction } = useMutation({
     mutationFn: setTransaction,
@@ -162,7 +211,6 @@ export function TableTransaction({ setVisible }: TableProps) {
       setEditedData({ ...editedData, [name]: value });
     }
   };
-
 
   const handleSave = async () => {
     if (editingId) {
@@ -209,17 +257,6 @@ export function TableTransaction({ setVisible }: TableProps) {
     }
   }
 
-  const itemsPerPage = 10
-
-  const paginatedData = currentTransactions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const totalPages = Math.ceil(currentTransactions.length / itemsPerPage);
-
-
-
   const { mutateAsync: transaction } = useMutation({
     mutationFn: removeTransaction,
     onSuccess: () => {
@@ -256,8 +293,8 @@ export function TableTransaction({ setVisible }: TableProps) {
     return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
   }
   return (
-    <div className="flex w-full flex-col rounded-2xl border border-muted bg-card px-4 py-5 shadow-md ">
-      <div className="flex  justify-between">
+    <div className="flex w-full flex-col rounded-2xl border border-muted bg-card px-4 py-5 shadow ">
+      <div className="flex  justify-between mb-1">
         <strong className="flex items-baseline gap-0.5 text-xl font-medium dark:text-foreground">
           <div className='flex items-center gap-0.5 '>
             <ArrowLeftRight className='text-muted-foreground size-5' />
@@ -265,10 +302,69 @@ export function TableTransaction({ setVisible }: TableProps) {
             <Asterisk className="size-2.5 text-muted-foreground" />
           </div>
         </strong>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
+          <div className=' flex items-center gap-1 '>
+            <Label className='text-sm  text-muted-foreground'>Descrição:</Label>
+            <div className='relative'>
+              <Input
+                value={filters.title}
+                onChange={(e) => handleFilterChange('title', e.target.value)}
+                className="w-28  h-8 rounded-full dark:border-muted-foreground"
+              />
+              <Search className='absolute right-3 top-[50%] -translate-y-1/2  text-muted-foreground size-4' />
+            </div>
+          </div>
+          <div className='flex gap-1 items-center'>
+            <Label className='text-sm text-muted-foreground'>Categoria:</Label>
+            <div className='relative'>
+              <Input
+                value={filters.category}
+                onChange={(e) => handleFilterChange('category', e.target.value)}
+                className="w-28 h-8 rounded-full dark:border-muted-foreground  relative"
+              />
+              <Search className='absolute right-2 top-[50%] -translate-y-1/2  size-4 text-muted-foreground  ' />
+            </div>
+          </div>
+          <div className='flex gap-1 items-center'>
+            <Label className='text-sm text-muted-foreground'>Metodo:</Label>
+            <div className='relative'>
+              <Input
+                value={filters.method}
+                onChange={(e) => handleFilterChange('method', e.target.value)}
+                className="w-28 h-8 rounded-full dark:border-muted-foreground "
+              />
+              <Search className='absolute right-2 top-[50%] -translate-y-1/2  size-4 text-muted-foreground  ' />
+            </div>
+          </div>
+
+          <div className='flex gap-1 items-center'>
+            <Label className='text-sm text-muted-foreground'>Conta:</Label>
+            <div className='relative'>
+              <Input
+                value={filters.account}
+                onChange={(e) => handleFilterChange('account', e.target.value)}
+                className="w-28 h-8 rounded-full dark:border-muted-foreground "
+              />
+
+              <Search className='absolute right-2 top-[50%] -translate-y-1/2  size-4 text-muted-foreground  ' />
+            </div>
+          </div>
+
+          <Select onValueChange={(value) => handleFilterChange('orderBy', value)}>
+            <SelectTrigger className="w-28 ml-2 text-sm rounded-full dark:border-muted-foreground  text-muted-foreground">
+              <SelectValue placeholder="Ordenar" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="recent">Mais recente</SelectItem>
+                <SelectItem value="old">Mais antigo</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
           <Select onValueChange={setInputType}>
-            <SelectTrigger className="w-[180px] text-foreground" value={inputType} >
-              <SelectValue placeholder="Filtrar por" />
+            <SelectTrigger className="w-[180px] text-muted-foreground border-muted-foreground" value={inputType} >
+              <SelectValue placeholder="Filtrar" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -292,74 +388,74 @@ export function TableTransaction({ setVisible }: TableProps) {
       {isLoading ? (
         <Spinner />
       ) : (
-        <Table className="my-6 dark:text-foreground">
-          <TableHeader className="text-xs bg-muted">
+        <Table className="my-6 dark:text-foreground table">
+          <TableHeader className="text-xs">
             <>
-              <TableRow className="">
-                <TableHead className="w-[50px]">
-                  <div className="flex items-center gap-1">
-                    <Eye className="size-3" />
+              <TableRow className="bg-gradient-to-r from-slate-800 to-slate-950 text-muted dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-foreground">
+                <TableHead className="w-[50px] py-6">
+                  <div className="flex items-center gap-1 text-white">
+                    <Eye className="size-3 text-muted-foreground" />
                     info
                   </div>
                 </TableHead>
                 <TableHead className="w-[300px]">
-                  <div className="flex items-center gap-1">
-                    <ListCollapse className="size-3" />
+                  <div className="flex items-center gap-1 text-white">
+                    <ListCollapse className="size-3 text-muted-foreground" />
                     Descrição
                   </div>
                 </TableHead>
                 <TableHead className="w-[300px]">
-                  <div className="flex items-center gap-1">
-                    <ListCollapse className="size-3" />
+                  <div className="flex items-center gap-1 text-white">
+                    <ListCollapse className="size-3 text-muted-foreground" />
                     Detalhamento
                   </div>
                 </TableHead>
                 <TableHead className="w-[150px]">
-                  <div className="flex items-center gap-1">
-                    <ListCollapse className="size-3" />
+                  <div className="flex items-center gap-1 text-white">
+                    <ListCollapse className="size-3 text-muted-foreground" />
                     NF
                   </div>
                 </TableHead>
                 <TableHead className="w-[180px]">
-                  <div className="flex items-center gap-1">
-                    <BadgeCent className="size-3" />
+                  <div className="flex items-center gap-1 text-white">
+                    <BadgeCent className="size-3 text-muted-foreground" />
                     Valor
                   </div>
                 </TableHead>
                 <TableHead className="w-[250px]">
-                  <div className="flex items-center gap-1">
-                    <Tag className="size-3" />
+                  <div className="flex items-center gap-1 text-white">
+                    <Tag className="size-3 text-muted-foreground" />
                     Categoria
                   </div>
                 </TableHead>
 
                 <TableHead className="w-[180px]">
-                  <div className="flex items-center gap-1">
-                    <CalendarDays className="size-3" />
+                  <div className="flex items-center gap-1 text-white">
+                    <CalendarDays className="size-3 text-muted-foreground" />
                     Pagamento
                   </div>
                 </TableHead>
                 <TableHead className="w-[180px]">
-                  <div className="flex items-center gap-1">
-                    <CreditCard className='size-3' />
+                  <div className="flex items-center gap-1 text-white">
+                    <CreditCard className='size-3 text-muted-foreground' />
                     Metodo
                   </div>
                 </TableHead>
                 <TableHead className="w-[180px]">
-                  <div className="flex items-center gap-1">
-                    <Landmark className='size-3' />
+                  <div className="flex items-center gap-1 text-white">
+                    <Landmark className='size-3 text-muted-foreground' />
                     C/ corrente
                   </div>
                 </TableHead>
                 <TableHead className="w-[180px]">
-                  <div className="flex items-center gap-1">
-                    <Paperclip className="size-3" />
+                  <div className="flex items-center gap-1 text-white">
+                    <Paperclip className="size-3 text-muted-foreground" />
                     Anexo
                   </div>
                 </TableHead>
                 <TableHead className="w-[100px]">
-                  <div className="item-center flex gap-1">
-                    <ArrowLeftRight className="size-3" />
+                  <div className="item-center flex gap-1 text-white">
+                    <ArrowLeftRight className="size-3 text-muted-foreground" />
                     Tipo
                   </div>
                 </TableHead>
@@ -369,10 +465,10 @@ export function TableTransaction({ setVisible }: TableProps) {
             </>
           </TableHeader>
           <TableBody className="text-xs">
-            {paginatedData?.map((t) => (
+            {paginatedData?.map((t, index) => (
               <TableRow
                 key={t.transaction_id}
-                className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''}`}
+                className={`border-muted ${editingId && editingId !== t.transaction_id ? 'opacity-50' : ''} ${index % 2 === 0 ? 'bg-card' : 'bg-muted'}`}
               >
                 <TableCell>
                   <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -388,7 +484,7 @@ export function TableTransaction({ setVisible }: TableProps) {
 
                     <DialogContent className="sm:max-w-[425px]">
                       <DialogHeader>
-                        <DialogTitle>Detalhes da Transação</DialogTitle>
+                        <DialogTitle className='text-foreground'>Detalhes da Transação</DialogTitle>
                         <DialogDescription>
                           Informações detalhadas sobre a transação selecionada.
                         </DialogDescription>

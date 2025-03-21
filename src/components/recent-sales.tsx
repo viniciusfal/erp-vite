@@ -65,7 +65,7 @@ export function RecentSales() {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className={`rounded-full p-2.5 text-${transaction.type === 'saida' ? 'red' : 'emerald'}-400 bg-muted hover:bg-${transaction.type === 'saida' ? 'red' : 'emerald'}-400 transition-colors hover:text-muted`}
+          className={`rounded-full p-2.5 ${transaction.type === 'saida' ? 'text-red-400' : 'text-emerald-400'} bg-muted ${transaction.type === 'saida' ? 'hover:bg-red-400' : 'hover:bg-emerald-400'} transition-colors hover:text-muted`}
           onClick={() => setSelectedTransaction(transaction)} // Atualiza a transação ao clicar
         >
           <ArrowRightLeft className="size-3" />

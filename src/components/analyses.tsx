@@ -83,8 +83,8 @@ export function Analyses() {
       ? 'alta'
       : 'baixa'
   const balancePercentage = totalBalanceTransactions
-    ? parseFloat(totalBalanceTransactions.total_balance?.toString()).toFixed(2)
-    : '0.00'
+    ? totalBalanceTransactions.total_balance
+    : 0.0
 
   return (
     <div>
@@ -132,7 +132,10 @@ export function Analyses() {
             </CardContent>
             <CardFooter className="flex-col items-start gap-2 text-sm">
               <div className="flex gap-2 font-medium leading-none">
-                Tendência de {trend} de {balancePercentage}%
+                Tendência de {trend} de{' '}
+                {new Intl.NumberFormat('pt-BR', {
+                  style: 'percent',
+                }).format(balancePercentage / 100)}
                 <TrendingUp className="h-4 w-4" />
               </div>
               <div className="leading-none text-muted-foreground">

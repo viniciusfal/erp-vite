@@ -133,10 +133,10 @@ export function Overview() {
           de{' '}
           {totalBalanceTransactions &&
             totalBalanceTransactions &&
-            parseFloat(
-              totalBalanceTransactions.total_balance?.toString(),
-            ).toFixed(2)}
-          % nesse mês
+            new Intl.NumberFormat('pt-BR', {
+              style: 'percent',
+            }).format(totalBalanceTransactions.total_balance / 100)}{' '}
+          nesse mês
           <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">

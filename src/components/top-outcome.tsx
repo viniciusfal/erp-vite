@@ -9,27 +9,27 @@ import {
 import { useListingTransactionByDate } from '@/hooks/listing-transactions-by-date'
 import { useDateRange } from '@/hooks/date-ranger-context'
 
-export const description = 'A bar chart'
+export const description = 'Grafico de Ranking de saidas'
 
 const chartConfig = {
   desktop: {
-    label: 'Entradas',
-    color: 'hsl(var(--chart-1))',
+    label: 'Saidas',
+    color: 'hsl(var(--destructive))',
   },
 } satisfies ChartConfig
 
-export function TopIncome() {
+export function TopOutcome() {
   const { dateRange } = useDateRange()
   const { startDate, endDate } = dateRange
   const { currentTransactions } = useListingTransactionByDate(
     startDate,
     endDate,
-    'entrada',
+    'saida',
   )
 
   // Agrupar e somar as entradas por categoria
   const totals = (currentTransactions || [])
-    .filter((transaction) => transaction.type === 'entrada')
+    .filter((transaction) => transaction.type === 'saida')
     .reduce(
       (acc, transaction) => {
         // Acumular o total por categoria
@@ -58,59 +58,6 @@ export function TopIncome() {
         barCategoryGap="0%"
         barSize={120}
       >
-        <defs>
-          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop
-              offset="0%"
-              style={{ stopColor: '#064e3b', stopOpacity: 1 }}
-            />
-            <stop
-              offset="100%"
-              style={{ stopColor: '#10b981', stopOpacity: 1 }}
-            />
-          </linearGradient>
-          <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop
-              offset="0%"
-              style={{ stopColor: '#059669', stopOpacity: 1 }}
-            />
-            <stop
-              offset="100%"
-              style={{ stopColor: '#99f6e4', stopOpacity: 1 }}
-            />
-          </linearGradient>
-          <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop
-              offset="0%"
-              style={{ stopColor: '#34d399', stopOpacity: 1 }}
-            />
-            <stop
-              offset="100%"
-              style={{ stopColor: '#ecfdf5', stopOpacity: 1 }}
-            />
-          </linearGradient>
-          <linearGradient id="grad4" x1="0%" y1="0%" x2="90%" y2="90%">
-            <stop
-              offset="0%"
-              style={{ stopColor: '#34d399', stopOpacity: 1 }}
-            />
-            <stop
-              offset="100%"
-              style={{ stopColor: '#ecfdf5', stopOpacity: 1 }}
-            />
-          </linearGradient>
-          <linearGradient id="grad5" x1="0%" y1="0%" x2="80%" y2="60%">
-            <stop
-              offset="0%"
-              style={{ stopColor: '#34d399', stopOpacity: 1 }}
-            />
-            <stop
-              offset="100%"
-              style={{ stopColor: '#ecfdf5', stopOpacity: 1 }}
-            />
-          </linearGradient>
-        </defs>
-
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="position"
