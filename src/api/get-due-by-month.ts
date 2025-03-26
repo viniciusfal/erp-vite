@@ -1,9 +1,5 @@
 import { api } from '@/lib/axios'
 
-interface GetTransactionRequest {
-  start_date: string
-  end_date: string
-}
 
 interface GetTransactionResponse {
   transaction_id: string
@@ -28,8 +24,8 @@ interface GetTransactionResponse {
   SupplierID: string
 }
 
-export async function getTransactionsByDate({ start_date, end_date }: GetTransactionRequest) {
-  const response = await api.get<GetTransactionResponse[]>(`/transaction/byDate/${start_date}/${end_date}`)
+export async function getTransactionDueByMonth() {
+  const response = await api.get<GetTransactionResponse[]>(`/transaction/byDate/due/current`)
 
-  return response.data
+  return response.data 
 }

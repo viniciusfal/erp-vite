@@ -104,7 +104,9 @@ export function IncomesPizza() {
       }))
     }
 
-    return processTransactions('saida')
+    const data = processTransactions('saida')
+
+    return data
   }, [currentTransactions]) // Dependência para recalcular quando currentTransactions mudar
 
   const chartConfig = {

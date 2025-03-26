@@ -195,6 +195,7 @@ export function Payments() {
                       <SelectItem value="paid">Pago</SelectItem>
                       <SelectItem value="unpaid">Não pago</SelectItem>
                     </SelectContent>
+                    x
                   </Select>
                 </div>
               </div>

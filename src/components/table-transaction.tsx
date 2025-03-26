@@ -79,6 +79,7 @@ import Spinner from './spinner'
 import { Textarea } from './ui/textarea'
 import { categories } from '@/services/categories'
 import { Label } from './ui/label'
+import { useDueByMonth } from '@/hooks/get-due-by-month'
 
 interface TransactionProps {
   transaction_id: string
@@ -98,8 +99,6 @@ interface TransactionProps {
   account: string
 }
 
-
-
 interface TableProps {
   setVisible: Dispatch<SetStateAction<boolean>>
 }
@@ -110,7 +109,7 @@ const TransactionID = z.object({
 
 type transactionID = z.infer<typeof TransactionID>
 
-export function TableTransaction({ setVisible }: TableProps) {
+export function TableTransaction({ setVisible, }: TableProps) {
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransactionProps | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -128,13 +127,11 @@ export function TableTransaction({ setVisible }: TableProps) {
   })
 
   const listCategories = categories();
-  const { dateRange } = useDateRange()
-  const { startDate, endDate } = dateRange
 
   const { currentTransactions, isLoading } =
-    useListingTransactionByDate(startDate, endDate, inputType)
+    useDueByMonth()
 
-  const filteredTransactions = currentTransactions.filter(transaction => {
+  const filteredTransactions = currentTransactions?.filter(transaction => {
     return (
       transaction.type.toLowerCase().includes(filters.type.toLowerCase()) &&
       transaction.category.toLowerCase().includes(filters.category.toLowerCase()) &&
@@ -144,7 +141,7 @@ export function TableTransaction({ setVisible }: TableProps) {
     );
   });
 
-  const sortedTransactions = filteredTransactions.sort((a, b) => {
+  const sortedTransactions = filteredTransactions?.sort((a, b) => {
     if (filters.orderBy === 'recent') {
       if (b.payment_date && a.payment_date) {
         return new Date(b.payment_date).getTime() - new Date(a.payment_date).getTime()
@@ -166,15 +163,14 @@ export function TableTransaction({ setVisible }: TableProps) {
     }
   });
 
-
   const itemsPerPage = 15
 
-  const paginatedData = sortedTransactions.slice(
+  const paginatedData = sortedTransactions?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const totalPages = Math.ceil(sortedTransactions.length / itemsPerPage);
+  const totalPages = sortedTransactions ? Math.ceil(sortedTransactions.length / itemsPerPage) : 1
 
   const handleFilterChange = (filterName: string, value: string) => {
     setFilters(prevFilters => ({
@@ -305,7 +301,7 @@ export function TableTransaction({ setVisible }: TableProps) {
     return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
   }
   return (
-    <div className="flex w-full flex-col rounded-2xl border border-muted bg-card px-4 py-5 shadow ">
+    <div className="flex w-full flex-col rounded-2xl border border-muted bg-card px-4 py-5 shado">
       <div className="flex  justify-between mb-1">
         <strong className="flex items-baseline gap-0.5 text-xl font-medium dark:text-foreground">
           <div className='flex items-center gap-0.5 '>
@@ -476,7 +472,7 @@ export function TableTransaction({ setVisible }: TableProps) {
               </TableRow>
             </>
           </TableHeader>
-          <TableBody className="text-xs">
+          <TableBody className="text-xs ">
             {paginatedData?.map((t, index) => (
               <TableRow
                 key={t.transaction_id}
@@ -638,7 +634,7 @@ export function TableTransaction({ setVisible }: TableProps) {
                       name="annex"
                       onChange={handleChange}
                     />
-                  ) : <a href={t.annex ? `https://erpnet.tech/api/${t.annex}` : "#"} target='_blank' download={false} rel="noopener noreferrer">
+                  ) : <a href={t.annex ? `https://erpnet.up.railway.app/api/${t.annex}` : "#"} target='_blank' download={false} rel="noopener noreferrer">
                     <File className="size-4 text-muted-foreground" />
                   </a>
                   }

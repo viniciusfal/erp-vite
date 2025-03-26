@@ -49,6 +49,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { TopOutcome } from '@/components/top-outcome'
+import { SelectLabel } from '@radix-ui/react-select'
 
 const today = new Date()
 
@@ -60,7 +61,18 @@ type paymentID = z.infer<typeof PaymentID>
 
 export function Finances() {
   const [visible, setVisible] = useState<boolean>(false)
+  const [filtering, setFiltering] = useState<string>("day")
   const { finalFilteredPayments } = useListingPaymentsNeverPag('unpaid')
+
+  const alterFilter = () => {
+    if (filtering === "day") {
+      setFiltering("day")
+    }
+
+    if (filtering === "month") {
+      setFiltering("month")
+    }
+  }
 
   const { mutateAsync: transaction } = useMutation({
     mutationFn: markPayment,
@@ -143,7 +155,20 @@ export function Finances() {
         </div>
 
         <div className="flex items-center gap-2">
-          <CalendarDateRangePicker />
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filtrar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Filtrar</SelectLabel>
+                <SelectItem value="day">Do dia</SelectItem>
+                <SelectItem value="month">Do mês</SelectItem>
+                <SelectItem value="seven">últimos 7 dias</SelectItem>
+                <SelectItem value="thirthy">últimos 30</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
 
           <DropSettings />
         </div>

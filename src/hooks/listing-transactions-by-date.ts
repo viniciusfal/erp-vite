@@ -17,6 +17,10 @@ interface Transaction {
   method: string
   nf: string | null
   account: string
+  status: string
+  Installment: Number
+  TotalInstallments: Number
+  SupplierID: string
 }
 
 export function useListingTransactionByDate(
