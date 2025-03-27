@@ -27,7 +27,7 @@ interface Transaction {
 
 export function useDueByThird() {
   const { data: currentTransactions, isLoading } = useQuery<Transaction[]>({
-    queryKey: ['transactionsByToday'],
+    queryKey: ['transactionsByThird'],
     queryFn: getDueByThirdTransaction,
   })
 

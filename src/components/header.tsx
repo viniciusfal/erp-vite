@@ -70,8 +70,8 @@ export function Header() {
                   <Link to="/">
                     <Button
                       className={`h-12 w-full rounded-full text-sm ${activeButton === '/'
-                          ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                          : 'bg-transparent'
+                        ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                        : 'bg-transparent'
                         }`}
                       variant="outline"
                       onClick={() => handleButtonClick('/')}
@@ -82,20 +82,20 @@ export function Header() {
                   <Link to="/finances">
                     <Button
                       className={`h-12 w-full rounded-full text-sm ${activeButton === '/finances'
-                          ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                          : 'bg-transparent'
+                        ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                        : 'bg-transparent'
                         }`}
                       variant="outline"
                       onClick={() => handleButtonClick('/finances')}
                     >
-                      Financeiro
+                      Contas a pagar
                     </Button>
                   </Link>
                   <Link to="/payments">
                     <Button
                       className={`h-12 w-full rounded-full text-sm ${activeButton === '/payments'
-                          ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                          : 'bg-transparent'
+                        ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                        : 'bg-transparent'
                         }`}
                       variant="outline"
                       onClick={() => handleButtonClick('/payments')}
@@ -105,8 +105,8 @@ export function Header() {
                   </Link>
                   <Button
                     className={`h-12 w-full rounded-full text-sm ${activeButton === '/safe'
-                        ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                        : 'bg-transparent'
+                      ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                      : 'bg-transparent'
                       }`}
                     variant="outline"
                     onClick={() => handleButtonClick('/safe')}
@@ -115,8 +115,8 @@ export function Header() {
                   </Button>
                   <Button
                     className={`h-12 w-full rounded-full text-sm ${activeButton === '/loan'
-                        ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                        : 'bg-transparent'
+                      ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                      : 'bg-transparent'
                       }`}
                     variant="outline"
                     onClick={() => handleButtonClick('/loan')}
@@ -125,8 +125,8 @@ export function Header() {
                   </Button>
                   <Button
                     className={`h-12 w-full rounded-full text-sm ${activeButton === '/banks'
-                        ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                        : 'bg-transparent'
+                      ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                      : 'bg-transparent'
                       }`}
                     variant="outline"
                     onClick={() => handleButtonClick('/banks')}
@@ -156,8 +156,8 @@ export function Header() {
           <Link to="/">
             <Button
               className={`h-12 w-32 rounded-full text-sm ${activeButton === '/'
-                  ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                  : 'bg-transparent dark:border-muted'
+                ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                : 'bg-transparent dark:border-muted'
                 }`}
               variant="outline"
               onClick={() => handleButtonClick('/')}
@@ -168,20 +168,20 @@ export function Header() {
           <Link to="/finances">
             <Button
               className={`h-12 w-32 rounded-full text-sm ${activeButton === '/finances'
-                  ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                  : 'bg-transparent'
+                ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                : 'bg-transparent'
                 }`}
               variant="outline"
               onClick={() => handleButtonClick('/finances')}
             >
-              Financeiro
+              Contas a pagar
             </Button>
           </Link>
           <Link to="/payments">
             <Button
               className={`h-12 w-32 rounded-full text-sm ${activeButton === '/payments'
-                  ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                  : 'bg-transparent'
+                ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                : 'bg-transparent'
                 }`}
               variant="outline"
               onClick={() => handleButtonClick('/payments')}
@@ -192,8 +192,8 @@ export function Header() {
           <Link to="/safe">
             <Button
               className={`h-12 w-32 rounded-full text-sm ${activeButton === '/safe'
-                  ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                  : 'bg-transparent'
+                ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                : 'bg-transparent'
                 }`}
               variant="outline"
               onClick={() => handleButtonClick('/safe')}
@@ -203,8 +203,8 @@ export function Header() {
           </Link>
           <Button
             className={`h-12 w-32 rounded-full text-xs ${activeButton === '/loan'
-                ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                : 'bg-transparent'
+              ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+              : 'bg-transparent'
               }`}
             variant="outline"
             onClick={() => handleButtonClick('/loan')}
@@ -213,8 +213,8 @@ export function Header() {
           </Button>{' '}
           <Button
             className={`h-12 w-32 rounded-full text-sm ${activeButton === '/banks'
-                ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                : 'bg-transparent'
+              ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+              : 'bg-transparent'
               }`}
             variant="outline"
             onClick={() => handleButtonClick('/banks')}

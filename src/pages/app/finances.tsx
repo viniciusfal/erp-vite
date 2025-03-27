@@ -1,5 +1,4 @@
 import { CardTransaction } from '@/components/card-transaction'
-import { CalendarDateRangePicker } from '@/components/date-ranger-picker'
 import { TableTransaction } from '@/components/table-transaction'
 import { TopIncome } from '@/components/top-income'
 import { Button } from '@/components/ui/button'
@@ -50,6 +49,10 @@ import {
 } from '@/components/ui/alert-dialog'
 import { TopOutcome } from '@/components/top-outcome'
 import { SelectLabel } from '@radix-ui/react-select'
+import { useDueByMonth } from '@/hooks/get-due-by-month'
+import { useDueBySeven } from '@/hooks/get-due-by-seven'
+import { useDueByThird } from '@/hooks/get-due-by-third'
+import { useDueByToday } from '@/hooks/get-due-by-today'
 
 const today = new Date()
 
@@ -64,16 +67,27 @@ export function Finances() {
   const [filtering, setFiltering] = useState<string>("day")
   const { finalFilteredPayments } = useListingPaymentsNeverPag('unpaid')
 
-  const alterFilter = () => {
-    if (filtering === "day") {
-      setFiltering("day")
-    }
+  const { currentTransactions: monthTransactions } = useDueByMonth()
+  const { currentTransactions: sevenTransactions } = useDueBySeven()
+  const { currentTransactions: thirtyTransactions } = useDueByThird()
+  const { currentTransactions: todayTransactions } = useDueByToday()
 
-    if (filtering === "month") {
-      setFiltering("month")
+  const getFilteredTransactions = () => {
+    switch (filtering) {
+      case "month":
+        return monthTransactions
+      case "seven":
+        return sevenTransactions
+      case "third":
+        return thirtyTransactions
+      case "day":
+        return todayTransactions
+      default:
+        return todayTransactions
     }
   }
 
+  const filteredTransactions = getFilteredTransactions()
   const { mutateAsync: transaction } = useMutation({
     mutationFn: markPayment,
     onSuccess: () => {
@@ -142,20 +156,20 @@ export function Finances() {
   return (
     <div className="min-h-screen">
       <div className="flex items-center justify-between">
-        <Helmet titleTemplate="Financeiro" />
+        <Helmet titleTemplate="Contas a Pagar" />
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
-            <h2 className="text-3xl text-slate-900 dark:text-foreground">
-              Financeiro
+            <h2 className="text-3xl text-slate-900 dark:text-foreground font-semibold">
+              Lançamento de Titulos(A pagar)
             </h2>
             <span className="mb-4 text-sm text-muted-foreground">
-              Registre as entradas e saidas financeiras.
+              Visualize e Lance seus titulos a pagar.
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <Select>
+          <Select onValueChange={(value) => setFiltering(value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filtrar por" />
             </SelectTrigger>
@@ -165,7 +179,7 @@ export function Finances() {
                 <SelectItem value="day">Do dia</SelectItem>
                 <SelectItem value="month">Do mês</SelectItem>
                 <SelectItem value="seven">últimos 7 dias</SelectItem>
-                <SelectItem value="thirthy">últimos 30</SelectItem>
+                <SelectItem value="third">últimos 30</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -175,7 +189,7 @@ export function Finances() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <TableTransaction setVisible={setVisible} />
+        <TableTransaction setVisible={setVisible} transactions={filteredTransactions} />
         <div className="flex h-1/3 gap-2">
           <div className="flex w-full flex-col justify-between rounded-2xl border border-muted bg-card px-4 py-5 shadow">
             <div className="flex items-center justify-between">

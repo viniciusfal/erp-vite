@@ -26,7 +26,6 @@ import { useListingtransaction } from '@/hooks/listing-transactions'
 import { useListingTransactionByDate } from '@/hooks/listing-transactions-by-date'
 import { isSameDay } from 'date-fns'
 import {
-  Asterisk,
   CircleMinus,
   CirclePlus,
   DollarSign,
@@ -83,7 +82,7 @@ export function Dashboard() {
       <div className="">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
-            <h2 className="text-3xl text-slate-900 dark:text-foreground">
+            <h2 className="text-3xl text-slate-900 dark:text-foreground font-semibold">
               Dashboard
             </h2>
             <span className="mb-4 text-sm text-muted-foreground">
@@ -145,7 +144,6 @@ export function Dashboard() {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="flex items-baseline gap-0.5 text-sm font-medium">
                       Balanço
-                      <Asterisk className="size-2.5 text-muted" />
                     </CardTitle>
                     <DollarSign className="size-4" />
                   </CardHeader>
@@ -189,8 +187,7 @@ export function Dashboard() {
                 <Card className="">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="flex items-baseline gap-0.5 text-sm font-medium">
-                      Entradas
-                      <Asterisk className="size-2.5 text-muted-foreground" />
+                      Receitas
                     </CardTitle>
                     <CirclePlus className="size-4 text-muted-foreground" />
                   </CardHeader>
@@ -235,8 +232,7 @@ export function Dashboard() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="flex items-baseline gap-0.5 text-sm font-medium">
-                      Saídas
-                      <Asterisk className="size-2.5 text-muted-foreground" />
+                      Despesas
                     </CardTitle>
                     <CircleMinus className="size-4 text-muted-foreground" />
                   </CardHeader>

@@ -25,7 +25,7 @@ interface GetTransactionResponse {
 }
 
 export async function getDueByThirdTransaction() {
-  const response = await api.get<GetTransactionResponse[]>(`/transaction/byDate/due/third`)
+  const response = await api.get<GetTransactionResponse[]>(`/transaction/byDate/due/lastThird`)
 
   return response.data 
 }
