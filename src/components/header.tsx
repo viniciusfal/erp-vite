@@ -1,10 +1,19 @@
 import { BellDot, ChartNoAxesCombined, ExternalLink, Menu } from 'lucide-react'
 import { Button } from './ui/button'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Input } from './ui/input'
 import { Link, useLocation } from 'react-router-dom'
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from './ui/sheet'
 import { ThemeToggle } from './theme/theme-toggle'
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from './ui/navigation-menu'
+import { cn } from '@/lib/utils'
 
 export function Header() {
   const location = useLocation()
@@ -33,7 +42,7 @@ export function Header() {
         </strong>
       </div>
       {responsive === 'tablet' ? (
-        <nav className="flex items-center gap-5">
+        <div className="flex items-center gap-5">
           <div className="flex items-center gap-3">
             <div>
               <Input type="search" placeholder="Pesquisar..." />
@@ -66,7 +75,7 @@ export function Header() {
                     ></Button>
                   </SheetClose>
                 </div>
-                <nav className="flex-grow space-y-4">
+                <div className="flex-grow space-y-4">
                   <Link to="/">
                     <Button
                       className={`h-12 w-full rounded-full text-sm ${activeButton === '/'
@@ -133,7 +142,7 @@ export function Header() {
                   >
                     Bancos
                   </Button>
-                </nav>
+                </div>
                 <a
                   href="https://glpiamazoniainter.com/glpi"
                   target="_blank"
@@ -150,9 +159,9 @@ export function Header() {
               </div>
             </SheetContent>
           </Sheet>
-        </nav>
+        </div>
       ) : (
-        <nav className="flex items-center gap-5">
+        <div className="flex items-center gap-5">
           <Link to="/">
             <Button
               className={`h-12 w-32 rounded-full text-sm ${activeButton === '/'
@@ -165,18 +174,51 @@ export function Header() {
               Dashboard
             </Button>
           </Link>
-          <Link to="/finances">
-            <Button
-              className={`h-12 w-32 rounded-full text-sm ${activeButton === '/finances'
-                ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
-                : 'bg-transparent'
-                }`}
-              variant="outline"
-              onClick={() => handleButtonClick('/finances')}
-            >
-              Contas a pagar
-            </Button>
-          </Link>
+
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <Button
+                  className={`h-12 w-32 rounded-full text-sm ${activeButton.startsWith('/finances')
+                    ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
+                    : 'bg-transparent'
+                    }`}
+                  variant="outline"
+                  onClick={() => handleButtonClick('/finances')}
+                >
+                  <NavigationMenuTrigger className="bg-transparent hover:bg-transparent">
+                    Contas a pagar
+                  </NavigationMenuTrigger>
+                </Button>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    <ListItem
+                      href="/finances"
+                      title="Lançamento de Títulos"
+                      onClick={() => handleButtonClick('/finances')}
+                    >
+                      Visualize e lance os títulos a pagar
+                    </ListItem>
+                    <ListItem
+                      href="/finances/low-by-due"
+                      title="Baixa de Títulos"
+                      onClick={() => handleButtonClick('/finances/payments')}
+                    >
+                      Visualize e dê baixa nos títulos a pagar em aberto
+                    </ListItem>
+                    <ListItem
+                      href="/finances/correction"
+                      title="Correção de Títulos"
+                      onClick={() => handleButtonClick('/finances/correction')}
+                    >
+                      Faça a correção dos títulos lançados e com baixa
+                    </ListItem>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+
           <Link to="/payments">
             <Button
               className={`h-12 w-32 rounded-full text-sm ${activeButton === '/payments'
@@ -209,8 +251,8 @@ export function Header() {
             variant="outline"
             onClick={() => handleButtonClick('/loan')}
           >
-            Emprestimos
-          </Button>{' '}
+            Empréstimos
+          </Button>
           <Button
             className={`h-12 w-32 rounded-full text-sm ${activeButton === '/banks'
               ? 'bg-gradient-to-r from-slate-950 to-slate-800 text-muted hover:text-white dark:bg-gradient-to-tr dark:from-emerald-700 dark:to-emerald-500 dark:text-white'
@@ -221,7 +263,7 @@ export function Header() {
           >
             Bancos
           </Button>
-        </nav>
+        </div>
       )}
       <div
         className={
@@ -241,3 +283,31 @@ export function Header() {
     </header>
   )
 }
+
+const ListItem = React.forwardRef<
+  React.ElementRef<'a'>,
+  React.ComponentPropsWithoutRef<'a'>
+>(({ className, title, children, href, onClick, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <Link
+          to={href || '#'}
+          ref={ref}
+          className={cn(
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            className
+          )}
+          onClick={onClick}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </Link>
+      </NavigationMenuLink>
+    </li>
+  )
+})
+ListItem.displayName = 'ListItem'

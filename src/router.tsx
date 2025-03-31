@@ -5,6 +5,7 @@ import { AppLayout } from './pages/layouts/app'
 import { Finances } from './pages/app/finances'
 import { Payments } from './pages/app/payments'
 import Safe from './pages/app/safe'
+import { LowByDue } from './pages/app/low'
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
       {
         path: 'finances',
         element: <Finances />,
+      },
+      {
+        path: 'finances/low-by-due',
+        element: <LowByDue />
       },
       {
         path: 'payments',
