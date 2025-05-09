@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { motion } from "framer-motion"
-import { useState, useEffect } from "react"
+import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 
 export default function Spinner() {
   const [currentColorIndex, setCurrentColorIndex] = useState(0)
   const colors = [
-    "border-emeral-500",
-    "border-secondary",
-    "border-accent",
-    "border-muted",
+    'border-emeral-500',
+    'border-secondary',
+    'border-accent',
+    'border-muted',
   ]
 
   useEffect(() => {
@@ -21,14 +21,14 @@ export default function Spinner() {
   }, [])
 
   return (
-    <div className="bg-background w-full min-h-screen flex items-center justify-center">
+    <div className="flex min-h-screen w-full items-center justify-center bg-background">
       <motion.div
-        className={`w-16 h-16 border-4 border-t-transparent rounded-full ${colors[currentColorIndex]}`}
+        className={`h-16 w-16 rounded-full border-4 border-t-transparent ${colors[currentColorIndex]}`}
         animate={{ rotate: 360 }}
         transition={{
           duration: 1,
           repeat: Infinity,
-          ease: "linear",
+          ease: 'linear',
         }}
       />
     </div>

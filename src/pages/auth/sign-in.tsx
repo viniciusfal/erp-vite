@@ -30,7 +30,7 @@ export function SignIn() {
 
       toast.success('Seja bem vindo!')
 
-      navigate('/dashboard')
+      navigate('/')
     } catch (err) {
       toast.error('Credenciais incorretas', {
         description: 'Tente novamente ou clique em esqueci minha senha.',
@@ -75,7 +75,7 @@ export function SignIn() {
               Entrar
             </Button>
             <a
-              href="#"
+              href=""
               className="text-end text-sm text-muted-foreground underline"
             >
               Esqueci minha senha

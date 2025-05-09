@@ -1,0 +1,463 @@
+import { useEffect, useMemo, useState } from 'react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../../components/ui/card'
+import { Download, Plus, ShieldCheck, Wrench, X } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../../components/ui/alert-dialog'
+import DateRangerSafe from '../../components/date-ranger-safes'
+import { Label } from '../../components/ui/label'
+import { useListingSafesByDate } from '@/hooks/listing-safes-by-date'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { useMutation } from '@tanstack/react-query'
+import { registerSafe } from '@/api/register-safe'
+import { queryClient } from '@/lib/query-client'
+import { toast } from 'sonner'
+import { setSafe } from '@/api/set-safe'
+import { inactiveSafe } from '@/api/inactive-safe'
+import { DropSettings } from '@/components/drop-settings'
+import { Helmet } from 'react-helmet-async'
+import { Textarea } from '@/components/ui/textarea'
+
+interface Safe {
+  id: string
+  send_date: Date
+  send_amount: number
+  active: boolean
+  code: string
+  resp?: string
+  details?: string
+}
+
+const inSafes = z.object({
+  send_date: z.string(),
+  send_amount: z.number(),
+  code: z.string(),
+  resp: z.string(),
+  details: z.string().nullable(),
+})
+
+type InSafes = z.infer<typeof inSafes>
+
+export default function Safe() {
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ])
+  const [startDate, endDate] = dateRange
+  const safes = useListingSafesByDate(startDate, endDate).data as Safe[] | null
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editableSafes, setEditableSafes] = useState(safes || [])
+  const { handleSubmit, register } = useForm<InSafes>()
+
+  const { mutateAsync: safe } = useMutation({
+    mutationFn: registerSafe,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['safesByDate'] })
+      toast.success('Informação Registrada no cofre')
+    },
+    onError: () => {
+      toast.error('Erro no preenchimento das informações')
+    },
+  })
+
+  const { mutateAsync: newSafe } = useMutation({
+    mutationFn: setSafe,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['safesByDate'] })
+      toast.success('Informação alterada com sucesso.')
+    },
+    onError: () => {
+      toast.error('Não foi possível alterar as informações')
+    },
+  })
+
+  const { mutateAsync: isActiveSafe } = useMutation({
+    mutationFn: inactiveSafe,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['safesByDate'] })
+    },
+    onError: () => {
+      toast.error('Não foi possível remover essa informação do cofre.')
+    },
+  })
+
+  const handleSafe = async (data: InSafes) => {
+    try {
+      await safe({
+        send_date: new Date(data.send_date),
+        send_amount: parseFloat(data.send_amount.toString()),
+        code: Math.floor(100 + Math.random() * 900).toString() + '-' + 'A',
+        details: data.details?.toString(),
+        resp: data.resp.toString(),
+      })
+    } catch (err) {
+      toast.error('Erro ao tentar salvar: ' + err)
+    }
+  }
+
+  const handleEdit = (id: string) => {
+    setEditingId(id)
+  }
+
+  const handleChange = (
+    id: string,
+    field: 'send_date' | 'send_amount' | 'resp' | 'details',
+    value: string | number,
+  ) => {
+    setEditableSafes((prevSafes) =>
+      prevSafes.map((safe) =>
+        safe.id === id
+          ? {
+            ...safe,
+            [field]:
+              field === 'send_amount' ? parseFloat(value.toString()) : value, // Para send_date, o valor já é uma string
+          }
+          : safe,
+      ),
+    )
+  }
+
+  const handleSave = async (id: string) => {
+    const editedSafe = editableSafes.find((safe) => safe.id === id)
+    if (editedSafe) {
+      try {
+        await newSafe({
+          id: editedSafe.id,
+          send_date: new Date(editedSafe.send_date).toISOString(),
+          send_amount: editedSafe.send_amount,
+          details: editedSafe?.details,
+          resp: editedSafe?.resp,
+        })
+        setEditingId(null)
+
+        toast.success('Recolhimento  registrado com sucesso!')
+      } catch (err) {
+        toast.error('Erro ao salvar alterações: ' + err)
+      }
+    }
+  }
+
+  const handleInactive = async (data: Safe) => {
+    try {
+      await isActiveSafe({
+        id: data.id,
+        active: false,
+      })
+    } catch (err) {
+      toast.error('Erro ao tentar remover: ' + err)
+    }
+  }
+
+  const filteredSafes = useMemo(() => {
+    return safes?.filter((s) => s.active === true)
+  }, [safes])
+
+  useEffect(() => {
+    if (safes) {
+      setEditableSafes(safes)
+    }
+  }, [safes])
+
+  const formatDate = (dateString: Date) => {
+    const date = new Date(dateString)
+
+    // Extraindo dia, mês e ano da data
+    const day = String(date.getUTCDate()).padStart(2, '0') // Garantir que o dia tenha dois dígitos
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0') // O mês começa de 0, então somamos 1
+    const year = date.getUTCFullYear() // Pega o ano
+
+    return `${day}/${month}/${year}` // Retorna a data no formato "dd/MM/yyyy"
+  }
+
+  const total = useMemo(() => {
+    return filteredSafes?.reduce((acc, safe) => acc + safe.send_amount, 0)
+  }, [filteredSafes])
+
+  return (
+    <div className="">
+      <div className="flex items-center justify-between">
+        <Helmet titleTemplate="Cofre" />
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-3xl text-slate-900 dark:text-foreground">
+              Cofre
+            </h2>
+            <span className="mb-4 text-sm text-muted-foreground">
+              Informe e gerencie os recolhimentos do cofre.
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={'outline'}
+            className="flex items-center gap-2 rounded-full text-muted-foreground"
+          >
+            <Download className="size-5" />
+            Exportar Dados
+          </Button>
+
+          <DropSettings />
+        </div>
+      </div>
+      <div className="content">
+        <Card>
+          <CardHeader className="mb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-0.5">
+                <ShieldCheck className="text-muted-foreground" />
+                <CardTitle className="text-xl font-medium">
+                  Recolhimento(s)
+                </CardTitle>
+              </div>
+              <div className="flex gap-2">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="transition-all dark:hover:text-foreground">
+                      <Plus className="size-4 dark:text-foreground" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="w-1/2 dark:text-foreground max-lg:w-1/3 max-sm:w-full">
+                    <CardContent>
+                      <form onSubmit={handleSubmit(handleSafe)}>
+                        <CardHeader className="px-0">
+                          <CardTitle className="text-xl">
+                            Registrar Cofre
+                          </CardTitle>
+                          <CardDescription>
+                            Insira os dados do recolhimento ao cofre.
+                          </CardDescription>
+                        </CardHeader>
+
+                        <div className="mb-2">
+                          <Label className="">Data de envio:</Label>
+                          <Input
+                            type="date"
+                            className="w-1/2"
+                            {...register('send_date')}
+                            required
+                          />
+                        </div>
+                        <div className="mb-2">
+                          <Label>Valor Enviado:</Label>
+                          <Input
+                            type="number"
+                            className="-webkit-appearance: none"
+                            {...register('send_amount')}
+                            required
+                          />
+                        </div>
+                        <div className="mb-2">
+                          <Label>Responsavel pelo envio</Label>
+                          <Input type="text" {...register('resp')} />
+                        </div>
+                        <div>
+                          <Label>Detalhamento</Label>
+                          <Textarea
+                            className="h-20 w-full resize-none"
+                            {...register('details')}
+                          />
+                        </div>
+
+                        <CardFooter className="mt-8 flex justify-between px-0">
+                          <AlertDialogCancel asChild>
+                            <Button variant="outline">Cancelar</Button>
+                          </AlertDialogCancel>
+                          <AlertDialogAction>
+                            <Button type="submit">Salvar</Button>
+                          </AlertDialogAction>
+                        </CardFooter>
+                      </form>
+                    </CardContent>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <DateRangerSafe
+                  startDate={startDate}
+                  endDate={endDate}
+                  setDateRange={setDateRange}
+                />
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            <Table>
+              <TableHeader className="bg-muted text-xs">
+                <TableRow>
+                  <TableHead>Codigo</TableHead>
+                  <TableHead>Valor enviado</TableHead>
+                  <TableHead>Data de envio</TableHead>
+                  <TableHead>Resp.envio</TableHead>
+                  <TableHead>Detalhamento</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="text-xs">
+                {filteredSafes?.map((safe) => (
+                  <>
+                    <TableRow key={safe.id}>
+                      <TableCell>{safe.code}</TableCell>
+                      <TableCell>
+                        {editingId === safe.id ? (
+                          <Input
+                            type="number"
+                            step="0.1"
+                            value={safe.send_amount}
+                            onChange={(e) =>
+                              handleChange(
+                                safe.id,
+                                'send_amount',
+                                e.target.value,
+                              )
+                            }
+                          />
+                        ) : (
+                          `${new Intl.NumberFormat('pt-br', {
+                            style: 'currency',
+                            currency: 'BRL',
+                          }).format(safe.send_amount)}`
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingId === safe.id ? (
+                          <Input
+                            type="date"
+                            value={
+                              safe.send_date
+                                ? new Date(safe.send_date)
+                                  .toISOString()
+                                  .split('T')[0]
+                                : ''
+                            }
+                            onChange={(e) =>
+                              handleChange(safe.id, 'send_date', e.target.value)
+                            }
+                          />
+                        ) : safe.send_date ? (
+                          formatDate(safe.send_date)
+                        ) : (
+                          'Sem data'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingId === safe.id ? (
+                          <Input {...register('resp')} value={safe.resp} />
+                        ) : (
+                          safe.resp
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingId === safe.id ? (
+                          <Textarea
+                            className="resize-none"
+                            onChange={(e) =>
+                              handleChange(safe.id, 'details', e.target.value)
+                            }
+                            defaultValue={safe.details}
+                          />
+                        ) : (
+                          safe.details
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingId === safe.id ? (
+                          <div className="flex gap-2">
+                            <Button onClick={() => handleSave(safe.id)}>
+                              Salvar
+                            </Button>
+                            <Button
+                              onClick={() => setEditingId(null)}
+                              variant="outline"
+                            >
+                              Cancelar
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-4">
+                            <Button
+                              onClick={() => handleEdit(safe.id)}
+                              variant="ghost"
+                            >
+                              <Wrench className="size-4 text-muted-foreground" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger>
+                                <Button
+                                  variant="ghost"
+                                  className="text-red-400 hover:bg-red-400 hover:text-white"
+                                >
+                                  <X className="size-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="dark:text-foreground">
+                                    Tem certeza que deseja desativar esta
+                                    informação do cofre?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Esta ação irá desativar a informação,
+                                    removendo-a da visualização.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="dark:text-foreground">
+                                  <AlertDialogCancel>
+                                    Cancelar
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleInactive(safe)}
+                                  >
+                                    Remover
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  </>
+                ))}
+                <TableRow>
+                  <TableCell className="text-muted-foreground">Total</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {total &&
+                      new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      }).format(total)}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}

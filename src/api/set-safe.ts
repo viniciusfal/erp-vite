@@ -5,6 +5,9 @@ interface SetSafeRequest {
   send_date: string
   send_amount: number
   active?: boolean 
+  code?: string
+  resp?: string
+  details?: string
 }
 
 export async function setSafe(data: SetSafeRequest) {
